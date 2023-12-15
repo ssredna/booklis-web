@@ -10,3 +10,5 @@
   <p>Not signed in.</p>
   <button on:click={() => signIn('google')}>Sign in</button>
 {/if}
+
+<a href="/home">Home</a>
