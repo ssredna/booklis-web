@@ -1,13 +1,20 @@
-<script lang="ts">
-	import { onMount } from "svelte";
-
-  let modal: HTMLDialogElement;
-
-  onMount(() => {
-    modal.showModal();
-  })
+<script>
+	import Modal from './Modal.svelte';
 </script>
 
-<dialog bind:this={modal} on:close>
-  <h1>Lag et nytt mål</h1>
-</dialog>
+<Modal on:close>
+	<h1>Lag et nytt mål</h1>
+	<form method="post" action="home?/createGoal">
+		<label>
+			Hvor mange bøker vil du lese?
+			<input type="number" name="numberOfBooks" min="0" required />
+		</label>
+		<br />
+		<label>
+			Til når vil du nå målet ditt?
+			<input type="date" name="date" required />
+		</label>
+		<br />
+		<input type="submit" />
+	</form>
+</Modal>

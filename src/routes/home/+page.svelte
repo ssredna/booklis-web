@@ -1,13 +1,11 @@
 <script lang="ts">
-	import CreateGoalModal from "$lib/components/CreateGoalModal.svelte";
+	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 
-  let showCreateGoalModal = false;
+	let showCreateGoalModal = false;
 </script>
 
-<button on:click={() => showCreateGoalModal = true}>
-  Lag et nytt mål
-</button>
+<button on:click={() => (showCreateGoalModal = true)}> Lag et nytt mål </button>
 
 {#if showCreateGoalModal}
-  <CreateGoalModal on:close={() => showCreateGoalModal = false} />
+	<CreateGoalModal on:close={() => (showCreateGoalModal = false)} />
 {/if}
