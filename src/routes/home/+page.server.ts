@@ -1,6 +1,16 @@
-import { createGoal } from '$lib/firebase/firestore.js';
-import { fail } from '@sveltejs/kit';
+import { createGoal, getGoals } from '$lib/firebase/firestore.js';
+import { fail, error } from '@sveltejs/kit';
 import { z } from 'zod';
+
+export const load = async () => {
+	try {
+		return {
+			goals: await getGoals()
+		};
+	} catch (e) {
+		error(400, e instanceof Error ? e.message : 'Unknown error');
+	}
+};
 
 export const actions = {
 	createGoal: async ({ request }) => {
