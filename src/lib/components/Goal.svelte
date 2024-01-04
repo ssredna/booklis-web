@@ -11,7 +11,16 @@
 
 <div class="container">
 	<h1>{numberOfBooks} bøker til {deadlineDate.toDateString()}</h1>
-	<form method="post" action="?/deleteGoal" use:enhance>
+	<form
+		method="post"
+		action="?/deleteGoal"
+		use:enhance={({ cancel }) => {
+			const conformed = confirm('Er du sikker?');
+			if (!conformed) {
+				cancel();
+			}
+		}}
+	>
 		<input type="hidden" name="id" value={id} />
 		<input type="submit" value="Slett" />
 		{#if $page.form?.idError}
