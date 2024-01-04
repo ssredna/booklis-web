@@ -1,13 +1,13 @@
-import { differenceInDays, isSameDay, startOfYear } from 'date-fns';
-import { z } from 'zod';
+import { differenceInDays, isSameDay } from 'date-fns';
 import { ActiveBook } from './activeBook';
 import { Book } from './book';
 import { ReadBook } from './readBook';
 
 export class ReadingGoal {
+	id;
 	deadline;
 	numberOfBooks;
-	avgPageCount = 350;
+	avgPageCount;
 
 	activeBooks: ActiveBook[] = [];
 	readBooks: ReadBook[] = [];
@@ -15,11 +15,11 @@ export class ReadingGoal {
 	todaysDate = new Date();
 	private _pagesReadToday = 0;
 
-	constructor(numberOfBooks: number, deadline?: Date) {
-		this.deadline = deadline ?? startOfYear(new Date().setFullYear(new Date().getFullYear() + 1));
-		z.date().parse(this.deadline);
-
+	constructor(id: string, numberOfBooks: number, deadline: string, avgPageCount: number) {
+		this.id = id;
+		this.deadline = new Date(deadline);
 		this.numberOfBooks = numberOfBooks;
+		this.avgPageCount = avgPageCount;
 	}
 
 	get pagesReadToday() {
