@@ -1,10 +1,11 @@
 import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
-export async function createGoal(numberOfBooks: number, deadline: Date) {
+export async function createGoal(numberOfBooks: number, deadline: Date, avgPageCount: number) {
 	const docRef = await addDoc(collection(db, 'goals'), {
 		numberOfBooks: numberOfBooks,
-		deadline: deadline
+		deadline: deadline,
+		avgPageCount: avgPageCount
 	});
 	return docRef.id;
 }

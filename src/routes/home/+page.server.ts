@@ -5,6 +5,7 @@ import { z } from 'zod';
 const numberOfBooksSchema = z.coerce.number().min(1);
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
+const avgPageCountSchema = z.coerce.number().min(1);
 
 export const load = async () => {
 	try {
@@ -22,6 +23,7 @@ export const actions = {
 
 		const numberOfBooks = data.get('numberOfBooks');
 		const deadline = data.get('deadline');
+		const avgPageCount = data.get('avgPageCount');
 
 		const parsedNumberOfBooks = numberOfBooksSchema.safeParse(numberOfBooks);
 		if (!parsedNumberOfBooks.success) {
@@ -37,8 +39,19 @@ export const actions = {
 			});
 		}
 
+		const parsedAvgPageCount = avgPageCountSchema.safeParse(avgPageCount);
+		if (!parsedAvgPageCount.success) {
+			return fail(422, {
+				avgPageCountError: true
+			});
+		}
+
 		try {
-			return await createGoal(parsedNumberOfBooks.data, parsedDeadline.data);
+			return await createGoal(
+				parsedNumberOfBooks.data,
+				parsedDeadline.data,
+				parsedAvgPageCount.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
