@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs } from 'firebase/firestore';
+import { addDoc, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from './firebase';
 
 export async function createGoal(numberOfBooks: number, deadline: Date) {
@@ -17,4 +17,8 @@ export async function getGoals() {
 		deadline: doc.data().deadline.toDate().toString() as string
 	}));
 	return goals;
+}
+
+export async function deleteGoal(id: string) {
+	await deleteDoc(doc(db, 'goals', id));
 }

@@ -1,4 +1,4 @@
-import { createGoal, getGoals } from '$lib/firebase/firestore.js';
+import { createGoal, deleteGoal, getGoals } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -38,6 +38,27 @@ export const actions = {
 
 		try {
 			return await createGoal(parsedNumberOfBooks.data, parsedDeadline.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	deleteGoal: async ({ request }) => {
+		const data = await request.formData();
+		const id = data.get('id');
+
+		const idSchema = z.string();
+		const parsedId = idSchema.safeParse(id);
+		if (!parsedId.success) {
+			return fail(422, {
+				idError: true
+			});
+		}
+
+		try {
+			return await deleteGoal(parsedId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
