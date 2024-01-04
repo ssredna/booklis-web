@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import dateFormat from 'dateformat';
 
-	export let id: string;
-	export let numberOfBooks: number;
-	export let deadline: string;
-	export let avgPageCount: number;
+	export let goal: ReadingGoal;
 
-	$: deadlineDate = new Date(deadline);
-	$: dateString = dateFormat(deadlineDate, 'yyyy-mm-dd');
+	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 
 	let isEditing = false;
 	let isFormSubmitting = false;
@@ -17,7 +14,7 @@
 
 <div class="container">
 	{#if !isEditing}
-		<h1>{numberOfBooks} bøker til {deadlineDate.toDateString()}</h1>
+		<h1>{goal.numberOfBooks} bøker til {goal.deadline.toDateString()}</h1>
 		<button on:click={() => (isEditing = true)}>Endre</button>
 		<form
 			method="post"
@@ -29,14 +26,14 @@
 				}
 			}}
 		>
-			<input type="hidden" name="id" value={id} />
+			<input type="hidden" name="id" value={goal.id} />
 			<input type="submit" value="Slett" />
 			{#if $page.form?.idError}
 				<p>Klarte ikke å slette, prøv igjen</p>
 			{/if}
 		</form>
 	{:else}
-		<h1>Endre målet {numberOfBooks} bøker til {deadlineDate.toDateString()}</h1>
+		<h1>Endre målet {goal.numberOfBooks} bøker til {goal.deadline.toDateString()}</h1>
 		<form
 			method="post"
 			action="?/editGoal"
@@ -54,7 +51,7 @@
 		>
 			<label>
 				Hvor mange bøker vil du lese?
-				<input value={numberOfBooks} type="number" name="numberOfBooks" min="1" required />
+				<input value={goal.numberOfBooks} type="number" name="numberOfBooks" min="1" required />
 			</label>
 			{#if $page.form?.numberOfBooksError}
 				<p>Er du sikker på at du har oppgitt et gyldig antall bøker?</p>
@@ -76,7 +73,7 @@
 				<p>Lagrer...</p>
 			{/if}
 
-			<input type="hidden" name="id" value={id} />
+			<input type="hidden" name="id" value={goal.id} />
 			<input type="submit" />
 			<button on:click={() => (isEditing = false)}>Avbryt</button>
 		</form>
