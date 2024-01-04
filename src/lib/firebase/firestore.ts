@@ -14,7 +14,8 @@ export async function getGoals() {
 	const goals = querySnapshot.docs.map((doc) => ({
 		id: doc.id,
 		numberOfBooks: doc.data().numberOfBooks as number,
-		deadline: doc.data().deadline.toDate().toString() as string
+		deadline: doc.data().deadline.toDate().toString() as string,
+		avgPageCount: doc.data().avgPageCount as number
 	}));
 	return goals;
 }

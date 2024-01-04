@@ -3,9 +3,10 @@
 	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
 
+	export let id: string;
 	export let numberOfBooks: number;
 	export let deadline: string;
-	export let id: string;
+	export let avgPageCount: number;
 
 	$: deadlineDate = new Date(deadline);
 	$: dateString = dateFormat(deadlineDate, 'yyyy-mm-dd');

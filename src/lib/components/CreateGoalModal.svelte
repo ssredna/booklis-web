@@ -46,6 +46,8 @@
 			<br />
 		{/if}
 
+		<input type="hidden" name="avgPageCount" value="350" />
+
 		{#if isFormSubmitting}
 			<p>Lagrer...</p>
 		{/if}
