@@ -1,4 +1,13 @@
-import { addDoc, collection, getDocs, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import {
+	addDoc,
+	collection,
+	getDocs,
+	deleteDoc,
+	doc,
+	updateDoc,
+	writeBatch,
+	arrayUnion
+} from 'firebase/firestore';
 import { db } from './firebase';
 
 export async function createGoal(numberOfBooks: number, deadline: Date, avgPageCount: number) {
@@ -30,4 +39,20 @@ export async function editGoal(id: string, numberOfBooks: number, deadline: Date
 		numberOfBooks: numberOfBooks,
 		deadline: deadline
 	});
+}
+
+export async function addBook(goalId: string, title: string, pageCount: number) {
+	const batch = writeBatch(db);
+
+	const bookRef = doc(collection(db, 'books'));
+	batch.set(bookRef, {
+		title: title,
+		pageCount: pageCount
+	});
+
+	batch.update(doc(db, 'goals', goalId), {
+		chosenBooks: arrayUnion(bookRef.id)
+	});
+
+	await batch.commit();
 }

@@ -30,7 +30,7 @@ describe('A Reading Goal', () => {
 
 		expect(goal.activeBooks.length).toBe(1);
 		expect(goal.activeBooks[0].book.title).toBe('Short book');
-		expect(goal.activeBooks[0].book.pages).toBe(100);
+		expect(goal.activeBooks[0].book.pageCount).toBe(100);
 	});
 
 	it('should adjust reading amount after new book is added', () => {

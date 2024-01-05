@@ -1,11 +1,11 @@
 export class Book {
 	private _id = crypto.randomUUID();
 	title;
-	pages;
+	pageCount;
 
-	constructor(title: string = '', pages: number = 0) {
+	constructor(title: string = '', pageCount: number = 0) {
 		this.title = title;
-		this.pages = pages;
+		this.pageCount = pageCount;
 	}
 
 	get id() {

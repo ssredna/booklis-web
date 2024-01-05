@@ -8,7 +8,7 @@ export class ActiveBook {
 	constructor(book: Book, pagesRead: number = 0, startDate?: Date) {
 		this._book = book;
 		this._startDate = startDate ?? new Date();
-		this._pagesRead = Math.min(pagesRead, book.pages);
+		this._pagesRead = Math.min(pagesRead, book.pageCount);
 	}
 
 	get book() {
@@ -20,7 +20,7 @@ export class ActiveBook {
 	}
 
 	set pagesRead(pagesRead) {
-		this._pagesRead = Math.min(pagesRead, this._book.pages);
+		this._pagesRead = Math.min(pagesRead, this._book.pageCount);
 	}
 
 	get startDate() {

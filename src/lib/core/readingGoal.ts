@@ -50,7 +50,7 @@ export class ReadingGoal {
 	pagesToRead() {
 		const pagesLeftInActiveBooks = this.activeBooks.reduce(
 			(pagesLeftTotal, activeBook) =>
-				pagesLeftTotal + (activeBook.book.pages - activeBook.pagesRead),
+				pagesLeftTotal + (activeBook.book.pageCount - activeBook.pagesRead),
 			0
 		);
 		const unknownBooksLeft = this.numberOfBooks - this.activeBooks.length - this.readBooks.length;

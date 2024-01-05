@@ -3,6 +3,7 @@
 	import { page } from '$app/stores';
 	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import dateFormat from 'dateformat';
+	import AddBookModal from './AddBookModal.svelte';
 
 	export let goal: ReadingGoal;
 
@@ -10,12 +11,19 @@
 
 	let isEditing = false;
 	let isFormSubmitting = false;
+
+	let showAddBookModal = false;
 </script>
 
 <div class="container">
 	{#if !isEditing}
 		<h1>{goal.numberOfBooks} bøker til {goal.deadline.toDateString()}</h1>
-		<button on:click={() => (isEditing = true)}>Endre</button>
+		<p>Gjennomsnittlig sider per dag: {goal.pagesPerDay()}</p>
+		<p>{goal.numberOfBooks - goal.readBooks.length} bøker igjen å lese</p>
+
+		<button on:click={() => (showAddBookModal = true)}>Legg til bok</button>
+		<br />
+		<button on:click={() => (isEditing = true)}>Rediger mål</button>
 		<form
 			method="post"
 			action="?/deleteGoal"
@@ -27,7 +35,7 @@
 			}}
 		>
 			<input type="hidden" name="id" value={goal.id} />
-			<input type="submit" value="Slett" />
+			<input type="submit" value="Slett mål" />
 			{#if $page.form?.idError}
 				<p>Klarte ikke å slette, prøv igjen</p>
 			{/if}
@@ -79,6 +87,10 @@
 		</form>
 	{/if}
 </div>
+
+{#if showAddBookModal}
+	<AddBookModal goalId={goal.id} on:close={() => (showAddBookModal = false)} />
+{/if}
 
 <style>
 	.container {
