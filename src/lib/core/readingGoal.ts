@@ -11,15 +11,35 @@ export class ReadingGoal {
 
 	activeBooks: ActiveBook[] = [];
 	readBooks: ReadBook[] = [];
+	chosenBooks: Book[] = [];
 
 	todaysDate = new Date();
 	private _pagesReadToday = 0;
 
-	constructor(id: string, numberOfBooks: number, deadline: string, avgPageCount: number) {
+	constructor(
+		id: string,
+		numberOfBooks: number,
+		deadline: string,
+		avgPageCount: number,
+		chosenBooks: string[],
+		books: {
+			id: string;
+			title: string;
+			pageCount: number;
+		}[]
+	) {
 		this.id = id;
 		this.deadline = new Date(deadline);
 		this.numberOfBooks = numberOfBooks;
 		this.avgPageCount = avgPageCount;
+		this.chosenBooks = chosenBooks.map((id) => {
+			const book = books.find((book) => book.id === id);
+			if (book) {
+				return new Book(book.title, book.pageCount);
+			} else {
+				return new Book('Error: book not found', 0);
+			}
+		});
 	}
 
 	get pagesReadToday() {

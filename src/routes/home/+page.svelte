@@ -6,7 +6,15 @@
 	export let data;
 
 	$: readingGoals = data.goals.map(
-		(goal) => new ReadingGoal(goal.id, goal.numberOfBooks, goal.deadline, goal.avgPageCount)
+		(goal) =>
+			new ReadingGoal(
+				goal.id,
+				goal.numberOfBooks,
+				goal.deadline,
+				goal.avgPageCount,
+				goal.chosenBooks,
+				data.books
+			)
 	);
 
 	let showCreateGoalModal = false;
@@ -17,6 +25,11 @@
 {/each}
 
 <button on:click={() => (showCreateGoalModal = true)}> Lag et nytt mål </button>
+
+<h1>Mine bøker:</h1>
+{#each data.books as book}
+	<p>{book.title}</p>
+{/each}
 
 {#if showCreateGoalModal}
 	<CreateGoalModal on:close={() => (showCreateGoalModal = false)} />

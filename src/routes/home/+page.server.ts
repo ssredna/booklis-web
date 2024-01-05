@@ -1,4 +1,11 @@
-import { addBook, createGoal, deleteGoal, editGoal, getGoals } from '$lib/firebase/firestore.js';
+import {
+	addBook,
+	createGoal,
+	deleteGoal,
+	editGoal,
+	getBooks,
+	getGoals
+} from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
 import { z } from 'zod';
 
@@ -11,7 +18,8 @@ const titleSchema = z.coerce.string();
 export const load = async () => {
 	try {
 		return {
-			goals: await getGoals()
+			goals: await getGoals(),
+			books: await getBooks()
 		};
 	} catch (e) {
 		error(400, e instanceof Error ? e.message : 'Unknown error');

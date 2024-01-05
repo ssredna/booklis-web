@@ -21,8 +21,32 @@
 		<p>Gjennomsnittlig sider per dag: {goal.pagesPerDay()}</p>
 		<p>{goal.numberOfBooks - goal.readBooks.length} bøker igjen å lese</p>
 
+		{#if goal.activeBooks.length > 0}
+			<h2>Aktive bøker:</h2>
+			{#each goal.activeBooks as activeBook}
+				<p>{activeBook.book.title}</p>
+			{/each}
+		{:else}
+			<p>Ingen bøker er aktive</p>
+		{/if}
+
+		<h2>Valgte bøker:</h2>
+		{#each goal.chosenBooks as book}
+			<p>{book.title} på {book.pageCount} sider</p>
+		{/each}
+
 		<button on:click={() => (showAddBookModal = true)}>Legg til bok</button>
 		<br />
+
+		{#if goal.readBooks.length > 0}
+			<h2>Lese bøker:</h2>
+			{#each goal.readBooks as readBook}
+				<p>{readBook.book.title}</p>
+			{/each}
+		{:else}
+			<p>Ingen bøker er fullført enda</p>
+		{/if}
+
 		<button on:click={() => (isEditing = true)}>Rediger mål</button>
 		<form
 			method="post"

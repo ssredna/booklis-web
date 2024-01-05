@@ -25,7 +25,8 @@ export async function getGoals() {
 		id: doc.id,
 		numberOfBooks: doc.data().numberOfBooks as number,
 		deadline: doc.data().deadline.toDate().toString() as string,
-		avgPageCount: doc.data().avgPageCount as number
+		avgPageCount: doc.data().avgPageCount as number,
+		chosenBooks: doc.data().chosenBooks as string[]
 	}));
 	return goals;
 }
@@ -55,4 +56,14 @@ export async function addBook(goalId: string, title: string, pageCount: number) 
 	});
 
 	await batch.commit();
+}
+
+export async function getBooks() {
+	const querySnapshot = await getDocs(collection(db, 'books'));
+	const books = querySnapshot.docs.map((doc) => ({
+		id: doc.id,
+		title: doc.data().title as string,
+		pageCount: doc.data().pageCount as number
+	}));
+	return books;
 }
