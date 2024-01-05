@@ -22,11 +22,7 @@ export class ReadingGoal {
 		deadline: string,
 		avgPageCount: number,
 		chosenBooks: string[],
-		books: {
-			id: string;
-			title: string;
-			pageCount: number;
-		}[]
+		books: Book[]
 	) {
 		this.id = id;
 		this.deadline = new Date(deadline);
@@ -63,7 +59,11 @@ export class ReadingGoal {
 		return Math.min(Math.max(this.pagesPerDay() - this.pagesReadToday, 0), this.pagesPerDay());
 	}
 
-	addBook(newBook: Book) {
+	addNewBook(newBook: Book) {
+		this.chosenBooks.push(newBook);
+	}
+
+	startNewBook(newBook: Book) {
 		this.activeBooks.push(new ActiveBook(newBook));
 	}
 
@@ -73,10 +73,21 @@ export class ReadingGoal {
 				pagesLeftTotal + (activeBook.book.pageCount - activeBook.pagesRead),
 			0
 		);
-		const unknownBooksLeft = this.numberOfBooks - this.activeBooks.length - this.readBooks.length;
+
+		const pagesLeftInChosenBooks = this.chosenBooks.reduce(
+			(pagesLeftTotal, chosenBook) => pagesLeftTotal + chosenBook.pageCount,
+			0
+		);
+
+		const unknownBooksLeft =
+			this.numberOfBooks -
+			this.activeBooks.length -
+			this.chosenBooks.length -
+			this.readBooks.length;
 		const pagesLetInUnknownBooks = unknownBooksLeft * this.avgPageCount;
 
-		const totalPagesLeftInBooks = pagesLeftInActiveBooks + pagesLetInUnknownBooks;
+		const totalPagesLeftInBooks =
+			pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLetInUnknownBooks;
 
 		const numberOfBooksLeft = this.numberOfBooks - this.readBooks.length;
 		if (numberOfBooksLeft >= this.activeBooks.length) {
