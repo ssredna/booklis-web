@@ -59,6 +59,12 @@ export async function addBook(goalId: string, title: string, pageCount: number) 
 	await batch.commit();
 }
 
+export async function addExistingBookToGoal(goalId: string, bookId: string) {
+	await updateDoc(doc(db, 'goals', goalId), {
+		chosenBooks: arrayUnion(bookId)
+	});
+}
+
 export async function getBooks() {
 	const querySnapshot = await getDocs(collection(db, 'books'));
 	const books = querySnapshot.docs.map((doc) => ({

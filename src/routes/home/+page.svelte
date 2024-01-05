@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { books } from '$lib/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
+	import { Book } from '$lib/core/book.js';
 	import { ReadingGoal } from '$lib/core/readingGoal.js';
 
 	export let data;
@@ -16,6 +18,8 @@
 				data.books
 			)
 	);
+
+	$: books.set(data.books.map((book) => new Book(book.id, book.title, book.pageCount)));
 
 	let showCreateGoalModal = false;
 </script>

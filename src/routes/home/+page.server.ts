@@ -1,5 +1,6 @@
 import {
 	addBook,
+	addExistingBookToGoal,
 	createGoal,
 	deleteGoal,
 	editGoal,
@@ -136,6 +137,31 @@ export const actions = {
 
 		try {
 			return await addBook(parsedGoalId.data, parsedTitle.data, parsedPageCount.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	addExistingBook: async ({ request }) => {
+		const data = await request.formData();
+
+		const bookId = data.get('bookId');
+		const goalId = data.get('goalId');
+
+		const parsedBookId = idSchema.safeParse(bookId);
+		if (!parsedBookId.success) {
+			return fail(422, { bookIdError: true });
+		}
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		if (!parsedGoalId.success) {
+			return fail(422, { goalIdError: true });
+		}
+
+		try {
+			return await addExistingBookToGoal(parsedGoalId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

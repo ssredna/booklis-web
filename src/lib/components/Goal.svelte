@@ -114,7 +114,7 @@
 </div>
 
 {#if showAddBookModal}
-	<AddBookModal goalId={goal.id} on:close={() => (showAddBookModal = false)} />
+	<AddBookModal {goal} on:close={() => (showAddBookModal = false)} />
 {/if}
 
 <style>

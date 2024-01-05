@@ -1,12 +1,21 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { books } from '$lib/booksStore';
+	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import Modal from './Modal.svelte';
 	import { createEventDispatcher } from 'svelte';
 
-	export let goalId: string;
+	export let goal: ReadingGoal;
 
 	let isFormSubmitting = false;
+
+	$: filteredBooks = $books.filter(
+		(book) =>
+			!goal.chosenBooks.some((chosenBook) => chosenBook.id === book.id) &&
+			!goal.activeBooks.some((activeBook) => activeBook.book.id === book.id) &&
+			!goal.readBooks.some((readBook) => readBook.book.id === book.id)
+	);
 
 	const dispatch = createEventDispatcher();
 </script>
@@ -48,11 +57,35 @@
 			<br />
 		{/if}
 
-		<input type="hidden" name="goalId" value={goalId} />
+		<input type="hidden" name="goalId" value={goal.id} />
 
 		{#if isFormSubmitting}
 			<p>Lagrer...</p>
 		{/if}
 		<input type="submit" value="Legg til bok" />
 	</form>
+
+	<p>Vil du legge til en bok du allerede har?</p>
+
+	{#each filteredBooks as book}
+		<form
+			action="?/addExistingBook"
+			method="post"
+			use:enhance={() => {
+				isFormSubmitting = true;
+
+				return async ({ result, update }) => {
+					isFormSubmitting = false;
+					update();
+					if (result.type === 'success') {
+						dispatch('close');
+					}
+				};
+			}}
+		>
+			<input type="hidden" name="bookId" value={book.id} />
+			<input type="hidden" name="goalId" value={goal.id} />
+			<input type="submit" value={book.title} />
+		</form>
+	{/each}
 </Modal>
