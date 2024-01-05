@@ -4,6 +4,7 @@
 	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import dateFormat from 'dateformat';
 	import AddBookModal from './AddBookModal.svelte';
+	import ChosenBook from './ChosenBook.svelte';
 
 	export let goal: ReadingGoal;
 
@@ -32,7 +33,7 @@
 
 		<h2>Valgte bøker:</h2>
 		{#each goal.chosenBooks as book}
-			<p>{book.title} på {book.pageCount} sider</p>
+			<ChosenBook {book} goalId={goal.id} />
 		{/each}
 
 		<button on:click={() => (showAddBookModal = true)}>Legg til bok</button>

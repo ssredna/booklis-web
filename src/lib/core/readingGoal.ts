@@ -35,9 +35,9 @@ export class ReadingGoal {
 		this.chosenBooks = chosenBooks.map((id) => {
 			const book = books.find((book) => book.id === id);
 			if (book) {
-				return new Book(book.title, book.pageCount);
+				return new Book(book.id, book.title, book.pageCount);
 			} else {
-				return new Book('Error: book not found', 0);
+				return new Book('error', 'Book not found', 0);
 			}
 		});
 	}

@@ -6,7 +6,8 @@ import {
 	doc,
 	updateDoc,
 	writeBatch,
-	arrayUnion
+	arrayUnion,
+	arrayRemove
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -66,4 +67,10 @@ export async function getBooks() {
 		pageCount: doc.data().pageCount as number
 	}));
 	return books;
+}
+
+export async function removeBook(goalId: string, bookId: string) {
+	await updateDoc(doc(db, 'goals', goalId), {
+		chosenBooks: arrayRemove(bookId)
+	});
 }
