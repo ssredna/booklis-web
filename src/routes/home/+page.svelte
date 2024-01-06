@@ -15,6 +15,7 @@
 				goal.deadline,
 				goal.avgPageCount,
 				goal.chosenBooks,
+				goal.activeBooks,
 				data.books
 			)
 	);

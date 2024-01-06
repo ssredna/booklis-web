@@ -22,6 +22,7 @@ export class ReadingGoal {
 		deadline: string,
 		avgPageCount: number,
 		chosenBooks: string[],
+		activeBooks: { bookId: string; pagesRead: number; startDate: string }[],
 		books: Book[]
 	) {
 		this.id = id;
@@ -34,6 +35,14 @@ export class ReadingGoal {
 				return new Book(book.id, book.title, book.pageCount);
 			} else {
 				return new Book('error', 'Book not found', 0);
+			}
+		});
+		this.activeBooks = activeBooks.map((activeBook) => {
+			const book = books.find((book) => book.id === activeBook.bookId);
+			if (book) {
+				return new ActiveBook(book, activeBook.pagesRead, new Date(activeBook.startDate));
+			} else {
+				return new ActiveBook(new Book('error', 'Book not found', 0));
 			}
 		});
 	}

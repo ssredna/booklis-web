@@ -1,18 +1,14 @@
 import { Book } from './book';
 
 export class ActiveBook {
-	private _book;
+	book;
 	private _pagesRead;
-	private _startDate;
+	startDate;
 
 	constructor(book: Book, pagesRead: number = 0, startDate?: Date) {
-		this._book = book;
-		this._startDate = startDate ?? new Date();
+		this.book = book;
+		this.startDate = startDate ?? new Date();
 		this._pagesRead = Math.min(pagesRead, book.pageCount);
-	}
-
-	get book() {
-		return this._book;
 	}
 
 	get pagesRead() {
@@ -20,10 +16,6 @@ export class ActiveBook {
 	}
 
 	set pagesRead(pagesRead) {
-		this._pagesRead = Math.min(pagesRead, this._book.pageCount);
-	}
-
-	get startDate() {
-		return this._startDate;
+		this._pagesRead = Math.min(pagesRead, this.book.pageCount);
 	}
 }

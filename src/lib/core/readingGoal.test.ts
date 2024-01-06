@@ -25,14 +25,14 @@ describe('A Reading Goal', () => {
 	});
 
 	it('create a new goal for the next year with a specified number of books, and get the pages to read', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], []);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], []);
 
 		// 12 * 350 / 365 = 11,5 -> ceil(11,5) = 12
 		expect(goal.pagesPerDay()).toBe(12);
 	});
 
 	it('should be able to add a new book', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 
 		goal.startNewBook(shortBook);
 
@@ -42,7 +42,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should adjust reading amount after new book is added', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 
 		goal.startNewBook(shortBook);
 		// (11 * 350 + 100) / 365 = 10,8 -> ceil(10,8) = 11
@@ -54,7 +54,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should show right amount of pages after finishing a book', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		goal.startNewBook(book500);
 		goal.startNewBook(book500_2);
 
@@ -70,7 +70,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should recalculate pages to read when the date changes', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		expect(goal.pagesPerDay()).toBe(12);
 
 		vi.setSystemTime(addMonths(startOf2024, 6));
@@ -80,7 +80,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should tell you how many pages to read today, and update when you have read some pages', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		expect(goal.pagesLeftToday()).toBe(12);
 
 		goal.startNewBook(book500);
@@ -99,7 +99,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should not let pagesLeftToday go below 0', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 
 		goal.startNewBook(book500);
 		goal.changePagesReadInBook(goal.activeBooks[0], 100);
@@ -108,7 +108,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should reset stats of the day on a new day', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		goal.startNewBook(book500);
 		goal.changePagesReadInBook(goal.activeBooks[0], 100);
 		expect(goal.pagesLeftToday()).toBe(0);
@@ -120,7 +120,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should not let pagesLeftToday go over the amount of pages to read for the day', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		goal.startNewBook(book500);
 		goal.changePagesReadInBook(goal.activeBooks[0], 100);
 
@@ -131,7 +131,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should store readBooks with startDate and finishedDate', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 
 		goal.startNewBook(book500);
 		const endDate1 = addMonths(startOf2024, 4);
@@ -147,7 +147,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should return the number of pages based on average number of pages to read if there are more active books than the goal', () => {
-		const goal = new ReadingGoal('asdf', 2, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 2, endOf2024String, 350, [], [], testBooks);
 		goal.startNewBook(book500);
 		goal.startNewBook(book500_2);
 		goal.startNewBook(book500_3);
@@ -156,7 +156,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should be able to add the same book two times to the same goal', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		const book = book500;
 		goal.startNewBook(book);
 		goal.startNewBook(book);
@@ -164,7 +164,7 @@ describe('A Reading Goal', () => {
 	});
 
 	it('should calculate correctly the pages to read when choosing but not starting a book', () => {
-		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], testBooks);
+		const goal = new ReadingGoal('asdf', 12, endOf2024String, 350, [], [], testBooks);
 		expect(goal.pagesPerDay()).toBe(12);
 		goal.addNewBook(longBook);
 		// (11 * 350 + 1000) / 365 = 13.3 -> ceil(13.3) = 14

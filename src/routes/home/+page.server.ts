@@ -6,7 +6,8 @@ import {
 	editGoal,
 	getBooks,
 	getGoals,
-	removeBook
+	removeBook,
+	startBook
 } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -186,6 +187,30 @@ export const actions = {
 
 		try {
 			return await removeBook(parsedGoalId.data, parsedBookId.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	startBook: async ({ request }) => {
+		const data = await request.formData();
+		const bookId = data.get('bookId');
+		const goalId = data.get('goalId');
+
+		const parsedBookId = idSchema.safeParse(bookId);
+		if (!parsedBookId.success) {
+			return fail(422, { bookIdError: true });
+		}
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		if (!parsedGoalId.success) {
+			return fail(422, { goalIdError: true });
+		}
+
+		try {
+			return await startBook(parsedGoalId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

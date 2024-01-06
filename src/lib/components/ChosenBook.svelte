@@ -8,6 +8,13 @@
 
 <div class="container">
 	<p>"{book.title}" på {book.pageCount} sider</p>
+
+	<form action="?/startBook" method="post" use:enhance>
+		<input type="hidden" name="bookId" value={book.id} required />
+		<input type="hidden" name="goalId" value={goalId} required />
+		<input type="submit" value="Start bok" />
+	</form>
+
 	<form action="?/removeBook" method="post" use:enhance>
 		<input type="hidden" name="bookId" value={book.id} required />
 		<input type="hidden" name="goalId" value={goalId} required />
