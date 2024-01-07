@@ -23,13 +23,17 @@
 		<h1>{goal.numberOfBooks} bøker til {goal.deadline.toDateString()}</h1>
 		<p>Gjennomsnittlig sider per dag: {goal.pagesPerDay()}</p>
 		<p>Sider lest i dag: {goal.pagesReadToday}</p>
-		<form method="post" action="?/resetToday" use:enhance>
-			<input type="hidden" name="goalId" value={goal.id} />
-			<input type="submit" value="Nullstill sider lest i dag" />
-			{#if $page.form?.resetTodayError}
-				<p>Noe gikk galt under nullstillingen</p>
-			{/if}
-		</form>
+
+		{#if goal.pagesReadToday !== 0}
+			<form method="post" action="?/resetToday" use:enhance>
+				<input type="hidden" name="goalId" value={goal.id} />
+				<input type="submit" value="Nullstill sider lest i dag" />
+				{#if $page.form?.resetTodayError}
+					<p>Noe gikk galt under nullstillingen</p>
+				{/if}
+			</form>
+		{/if}
+
 		<p>Sider igjen å lese i dag: {goal.pagesLeftToday()}</p>
 		<p>{goal.numberOfBooks - goal.readBooks.length} bøker igjen å lese</p>
 
