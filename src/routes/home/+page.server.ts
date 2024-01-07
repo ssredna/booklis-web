@@ -8,7 +8,8 @@ import {
 	getGoals,
 	removeActiveBook,
 	removeBook,
-	startBook
+	startBook,
+	updatePagesRead
 } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
 import { z } from 'zod';
@@ -18,6 +19,7 @@ const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
 const pageCountSchema = z.coerce.number().min(1);
 const titleSchema = z.coerce.string();
+const pagesReadSchema = z.coerce.number().min(0);
 
 export const load = async () => {
 	try {
@@ -242,6 +244,41 @@ export const actions = {
 
 		try {
 			return await removeActiveBook(parsedGoalId.data, parsedActiveBookId.data, parsedBookId.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	updatePagesRead: async ({ request }) => {
+		const data = await request.formData();
+
+		const activeBookId = data.get('activeBookId');
+		const goalId = data.get('goalId');
+		const pagesRead = data.get('pagesRead');
+
+		const parsedActiveBookId = idSchema.safeParse(activeBookId);
+		if (!parsedActiveBookId.success) {
+			return fail(422, { activeBookIdError: true });
+		}
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		if (!parsedGoalId.success) {
+			return fail(422, { goalIdError: true });
+		}
+
+		const parsedPagesRead = pagesReadSchema.safeParse(pagesRead);
+		if (!parsedPagesRead.success) {
+			return fail(422, { pagesReadError: true });
+		}
+
+		try {
+			return await updatePagesRead(
+				parsedActiveBookId.data,
+				parsedGoalId.data,
+				parsedPagesRead.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

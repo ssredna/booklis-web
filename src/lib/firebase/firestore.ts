@@ -25,6 +25,9 @@ export async function getGoals() {
 	const goals = Promise.all(
 		goalSnapshot.docs.map(async (goalDoc) => {
 			const activeBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'activeBooks'));
+
+			const chosenBooks = (goalDoc.data().chosenBooks as string[]) ?? [];
+
 			const activeBooks = activeBooksSnapshot.docs.map((activeBookDoc) => {
 				return {
 					id: activeBookDoc.id,
@@ -39,7 +42,7 @@ export async function getGoals() {
 				numberOfBooks: goalDoc.data().numberOfBooks as number,
 				deadline: goalDoc.data().deadline.toDate().toString() as string,
 				avgPageCount: goalDoc.data().avgPageCount as number,
-				chosenBooks: goalDoc.data().chosenBooks as string[],
+				chosenBooks,
 				activeBooks
 			};
 		})
@@ -123,4 +126,10 @@ export async function removeActiveBook(goalId: string, activeBookId: string, boo
 	batch.delete(doc(db, 'goals', goalId, 'activeBooks', activeBookId));
 
 	await batch.commit();
+}
+
+export async function updatePagesRead(activeBookId: string, goalId: string, pagesRead: number) {
+	await updateDoc(doc(db, 'goals', goalId, 'activeBooks', activeBookId), {
+		pagesRead: pagesRead
+	});
 }
