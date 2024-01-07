@@ -6,6 +6,7 @@
 	import AddBookModal from './AddBookModal.svelte';
 	import ChosenBook from './ChosenBook.svelte';
 	import ActiveBook from './ActiveBook.svelte';
+	import ReadBook from './ReadBook.svelte';
 
 	export let goal: ReadingGoal;
 
@@ -41,10 +42,12 @@
 			<p>Ingen bøker er aktive</p>
 		{/if}
 
-		<h2>Valgte bøker:</h2>
-		{#each goal.chosenBooks as book}
-			<ChosenBook {book} goalId={goal.id} />
-		{/each}
+		{#if goal.chosenBooks.length > 0}
+			<h2>Valgte bøker:</h2>
+			{#each goal.chosenBooks as book}
+				<ChosenBook {book} goalId={goal.id} />
+			{/each}
+		{/if}
 
 		<button on:click={() => (showAddBookModal = true)}>Legg til bok</button>
 		<br />
@@ -52,7 +55,7 @@
 		{#if goal.readBooks.length > 0}
 			<h2>Leste bøker:</h2>
 			{#each goal.readBooks as readBook}
-				<p>{readBook.book.title}</p>
+				<ReadBook {readBook} goalId={goal.id} />
 			{/each}
 		{:else}
 			<p>Ingen bøker er fullført enda</p>

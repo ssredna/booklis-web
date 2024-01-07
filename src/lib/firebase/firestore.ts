@@ -186,5 +186,26 @@ export async function finishBook(
 
 	batch.delete(doc(db, 'goals', goalId, 'activeBooks', activeBookId));
 
-	batch.commit();
+	await batch.commit();
+}
+
+export async function reactivateBook(
+	goalId: string,
+	bookId: string,
+	pageCount: number,
+	startDate: Date,
+	readBookId: string
+) {
+	const batch = writeBatch(db);
+
+	const activeBookRef = doc(collection(db, 'goals', goalId, 'activeBooks'));
+	batch.set(activeBookRef, {
+		bookId: bookId,
+		pagesRead: pageCount,
+		startDate
+	});
+
+	batch.delete(doc(db, 'goals', goalId, 'readBooks', readBookId));
+
+	await batch.commit();
 }

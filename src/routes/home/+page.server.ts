@@ -7,6 +7,7 @@ import {
 	finishBook,
 	getBooks,
 	getGoals,
+	reactivateBook,
 	removeActiveBook,
 	removeBook,
 	resetToday,
@@ -345,6 +346,46 @@ export const actions = {
 				parsedActiveBookId.data,
 				parsedBookId.data,
 				parsedStartDate.data
+			);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	reactivateBook: async ({ request }) => {
+		const data = await request.formData();
+
+		const goalId = data.get('goalId');
+		const bookId = data.get('bookId');
+		const readBookId = data.get('readBookId');
+		const startDate = data.get('startDate');
+		const pageCount = data.get('pageCount');
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedBookId = idSchema.safeParse(bookId);
+		const parsedReadBookId = idSchema.safeParse(readBookId);
+		const parsedStartDate = deadlineSchema.safeParse(startDate);
+		const parsedPageCount = pageCountSchema.safeParse(pageCount);
+
+		if (
+			!parsedGoalId.success ||
+			!parsedReadBookId.success ||
+			!parsedBookId.success ||
+			!parsedStartDate.success ||
+			!parsedPageCount.success
+		) {
+			return fail(422, { reactivateBookError: true });
+		}
+
+		try {
+			await reactivateBook(
+				parsedGoalId.data,
+				parsedBookId.data,
+				parsedPageCount.data,
+				parsedStartDate.data,
+				parsedReadBookId.data
 			);
 		} catch (error) {
 			return fail(400, {
