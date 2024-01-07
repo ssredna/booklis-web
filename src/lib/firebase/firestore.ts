@@ -7,8 +7,7 @@ import {
 	updateDoc,
 	writeBatch,
 	arrayUnion,
-	arrayRemove,
-	Timestamp
+	arrayRemove
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -22,25 +21,28 @@ export async function createGoal(numberOfBooks: number, deadline: Date, avgPageC
 }
 
 export async function getGoals() {
-	const querySnapshot = await getDocs(collection(db, 'goals'));
-	const goals = querySnapshot.docs.map((doc) => {
-		const activeBooks = (
-			doc.data().activeBooks as { bookId: string; pagesRead: number; startDate: Timestamp }[]
-		).map((book) => ({
-			bookId: book.bookId,
-			pagesRead: book.pagesRead,
-			startDate: book.startDate.toDate().toString()
-		}));
+	const goalSnapshot = await getDocs(collection(db, 'goals'));
+	const goals = Promise.all(
+		goalSnapshot.docs.map(async (goalDoc) => {
+			const activeBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'activeBooks'));
+			const activeBooks = activeBooksSnapshot.docs.map((activeBookDoc) => {
+				return {
+					bookId: activeBookDoc.data().bookId as string,
+					pagesRead: activeBookDoc.data().pagesRead as number,
+					startDate: activeBookDoc.data().startDate.toDate().toString() as string
+				};
+			});
 
-		return {
-			id: doc.id,
-			numberOfBooks: doc.data().numberOfBooks as number,
-			deadline: doc.data().deadline.toDate().toString() as string,
-			avgPageCount: doc.data().avgPageCount as number,
-			chosenBooks: doc.data().chosenBooks as string[],
-			activeBooks
-		};
-	});
+			return {
+				id: goalDoc.id,
+				numberOfBooks: goalDoc.data().numberOfBooks as number,
+				deadline: goalDoc.data().deadline.toDate().toString() as string,
+				avgPageCount: goalDoc.data().avgPageCount as number,
+				chosenBooks: goalDoc.data().chosenBooks as string[],
+				activeBooks
+			};
+		})
+	);
 	return goals;
 }
 
@@ -94,12 +96,18 @@ export async function removeBook(goalId: string, bookId: string) {
 }
 
 export async function startBook(goalId: string, bookId: string) {
-	await updateDoc(doc(db, 'goals', goalId), {
-		chosenBooks: arrayRemove(bookId),
-		activeBooks: arrayUnion({
-			bookId: bookId,
-			pagesRead: 0,
-			startDate: new Date()
-		})
+	const batch = writeBatch(db);
+
+	const activeBookRef = doc(collection(db, 'goals', goalId, 'activeBooks'));
+	batch.set(activeBookRef, {
+		bookId: bookId,
+		pagesRead: 0,
+		startDate: new Date()
 	});
+
+	batch.update(doc(db, 'goals', goalId), {
+		chosenBooks: arrayRemove(bookId)
+	});
+
+	await batch.commit();
 }
