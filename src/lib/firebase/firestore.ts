@@ -27,6 +27,7 @@ export async function getGoals() {
 			const activeBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'activeBooks'));
 			const activeBooks = activeBooksSnapshot.docs.map((activeBookDoc) => {
 				return {
+					id: activeBookDoc.id,
 					bookId: activeBookDoc.data().bookId as string,
 					pagesRead: activeBookDoc.data().pagesRead as number,
 					startDate: activeBookDoc.data().startDate.toDate().toString() as string
@@ -108,6 +109,18 @@ export async function startBook(goalId: string, bookId: string) {
 	batch.update(doc(db, 'goals', goalId), {
 		chosenBooks: arrayRemove(bookId)
 	});
+
+	await batch.commit();
+}
+
+export async function removeActiveBook(goalId: string, activeBookId: string, bookId: string) {
+	const batch = writeBatch(db);
+
+	batch.update(doc(db, 'goals', goalId), {
+		chosenBooks: arrayUnion(bookId)
+	});
+
+	batch.delete(doc(db, 'goals', goalId, 'activeBooks', activeBookId));
 
 	await batch.commit();
 }

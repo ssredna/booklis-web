@@ -6,6 +6,7 @@ import {
 	editGoal,
 	getBooks,
 	getGoals,
+	removeActiveBook,
 	removeBook,
 	startBook
 } from '$lib/firebase/firestore.js';
@@ -211,6 +212,36 @@ export const actions = {
 
 		try {
 			return await startBook(parsedGoalId.data, parsedBookId.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	removeActiveBook: async ({ request }) => {
+		const data = await request.formData();
+		const bookId = data.get('bookId');
+		const activeBookId = data.get('activeBookId');
+		const goalId = data.get('goalId');
+
+		const parsedBookId = idSchema.safeParse(bookId);
+		if (!parsedBookId.success) {
+			return fail(422, { bookIdError: true });
+		}
+
+		const parsedActiveBookId = idSchema.safeParse(activeBookId);
+		if (!parsedActiveBookId.success) {
+			return fail(422, { activeBookIdError: true });
+		}
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		if (!parsedGoalId.success) {
+			return fail(422, { goalIdError: true });
+		}
+
+		try {
+			return await removeActiveBook(parsedGoalId.data, parsedActiveBookId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

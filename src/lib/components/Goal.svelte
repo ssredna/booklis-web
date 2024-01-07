@@ -5,6 +5,7 @@
 	import dateFormat from 'dateformat';
 	import AddBookModal from './AddBookModal.svelte';
 	import ChosenBook from './ChosenBook.svelte';
+	import ActiveBook from './ActiveBook.svelte';
 
 	export let goal: ReadingGoal;
 
@@ -25,7 +26,7 @@
 		{#if goal.activeBooks.length > 0}
 			<h2>Aktive bøker:</h2>
 			{#each goal.activeBooks as activeBook}
-				<p>{activeBook.book.title}</p>
+				<ActiveBook {activeBook} goalId={goal.id} />
 			{/each}
 		{:else}
 			<p>Ingen bøker er aktive</p>
