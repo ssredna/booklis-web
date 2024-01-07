@@ -4,6 +4,7 @@ import {
 	createGoal,
 	deleteGoal,
 	editGoal,
+	finishBook,
 	getBooks,
 	getGoals,
 	removeActiveBook,
@@ -309,6 +310,42 @@ export const actions = {
 
 		try {
 			return await resetToday(parsedGoalId.data);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	finishBook: async ({ request }) => {
+		const data = await request.formData();
+
+		const goalId = data.get('goalId');
+		const activeBookId = data.get('activeBookId');
+		const bookId = data.get('bookId');
+		const startDate = data.get('startDate');
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedActiveBookId = idSchema.safeParse(activeBookId);
+		const parsedBookId = idSchema.safeParse(bookId);
+		const parsedStartDate = deadlineSchema.safeParse(startDate);
+
+		if (
+			!parsedGoalId.success ||
+			!parsedActiveBookId.success ||
+			!parsedBookId.success ||
+			!parsedStartDate.success
+		) {
+			return fail(422, { finishBookError: true });
+		}
+
+		try {
+			await finishBook(
+				parsedGoalId.data,
+				parsedActiveBookId.data,
+				parsedBookId.data,
+				parsedStartDate.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

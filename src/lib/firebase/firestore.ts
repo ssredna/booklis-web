@@ -158,3 +158,23 @@ export async function resetToday(goalId: string) {
 		todaysDate: new Date()
 	});
 }
+
+export async function finishBook(
+	goalId: string,
+	activeBookId: string,
+	bookId: string,
+	startDate: Date
+) {
+	const batch = writeBatch(db);
+
+	const readBookRef = doc(collection(db, 'goals', goalId, 'readBooks'));
+	batch.set(readBookRef, {
+		bookId,
+		startDate,
+		endDate: new Date()
+	});
+
+	batch.delete(doc(db, 'goals', goalId, 'activeBooks', activeBookId));
+
+	batch.commit();
+}

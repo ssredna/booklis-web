@@ -63,6 +63,21 @@
 		</noscript>
 	</form>
 
+	{#if activeBook.pagesRead === activeBook.book.pageCount}
+		<form action="?/finishBook" method="post" use:enhance>
+			<input type="hidden" name="goalId" value={goal.id} required />
+			<input type="hidden" name="activeBookId" value={activeBook.id} required />
+			<input type="hidden" name="bookId" value={activeBook.book.id} required />
+			<input type="hidden" name="startDate" value={activeBook.startDate} required />
+
+			<input type="submit" value="Fullfør bok" />
+
+			{#if $page.form?.finishBookError}
+				<p>Noe gikk galt under flyttingen av boken til fullført</p>
+			{/if}
+		</form>
+	{/if}
+
 	<form action="?/removeActiveBook" method="post" use:enhance>
 		<input type="hidden" name="bookId" value={activeBook.book.id} required />
 		<input type="hidden" name="goalId" value={goal.id} required />
