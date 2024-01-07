@@ -151,3 +151,10 @@ export async function updatePagesRead(
 
 	await batch.commit();
 }
+
+export async function resetToday(goalId: string) {
+	await updateDoc(doc(db, 'goals', goalId), {
+		pagesReadToday: 0,
+		todaysDate: new Date()
+	});
+}

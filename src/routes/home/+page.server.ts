@@ -8,6 +8,7 @@ import {
 	getGoals,
 	removeActiveBook,
 	removeBook,
+	resetToday,
 	startBook,
 	updatePagesRead
 } from '$lib/firebase/firestore.js';
@@ -269,23 +270,17 @@ export const actions = {
 		const pagesReadToday = data.get('pagesReadToday');
 
 		const parsedActiveBookId = idSchema.safeParse(activeBookId);
-		if (!parsedActiveBookId.success) {
-			return fail(422, { activeBookIdError: true });
-		}
-
 		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
-			return fail(422, { goalIdError: true });
-		}
-
 		const parsedPagesRead = pagesReadSchema.safeParse(pagesRead);
-		if (!parsedPagesRead.success) {
-			return fail(422, { pagesReadError: true });
-		}
-
 		const parsedPagesReadToday = pagesReadSchema.safeParse(pagesReadToday);
-		if (!parsedPagesReadToday.success) {
-			return fail(422, { increaseError: true });
+
+		if (
+			!parsedGoalId.success ||
+			!parsedPagesRead.success ||
+			!parsedActiveBookId.success ||
+			!parsedPagesReadToday.success
+		) {
+			return fail(422, { updatePagesReadError: true });
 		}
 
 		try {
@@ -295,6 +290,25 @@ export const actions = {
 				parsedPagesRead.data,
 				parsedPagesReadToday.data
 			);
+		} catch (error) {
+			return fail(400, {
+				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
+			});
+		}
+	},
+
+	resetToday: async ({ request }) => {
+		const data = await request.formData();
+
+		const goalId = data.get('goalId');
+
+		const parsedGoalId = idSchema.safeParse(goalId);
+		if (!parsedGoalId.success) {
+			return fail(422, { resetTodayError: true });
+		}
+
+		try {
+			return await resetToday(parsedGoalId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { page } from '$app/stores';
 	import type { ActiveBook } from '$lib/core/activeBook';
 	import type { ReadingGoal } from '$lib/core/readingGoal';
 
@@ -50,6 +51,10 @@
 
 		{#if isFormSubmitting}
 			Lagrer...
+		{/if}
+
+		{#if $page.form?.updatePagesReadError}
+			<p>Noe gikk galt i lagringen</p>
 		{/if}
 
 		<noscript>

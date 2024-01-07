@@ -61,7 +61,7 @@ export class ReadingGoal {
 
 	set pagesReadToday(amount: number) {
 		this.resetStatsOfTheDayIfNewDay();
-		this._pagesReadToday = amount;
+		this._pagesReadToday = Math.max(amount, 0);
 	}
 
 	pagesPerDay() {
