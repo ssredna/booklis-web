@@ -3,10 +3,18 @@
 	import { page } from '$app/stores';
 	import { createEventDispatcher } from 'svelte';
 	import Modal from './Modal.svelte';
+	import dateFormat from 'dateformat';
 
 	let isFormSubmitting = false;
+	let deadline: string;
 
 	const dispatch = createEventDispatcher();
+
+	function setDeadlineToNextYear() {
+		const thisYear = new Date().getFullYear();
+		const endOfYearDate = new Date(Date.UTC(thisYear, 11, 31));
+		deadline = dateFormat(endOfYearDate, 'yyyy-mm-dd');
+	}
 </script>
 
 <Modal on:close>
@@ -38,8 +46,10 @@
 
 		<label>
 			Til når vil du nå målet ditt?
-			<input type="date" name="deadline" required />
+			<input type="date" name="deadline" bind:value={deadline} required />
 		</label>
+		<button on:click|preventDefault={setDeadlineToNextYear}> I løpet av året </button>
+
 		{#if $page.form?.deadlineError}
 			<p>Er du sikker på at du har oppgitt en gyldig dato?</p>
 		{:else}
