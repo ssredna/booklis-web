@@ -65,27 +65,29 @@
 		<input type="submit" value="Legg til bok" />
 	</form>
 
-	<p>Vil du legge til en bok du allerede har?</p>
+	{#if filteredBooks.length > 0}
+		<p>Vil du legge til en bok du allerede har?</p>
 
-	{#each filteredBooks as book}
-		<form
-			action="?/addExistingBook"
-			method="post"
-			use:enhance={() => {
-				isFormSubmitting = true;
+		{#each filteredBooks as book}
+			<form
+				action="?/addExistingBook"
+				method="post"
+				use:enhance={() => {
+					isFormSubmitting = true;
 
-				return async ({ result, update }) => {
-					isFormSubmitting = false;
-					update();
-					if (result.type === 'success') {
-						dispatch('close');
-					}
-				};
-			}}
-		>
-			<input type="hidden" name="bookId" value={book.id} />
-			<input type="hidden" name="goalId" value={goal.id} />
-			<input type="submit" value={book.title} />
-		</form>
-	{/each}
+					return async ({ result, update }) => {
+						isFormSubmitting = false;
+						update();
+						if (result.type === 'success') {
+							dispatch('close');
+						}
+					};
+				}}
+			>
+				<input type="hidden" name="bookId" value={book.id} />
+				<input type="hidden" name="goalId" value={goal.id} />
+				<input type="submit" value={book.title} />
+			</form>
+		{/each}
+	{/if}
 </Modal>
