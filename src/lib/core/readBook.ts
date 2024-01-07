@@ -1,25 +1,15 @@
 import { Book } from './book';
 
 export class ReadBook {
-	private _book;
-	private _startDate;
-	private _endDate;
+	id;
+	book;
+	startDate;
+	endDate;
 
-	constructor(book: Book, startDate?: Date) {
-		this._book = book;
-		this._startDate = startDate ?? new Date();
-		this._endDate = new Date();
-	}
-
-	get book() {
-		return this._book;
-	}
-
-	get startDate() {
-		return this._startDate;
-	}
-
-	get endDate() {
-		return this._endDate;
+	constructor(id: string, book: Book, startDate: Date, endDate = new Date()) {
+		this.id = id;
+		this.book = book;
+		this.startDate = startDate ?? new Date();
+		this.endDate = endDate;
 	}
 }

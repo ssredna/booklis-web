@@ -23,6 +23,7 @@ export class ReadingGoal {
 		avgPageCount: number,
 		chosenBooks: string[],
 		activeBooks: { id: string; bookId: string; pagesRead: number; startDate: string }[],
+		readBooks: { id: string; bookId: string; startDate: string; endDate: string }[],
 		books: Book[],
 		pagesReadToday?: number
 	) {
@@ -50,6 +51,24 @@ export class ReadingGoal {
 				);
 			} else {
 				return new ActiveBook('Error', new Book('error', 'Book not found', 0));
+			}
+		});
+		this.readBooks = readBooks.map((readBook) => {
+			const book = books.find((book) => book.id === readBook.bookId);
+			if (book) {
+				return new ReadBook(
+					readBook.id,
+					book,
+					new Date(readBook.startDate),
+					new Date(readBook.endDate)
+				);
+			} else {
+				return new ReadBook(
+					'Error',
+					new Book('error', 'Book not found', 0),
+					new Date(),
+					new Date()
+				);
 			}
 		});
 	}
@@ -126,7 +145,9 @@ export class ReadingGoal {
 			(book) => book.book.id === finishedBook.book.id
 		);
 		this.activeBooks.splice(indexOfFinishedBook, 1);
-		this.readBooks.push(new ReadBook(finishedBook.book, finishedBook.startDate));
+		this.readBooks.push(
+			new ReadBook(crypto.randomUUID(), finishedBook.book, finishedBook.startDate)
+		);
 	}
 
 	resetStatsOfTheDayIfNewDay() {

@@ -50,7 +50,7 @@
 		<br />
 
 		{#if goal.readBooks.length > 0}
-			<h2>Lese bøker:</h2>
+			<h2>Leste bøker:</h2>
 			{#each goal.readBooks as readBook}
 				<p>{readBook.book.title}</p>
 			{/each}

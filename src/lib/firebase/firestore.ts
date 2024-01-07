@@ -26,16 +26,25 @@ export async function getGoals() {
 	const goalSnapshot = await getDocs(collection(db, 'goals'));
 	const goals = Promise.all(
 		goalSnapshot.docs.map(async (goalDoc) => {
-			const activeBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'activeBooks'));
-
 			const chosenBooks = (goalDoc.data().chosenBooks as string[]) ?? [];
 
+			const activeBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'activeBooks'));
 			const activeBooks = activeBooksSnapshot.docs.map((activeBookDoc) => {
 				return {
 					id: activeBookDoc.id,
 					bookId: activeBookDoc.data().bookId as string,
 					pagesRead: activeBookDoc.data().pagesRead as number,
 					startDate: activeBookDoc.data().startDate.toDate().toString() as string
+				};
+			});
+
+			const readBooksSnapshot = await getDocs(collection(db, 'goals', goalDoc.id, 'readBooks'));
+			const readBooks = readBooksSnapshot.docs.map((readBookDoc) => {
+				return {
+					id: readBookDoc.id,
+					bookId: readBookDoc.data().bookId as string,
+					startDate: readBookDoc.data().startDate.toDate().toString() as string,
+					endDate: readBookDoc.data().endDate.toDate().toString() as string
 				};
 			});
 
@@ -47,7 +56,8 @@ export async function getGoals() {
 				pagesReadToday: goalDoc.data().pagesReadToday as number,
 				todaysDate: goalDoc.data().todaysDate.toDate().toString() as string,
 				chosenBooks,
-				activeBooks
+				activeBooks,
+				readBooks
 			};
 		})
 	);
