@@ -1,12 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActiveBook } from '$lib/core/activeBook';
+	import type { ReadingGoal } from '$lib/core/readingGoal';
 
 	export let activeBook: ActiveBook;
-	export let goalId: string;
+	export let goal: ReadingGoal;
 
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
+
+	let oldPagesRead: number;
+	$: increase = activeBook.pagesRead - oldPagesRead;
 </script>
 
 <div class="container">
@@ -17,7 +21,8 @@
 		bind:this={pagesReadForm}
 		action="?/updatePagesRead"
 		method="post"
-		use:enhance={() => {
+		use:enhance={({ formData }) => {
+			formData.append('pagesReadToday', String(goal.pagesReadToday));
 			isFormSubmitting = true;
 
 			return async ({ update }) => {
@@ -33,13 +38,15 @@
 			step="1"
 			name="pagesRead"
 			bind:value={activeBook.pagesRead}
-			on:change={() => {
+			on:mouseup={() => {
+				goal.pagesReadToday += increase;
 				pagesReadForm.requestSubmit();
 			}}
+			on:mousedown={() => (oldPagesRead = activeBook.pagesRead)}
 			disabled={isFormSubmitting}
 		/>
 		<input type="hidden" value={activeBook.id} name="activeBookId" required />
-		<input type="hidden" value={goalId} name="goalId" required />
+		<input type="hidden" value={goal.id} name="goalId" required />
 
 		{#if isFormSubmitting}
 			Lagrer...
@@ -53,7 +60,7 @@
 
 	<form action="?/removeActiveBook" method="post" use:enhance>
 		<input type="hidden" name="bookId" value={activeBook.book.id} required />
-		<input type="hidden" name="goalId" value={goalId} required />
+		<input type="hidden" name="goalId" value={goal.id} required />
 		<input type="hidden" name="activeBookId" value={activeBook.id} required />
 		<input type="submit" value="Fjern fra aktive bøker" />
 	</form>

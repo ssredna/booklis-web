@@ -21,12 +21,14 @@
 	{#if !isEditing}
 		<h1>{goal.numberOfBooks} bøker til {goal.deadline.toDateString()}</h1>
 		<p>Gjennomsnittlig sider per dag: {goal.pagesPerDay()}</p>
+		<p>Sider lest i dag: {goal.pagesReadToday}</p>
+		<p>Sider igjen å lese i dag: {goal.pagesLeftToday()}</p>
 		<p>{goal.numberOfBooks - goal.readBooks.length} bøker igjen å lese</p>
 
 		{#if goal.activeBooks.length > 0}
 			<h2>Aktive bøker:</h2>
 			{#each goal.activeBooks as activeBook}
-				<ActiveBook {activeBook} goalId={goal.id} />
+				<ActiveBook {activeBook} {goal} />
 			{/each}
 		{:else}
 			<p>Ingen bøker er aktive</p>

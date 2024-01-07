@@ -14,7 +14,7 @@ export class ReadingGoal {
 	chosenBooks: Book[] = [];
 
 	todaysDate = new Date();
-	private _pagesReadToday = 0;
+	private _pagesReadToday;
 
 	constructor(
 		id: string,
@@ -23,12 +23,14 @@ export class ReadingGoal {
 		avgPageCount: number,
 		chosenBooks: string[],
 		activeBooks: { id: string; bookId: string; pagesRead: number; startDate: string }[],
-		books: Book[]
+		books: Book[],
+		pagesReadToday?: number
 	) {
 		this.id = id;
 		this.deadline = new Date(deadline);
 		this.numberOfBooks = numberOfBooks;
 		this.avgPageCount = avgPageCount;
+		this._pagesReadToday = pagesReadToday ?? 0;
 		this.chosenBooks = chosenBooks.map((id) => {
 			const book = books.find((book) => book.id === id);
 			if (book) {

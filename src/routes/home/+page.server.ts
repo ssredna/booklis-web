@@ -257,6 +257,7 @@ export const actions = {
 		const activeBookId = data.get('activeBookId');
 		const goalId = data.get('goalId');
 		const pagesRead = data.get('pagesRead');
+		const pagesReadToday = data.get('pagesReadToday');
 
 		const parsedActiveBookId = idSchema.safeParse(activeBookId);
 		if (!parsedActiveBookId.success) {
@@ -273,11 +274,17 @@ export const actions = {
 			return fail(422, { pagesReadError: true });
 		}
 
+		const parsedPagesReadToday = pagesReadSchema.safeParse(pagesReadToday);
+		if (!parsedPagesReadToday.success) {
+			return fail(422, { increaseError: true });
+		}
+
 		try {
 			return await updatePagesRead(
 				parsedActiveBookId.data,
 				parsedGoalId.data,
-				parsedPagesRead.data
+				parsedPagesRead.data,
+				parsedPagesReadToday.data
 			);
 		} catch (error) {
 			return fail(400, {

@@ -16,7 +16,8 @@
 				goal.avgPageCount,
 				goal.chosenBooks,
 				goal.activeBooks,
-				data.books
+				data.books,
+				goal.pagesReadToday
 			)
 	);
 

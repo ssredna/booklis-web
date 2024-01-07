@@ -15,7 +15,8 @@ export async function createGoal(numberOfBooks: number, deadline: Date, avgPageC
 	const docRef = await addDoc(collection(db, 'goals'), {
 		numberOfBooks: numberOfBooks,
 		deadline: deadline,
-		avgPageCount: avgPageCount
+		avgPageCount: avgPageCount,
+		pagesReadToday: 0
 	});
 	return docRef.id;
 }
@@ -42,6 +43,7 @@ export async function getGoals() {
 				numberOfBooks: goalDoc.data().numberOfBooks as number,
 				deadline: goalDoc.data().deadline.toDate().toString() as string,
 				avgPageCount: goalDoc.data().avgPageCount as number,
+				pagesReadToday: goalDoc.data().pagesReadToday as number,
 				chosenBooks,
 				activeBooks
 			};
@@ -128,8 +130,21 @@ export async function removeActiveBook(goalId: string, activeBookId: string, boo
 	await batch.commit();
 }
 
-export async function updatePagesRead(activeBookId: string, goalId: string, pagesRead: number) {
-	await updateDoc(doc(db, 'goals', goalId, 'activeBooks', activeBookId), {
+export async function updatePagesRead(
+	activeBookId: string,
+	goalId: string,
+	pagesRead: number,
+	pagesReadToday: number
+) {
+	const batch = writeBatch(db);
+
+	batch.update(doc(db, 'goals', goalId, 'activeBooks', activeBookId), {
 		pagesRead: pagesRead
 	});
+
+	batch.update(doc(db, 'goals', goalId), {
+		pagesReadToday: pagesReadToday
+	});
+
+	await batch.commit();
 }
