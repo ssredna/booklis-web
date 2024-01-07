@@ -12,6 +12,7 @@ import {
 	updatePagesRead
 } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
+import { isSameDay } from 'date-fns';
 import { z } from 'zod';
 
 const numberOfBooksSchema = z.coerce.number().min(1);
@@ -23,8 +24,16 @@ const pagesReadSchema = z.coerce.number().min(0);
 
 export const load = async () => {
 	try {
+		const goals = await getGoals();
+		const today = new Date();
+		goals.forEach((goal) => {
+			if (!isSameDay(today, new Date(goal.todaysDate))) {
+				goal.todaysDate = today.toString();
+				goal.pagesReadToday = 0;
+			}
+		});
 		return {
-			goals: await getGoals(),
+			goals,
 			books: await getBooks()
 		};
 	} catch (e) {

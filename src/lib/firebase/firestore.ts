@@ -16,7 +16,8 @@ export async function createGoal(numberOfBooks: number, deadline: Date, avgPageC
 		numberOfBooks: numberOfBooks,
 		deadline: deadline,
 		avgPageCount: avgPageCount,
-		pagesReadToday: 0
+		pagesReadToday: 0,
+		todaysDate: new Date()
 	});
 	return docRef.id;
 }
@@ -44,6 +45,7 @@ export async function getGoals() {
 				deadline: goalDoc.data().deadline.toDate().toString() as string,
 				avgPageCount: goalDoc.data().avgPageCount as number,
 				pagesReadToday: goalDoc.data().pagesReadToday as number,
+				todaysDate: goalDoc.data().todaysDate.toDate().toString() as string,
 				chosenBooks,
 				activeBooks
 			};
@@ -143,7 +145,8 @@ export async function updatePagesRead(
 	});
 
 	batch.update(doc(db, 'goals', goalId), {
-		pagesReadToday: pagesReadToday
+		pagesReadToday: pagesReadToday,
+		todaysDate: new Date()
 	});
 
 	await batch.commit();
