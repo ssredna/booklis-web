@@ -11,3 +11,4 @@ vite.config.ts.timestamp-*
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+booklis_service_account_key.json
