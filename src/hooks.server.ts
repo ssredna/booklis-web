@@ -1,8 +1,10 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
 import Google from '@auth/sveltekit/providers/google';
 import { GOOGLE_ID, GOOGLE_SECRET } from '$env/static/private';
+import { redirect, type Handle } from '@sveltejs/kit';
+import { sequence } from '@sveltejs/kit/hooks';
 
-export const handle = SvelteKitAuth({
+const authentication = SvelteKitAuth({
 	providers: [
 		Google({
 			clientId: GOOGLE_ID,
@@ -23,3 +25,16 @@ export const handle = SvelteKitAuth({
 		}
 	}
 });
+
+const authorization = (async ({ event, resolve }) => {
+	if (event.url.pathname.startsWith('/home')) {
+		const session = await event.locals.getSession();
+		if (!session) {
+			throw redirect(303, '/');
+		}
+	}
+
+	return resolve(event);
+}) satisfies Handle;
+
+export const handle = sequence(authentication, authorization);
