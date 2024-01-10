@@ -25,9 +25,9 @@ const pageCountSchema = z.coerce.number().min(1);
 const titleSchema = z.coerce.string();
 const pagesReadSchema = z.coerce.number().min(0);
 
-export const load = async () => {
+export const load = async ({ locals, params }) => {
 	try {
-		const goals = await getGoals();
+		const goals = await getGoals(params.userId);
 		const today = new Date();
 		goals.forEach((goal) => {
 			if (!isSameDay(today, new Date(goal.todaysDate))) {
@@ -37,7 +37,8 @@ export const load = async () => {
 		});
 		return {
 			goals,
-			books: await getBooks()
+			books: await getBooks(params.userId),
+			isOwner: locals.isOwner
 		};
 	} catch (e) {
 		error(400, e instanceof Error ? e.message : 'Unknown error');
@@ -45,7 +46,9 @@ export const load = async () => {
 };
 
 export const actions = {
-	createGoal: async ({ request }) => {
+	createGoal: async ({ request, params, locals }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const numberOfBooks = data.get('numberOfBooks');
@@ -69,6 +72,7 @@ export const actions = {
 
 		try {
 			return await createGoal(
+				params.userId,
 				parsedNumberOfBooks.data,
 				parsedDeadline.data,
 				parsedAvgPageCount.data
@@ -80,7 +84,9 @@ export const actions = {
 		}
 	},
 
-	deleteGoal: async ({ request }) => {
+	deleteGoal: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 		const id = data.get('id');
 
@@ -90,7 +96,7 @@ export const actions = {
 		}
 
 		try {
-			return await deleteGoal(parsedId.data);
+			return await deleteGoal(params.userId, parsedId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -98,7 +104,9 @@ export const actions = {
 		}
 	},
 
-	editGoal: async ({ request }) => {
+	editGoal: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const numberOfBooks = data.get('numberOfBooks');
@@ -121,7 +129,12 @@ export const actions = {
 		}
 
 		try {
-			return await editGoal(parsedId.data, parsedNumberOfBooks.data, parsedDeadline.data);
+			return await editGoal(
+				params.userId,
+				parsedId.data,
+				parsedNumberOfBooks.data,
+				parsedDeadline.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -129,7 +142,9 @@ export const actions = {
 		}
 	},
 
-	addBook: async ({ request }) => {
+	addBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const title = data.get('title');
@@ -152,15 +167,23 @@ export const actions = {
 		}
 
 		try {
-			return await addBook(parsedGoalId.data, parsedTitle.data, parsedPageCount.data);
+			return await addBook(
+				params.userId,
+				parsedGoalId.data,
+				parsedTitle.data,
+				parsedPageCount.data
+			);
 		} catch (error) {
+			console.log(error);
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
 	},
 
-	addExistingBook: async ({ request }) => {
+	addExistingBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const bookId = data.get('bookId');
@@ -177,7 +200,7 @@ export const actions = {
 		}
 
 		try {
-			return await addExistingBookToGoal(parsedGoalId.data, parsedBookId.data);
+			return await addExistingBookToGoal(params.userId, parsedGoalId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -185,7 +208,9 @@ export const actions = {
 		}
 	},
 
-	removeBook: async ({ request }) => {
+	removeBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 		const bookId = data.get('bookId');
 		const goalId = data.get('goalId');
@@ -201,7 +226,7 @@ export const actions = {
 		}
 
 		try {
-			return await removeBook(parsedGoalId.data, parsedBookId.data);
+			return await removeBook(params.userId, parsedGoalId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -209,7 +234,9 @@ export const actions = {
 		}
 	},
 
-	startBook: async ({ request }) => {
+	startBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 		const bookId = data.get('bookId');
 		const goalId = data.get('goalId');
@@ -225,7 +252,7 @@ export const actions = {
 		}
 
 		try {
-			return await startBook(parsedGoalId.data, parsedBookId.data);
+			return await startBook(params.userId, parsedGoalId.data, parsedBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -233,7 +260,9 @@ export const actions = {
 		}
 	},
 
-	removeActiveBook: async ({ request }) => {
+	removeActiveBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 		const bookId = data.get('bookId');
 		const activeBookId = data.get('activeBookId');
@@ -255,7 +284,12 @@ export const actions = {
 		}
 
 		try {
-			return await removeActiveBook(parsedGoalId.data, parsedActiveBookId.data, parsedBookId.data);
+			return await removeActiveBook(
+				params.userId,
+				parsedGoalId.data,
+				parsedActiveBookId.data,
+				parsedBookId.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -263,7 +297,9 @@ export const actions = {
 		}
 	},
 
-	updatePagesRead: async ({ request }) => {
+	updatePagesRead: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const activeBookId = data.get('activeBookId');
@@ -287,6 +323,7 @@ export const actions = {
 
 		try {
 			return await updatePagesRead(
+				params.userId,
 				parsedActiveBookId.data,
 				parsedGoalId.data,
 				parsedPagesRead.data,
@@ -299,7 +336,9 @@ export const actions = {
 		}
 	},
 
-	resetToday: async ({ request }) => {
+	resetToday: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const goalId = data.get('goalId');
@@ -310,7 +349,7 @@ export const actions = {
 		}
 
 		try {
-			return await resetToday(parsedGoalId.data);
+			return await resetToday(params.userId, parsedGoalId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -318,7 +357,9 @@ export const actions = {
 		}
 	},
 
-	finishBook: async ({ request }) => {
+	finishBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const goalId = data.get('goalId');
@@ -342,6 +383,7 @@ export const actions = {
 
 		try {
 			await finishBook(
+				params.userId,
 				parsedGoalId.data,
 				parsedActiveBookId.data,
 				parsedBookId.data,
@@ -354,7 +396,9 @@ export const actions = {
 		}
 	},
 
-	reactivateBook: async ({ request }) => {
+	reactivateBook: async ({ request, locals, params }) => {
+		if (!locals.isOwner) return fail(403, { unauthorized: true });
+
 		const data = await request.formData();
 
 		const goalId = data.get('goalId');
@@ -381,6 +425,7 @@ export const actions = {
 
 		try {
 			await reactivateBook(
+				params.userId,
 				parsedGoalId.data,
 				parsedBookId.data,
 				parsedPageCount.data,

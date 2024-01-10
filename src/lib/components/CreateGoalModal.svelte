@@ -61,6 +61,10 @@
 		{#if isFormSubmitting}
 			<p>Lagrer...</p>
 		{/if}
+
+		{#if $page.form?.unauthorized}
+			<p>Du har ikke tilgang til å gjøre dette</p>
+		{/if}
 		<input type="submit" />
 	</form>
 </Modal>

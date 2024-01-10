@@ -26,15 +26,26 @@ const authentication = SvelteKitAuth({
 	}
 });
 
-const authorization = (async ({ event, resolve }) => {
-	if (event.url.pathname.startsWith('/home')) {
+const redirectToUserPage = (async ({ event, resolve }) => {
+	if (event.url.pathname === '/home') {
 		const session = await event.locals.getSession();
-		if (!session) {
-			throw redirect(303, '/');
-		}
+		if (!session?.user) redirect(303, '/');
+		redirect(303, '/' + session.user.id);
 	}
 
 	return resolve(event);
 }) satisfies Handle;
 
-export const handle = sequence(authentication, authorization);
+const isOwner = (async ({ event, resolve }) => {
+	if (event.params.userId) {
+		const session = await event.locals.getSession();
+
+		const isOwner = !!session?.user && session.user.id === event.params.userId;
+
+		event.locals.isOwner = isOwner;
+	}
+
+	return resolve(event);
+}) satisfies Handle;
+
+export const handle = sequence(authentication, redirectToUserPage, isOwner);
