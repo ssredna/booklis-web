@@ -24,15 +24,15 @@
 	);
 
 	$: books.set(data.books.map((book) => new Book(book.id, book.title, book.pageCount)));
-
-	let showCreateGoalModal = false;
 </script>
 
 {#if readingGoals.length === 0 && data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Lag deg et lesemål
 	</h1>
-	<Button size="lg" on:click={() => (showCreateGoalModal = true)}>Opprett mål</Button>
+	<CreateGoalModal>
+		<Button size="lg">Opprett mål</Button>
+	</CreateGoalModal>
 {:else if readingGoals.length === 0 && !data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Her er det ingen lesemål
@@ -49,8 +49,4 @@
 	{#each data.books as book}
 		<p>{book.title}</p>
 	{/each}
-{/if}
-
-{#if showCreateGoalModal}
-	<CreateGoalModal on:close={() => (showCreateGoalModal = false)} />
 {/if}
