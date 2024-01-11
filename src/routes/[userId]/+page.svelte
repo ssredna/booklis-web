@@ -2,6 +2,7 @@
 	import { books } from '$lib/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
+	import { Button } from '$lib/components/ui/button';
 	import { Book } from '$lib/core/book.js';
 	import { ReadingGoal } from '$lib/core/readingGoal.js';
 
@@ -27,16 +28,28 @@
 	let showCreateGoalModal = false;
 </script>
 
-{#each readingGoals as goal}
-	<Goal {goal} />
-{/each}
+{#if readingGoals.length === 0 && data.isOwner}
+	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
+		Lag deg et lesemål
+	</h1>
+	<Button size="lg" on:click={() => (showCreateGoalModal = true)}>Opprett mål</Button>
+{:else if readingGoals.length === 0 && !data.isOwner}
+	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
+		Her er det ingen lesemål
+	</h1>
+	<Button size="lg" href="/home">Gå hjem</Button>
+{:else}
+	{#each readingGoals as goal}
+		<Goal {goal} />
+	{/each}
+{/if}
 
-<button on:click={() => (showCreateGoalModal = true)}> Lag et nytt mål </button>
-
-<h1>Mine bøker:</h1>
-{#each data.books as book}
-	<p>{book.title}</p>
-{/each}
+{#if data.books.length !== 0}
+	<h1>Mine bøker:</h1>
+	{#each data.books as book}
+		<p>{book.title}</p>
+	{/each}
+{/if}
 
 {#if showCreateGoalModal}
 	<CreateGoalModal on:close={() => (showCreateGoalModal = false)} />
