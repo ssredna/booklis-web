@@ -15,6 +15,7 @@
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { CreateGoalSchema } from '../../routes/[userId]/createGoalSchema';
 	import { superForm } from 'sveltekit-superforms/client';
+	import { isOwner } from '$lib/isOwnerStore';
 
 	export let goal: ReadingGoal;
 	export let inputForm: SuperValidated<CreateGoalSchema>;
@@ -40,10 +41,12 @@
 		<Card.Header>
 			<Card.Title class="flex place-content-between">
 				Lesemål
-				<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
-					<Edit class="mr-2 h-4 w-4" />
-					Rediger mål
-				</Button>
+				{#if $isOwner}
+					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
+						<Edit class="mr-2 h-4 w-4" />
+						Rediger mål
+					</Button>
+				{/if}
 			</Card.Title>
 			<Card.Description>{goal.numberOfBooks} bøker til {dateString}</Card.Description>
 		</Card.Header>

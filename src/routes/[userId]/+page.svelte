@@ -5,6 +5,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Book } from '$lib/core/book.js';
 	import { ReadingGoal } from '$lib/core/readingGoal.js';
+	import { isOwner } from '$lib/isOwnerStore.js';
 
 	export let data;
 
@@ -24,6 +25,7 @@
 	);
 
 	$: books.set(data.books.map((book) => new Book(book.id, book.title, book.pageCount)));
+	$: isOwner.set(data.isOwner);
 </script>
 
 {#if readingGoals.length === 0 && data.isOwner}
