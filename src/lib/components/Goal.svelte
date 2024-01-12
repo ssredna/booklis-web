@@ -9,25 +9,33 @@
 	import ReadBook from './ReadBook.svelte';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
-	import { Edit, Loader2 } from 'lucide-svelte';
+	import { Edit, Loader2, Trash } from 'lucide-svelte';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { CreateGoalSchema } from '../../routes/[userId]/createGoalSchema';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { isOwner } from '$lib/isOwnerStore';
+	import type { DeleteGoalSchema } from '../../routes/[userId]/deleteGoalSchema';
 
 	export let goal: ReadingGoal;
-	export let inputForm: SuperValidated<CreateGoalSchema>;
+	export let createGoalForm: SuperValidated<CreateGoalSchema>;
+	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
 
 	const {
-		errors,
-		delayed,
-		submitting,
-		enhance: sEnhance
-	} = superForm(inputForm, {
+		errors: createErrors,
+		delayed: createDelayed,
+		submitting: createSubmitting,
+		enhance: createEnhance
+	} = superForm(createGoalForm, {
 		onUpdated: () => (isEditing = false)
 	});
+
+	const {
+		delayed: deleteDelayed,
+		submitting: deleteSubmitting,
+		enhance: deleteEnhance
+	} = superForm(deleteGoalForm);
 
 	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 
@@ -81,29 +89,35 @@
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form id="editGoalForm" method="post" action="?/editGoal" use:sEnhance class="grid gap-6">
+			<form
+				id="editGoalForm"
+				method="post"
+				action="?/editGoal"
+				use:createEnhance
+				class="grid gap-6"
+			>
 				<div class="grid gap-2">
-					<Label for="numberOfBooks" class={$errors.numberOfBooks ? 'text-destructive' : ''}>
+					<Label for="numberOfBooks" class={$createErrors.numberOfBooks ? 'text-destructive' : ''}>
 						Hvor mange bøker vil du lese?
 					</Label>
 					<Input id="numberOfBooks" name="numberOfBooks" type="number" value={goal.numberOfBooks} />
-					{#if $errors.numberOfBooks}
-						<small class="text-destructive">{$errors.numberOfBooks}</small>
+					{#if $createErrors.numberOfBooks}
+						<small class="text-destructive">{$createErrors.numberOfBooks}</small>
 					{/if}
 				</div>
 
 				<div class="grid gap-2">
-					<Label for="deadline" class={$errors.numberOfBooks ? 'text-destructive' : ''}>
+					<Label for="deadline" class={$createErrors.numberOfBooks ? 'text-destructive' : ''}>
 						Til når vil du nå målet ditt?
 					</Label>
 					<Input id="deadline" value={dateString} type="date" name="deadline" />
-					{#if $errors.deadline}
-						<small class="text-destructive">{$errors.deadline}</small>
+					{#if $createErrors.deadline}
+						<small class="text-destructive">{$createErrors.deadline}</small>
 					{/if}
 				</div>
 
 				<div class="grid gap-2">
-					<Label for="avgPageCount" class={$errors.avgPageCount ? 'text-destructive' : ''}>
+					<Label for="avgPageCount" class={$createErrors.avgPageCount ? 'text-destructive' : ''}>
 						Gjennomsnittlig antall sider per bok
 					</Label>
 					<Input id="avgPageCount" name="avgPageCount" type="number" value={goal.avgPageCount} />
@@ -111,8 +125,8 @@
 						Brukes for å regne ut hvor mange sider du må lese, før du har lagt til alle de
 						spesifikke bøkene.
 					</small>
-					{#if $errors.avgPageCount}
-						<small class="text-destructive">{$errors.avgPageCount}</small>
+					{#if $createErrors.avgPageCount}
+						<small class="text-destructive">{$createErrors.avgPageCount}</small>
 					{/if}
 				</div>
 
@@ -128,14 +142,30 @@
 				<input type="hidden" name="goalId" value={goal.id} />
 			</form>
 		</Card.Content>
-		<Card.Footer class="flex gap-6">
-			<Button type="submit" form="editGoalForm" disabled={$submitting}>
-				{#if $delayed}
-					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+		<Card.Footer class="place-content-between">
+			<div class="flex gap-6">
+				<Button type="submit" form="editGoalForm" disabled={$createSubmitting}>
+					{#if $createDelayed}
+						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					{/if}
+					Lagre
+				</Button>
+				<Button variant="destructive" on:click={() => (isEditing = false)}>Avbryt</Button>
+			</div>
+			<form method="post" action="?/deleteGoal" use:deleteEnhance>
+				<input type="hidden" name="goalId" value={goal.id} />
+				<Button type="submit" variant="destructive" disabled={$deleteSubmitting}>
+					{#if $deleteDelayed}
+						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+					{:else}
+						<Trash class="mr-2 h-4 w-4" />
+					{/if}
+					Slett mål
+				</Button>
+				{#if $page.form?.idError}
+					<p>Klarte ikke å slette, prøv igjen</p>
 				{/if}
-				Lagre
-			</Button>
-			<Button variant="destructive" on:click={() => (isEditing = false)}>Avbryt</Button>
+			</form>
 		</Card.Footer>
 	</Card.Root>
 {/if}
@@ -167,23 +197,6 @@
 {:else}
 	<p>Ingen bøker er fullført enda</p>
 {/if}
-
-<form
-	method="post"
-	action="?/deleteGoal"
-	use:enhance={({ cancel }) => {
-		const conformed = confirm('Er du sikker?');
-		if (!conformed) {
-			cancel();
-		}
-	}}
->
-	<input type="hidden" name="id" value={goal.id} />
-	<input type="submit" value="Slett mål" />
-	{#if $page.form?.idError}
-		<p>Klarte ikke å slette, prøv igjen</p>
-	{/if}
-</form>
 
 {#if showAddBookModal}
 	<AddBookModal {goal} on:close={() => (showAddBookModal = false)} />

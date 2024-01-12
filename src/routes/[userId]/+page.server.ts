@@ -20,6 +20,7 @@ import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
 import { createGoalSchema } from './createGoalSchema';
 import { editGoalSchema } from './editGoalSchema';
+import { deleteGoalSchema } from './deleteGoalSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
@@ -40,6 +41,7 @@ export const load = async ({ locals, params }) => {
 		return {
 			createGoalForm: await superValidate(createGoalSchema),
 			editGoalForm: await superValidate(editGoalSchema),
+			deleteGoalForm: await superValidate(deleteGoalSchema),
 			goals,
 			books: await getBooks(params.userId),
 			isOwner: locals.isOwner
@@ -74,23 +76,21 @@ export const actions = {
 	},
 
 	deleteGoal: async ({ request, locals, params }) => {
-		if (!locals.isOwner) return fail(403, { unauthorized: true });
+		const deleteGoalForm = await superValidate(request, deleteGoalSchema);
 
-		const data = await request.formData();
-		const id = data.get('id');
-
-		const parsedId = idSchema.safeParse(id);
-		if (!parsedId.success) {
-			return fail(422, { idError: true });
-		}
+		if (!locals.isOwner) return fail(403, { deleteGoalForm, unauthorized: true });
+		if (!deleteGoalForm.valid) return fail(400, { deleteGoalForm });
 
 		try {
-			return await deleteGoal(params.userId, parsedId.data);
+			await deleteGoal(params.userId, deleteGoalForm.data.goalId);
 		} catch (error) {
 			return fail(400, {
+				deleteGoalForm,
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
+
+		return { deleteGoalForm };
 	},
 
 	editGoal: async ({ request, locals, params }) => {
