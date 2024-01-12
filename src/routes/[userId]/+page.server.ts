@@ -19,8 +19,8 @@ import { isSameDay } from 'date-fns';
 import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
 import { createGoalSchema } from './createGoalSchema';
+import { editGoalSchema } from './editGoalSchema';
 
-const numberOfBooksSchema = z.coerce.number().min(1);
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
 const pageCountSchema = z.coerce.number().min(1);
@@ -38,7 +38,8 @@ export const load = async ({ locals, params }) => {
 			}
 		});
 		return {
-			form: await superValidate(createGoalSchema),
+			createGoalForm: await superValidate(createGoalSchema),
+			editGoalForm: await superValidate(editGoalSchema),
 			goals,
 			books: await getBooks(params.userId),
 			isOwner: locals.isOwner
@@ -50,28 +51,26 @@ export const load = async ({ locals, params }) => {
 
 export const actions = {
 	createGoal: async (event) => {
-		const form = await superValidate(event.request, createGoalSchema);
+		const createGoalForm = await superValidate(event.request, createGoalSchema);
 
-		if (!event.locals.isOwner) return fail(403, { form, unauthorized: true });
-		if (!form.valid) return fail(400, { form });
+		if (!event.locals.isOwner) return fail(403, { createGoalForm, unauthorized: true });
+		if (!createGoalForm.valid) return fail(400, { createGoalForm });
 
 		try {
 			await createGoal(
 				event.params.userId,
-				form.data.numberOfBooks,
-				form.data.deadline,
-				form.data.avgPageCount
+				createGoalForm.data.numberOfBooks,
+				createGoalForm.data.deadline,
+				createGoalForm.data.avgPageCount
 			);
 		} catch (error) {
 			return fail(400, {
-				form,
+				createGoalForm,
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
 
-		return {
-			form
-		};
+		return { createGoalForm };
 	},
 
 	deleteGoal: async ({ request, locals, params }) => {
@@ -95,41 +94,27 @@ export const actions = {
 	},
 
 	editGoal: async ({ request, locals, params }) => {
-		if (!locals.isOwner) return fail(403, { unauthorized: true });
+		const editGoalForm = await superValidate(request, editGoalSchema);
 
-		const data = await request.formData();
-
-		const numberOfBooks = data.get('numberOfBooks');
-		const deadline = data.get('deadline');
-		const id = data.get('id');
-
-		const parsedNumberOfBooks = numberOfBooksSchema.safeParse(numberOfBooks);
-		if (!parsedNumberOfBooks.success) {
-			return fail(422, { numberOfBooksError: true });
-		}
-
-		const parsedDeadline = deadlineSchema.safeParse(deadline);
-		if (!parsedDeadline.success) {
-			return fail(422, { deadlineError: true });
-		}
-
-		const parsedId = idSchema.safeParse(id);
-		if (!parsedId.success) {
-			return fail(422, { idError: true });
-		}
+		if (!locals.isOwner) return fail(403, { editGoalForm, unauthorized: true });
+		if (!editGoalForm.valid) return fail(400, { editGoalForm });
 
 		try {
-			return await editGoal(
+			await editGoal(
 				params.userId,
-				parsedId.data,
-				parsedNumberOfBooks.data,
-				parsedDeadline.data
+				editGoalForm.data.goalId,
+				editGoalForm.data.numberOfBooks,
+				editGoalForm.data.deadline,
+				editGoalForm.data.avgPageCount
 			);
 		} catch (error) {
 			return fail(400, {
+				editGoalForm,
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
+
+		return { editGoalForm };
 	},
 
 	addBook: async ({ request, locals, params }) => {

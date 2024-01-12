@@ -30,7 +30,7 @@
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Lag deg et lesemål
 	</h1>
-	<CreateGoalModal inputForm={data.form}>
+	<CreateGoalModal inputForm={data.createGoalForm}>
 		<Button size="lg">Opprett mål</Button>
 	</CreateGoalModal>
 {:else if readingGoals.length === 0 && !data.isOwner}
@@ -40,7 +40,7 @@
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
 	{#each readingGoals as goal}
-		<Goal {goal} />
+		<Goal {goal} inputForm={data.createGoalForm} />
 	{/each}
 {/if}
 

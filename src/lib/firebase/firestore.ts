@@ -82,11 +82,13 @@ export async function editGoal(
 	userId: string,
 	goalId: string,
 	numberOfBooks: number,
-	deadline: Date
+	deadline: Date,
+	avgPageCount: number
 ) {
 	await updateDoc(doc(db, 'users', userId, 'goals', goalId), {
-		numberOfBooks: numberOfBooks,
-		deadline: deadline
+		numberOfBooks,
+		deadline,
+		avgPageCount
 	});
 }
 

@@ -9,16 +9,28 @@
 	import ReadBook from './ReadBook.svelte';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
-	import { Edit } from 'lucide-svelte';
+	import { Edit, Loader2 } from 'lucide-svelte';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
+	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { CreateGoalSchema } from '../../routes/[userId]/createGoalSchema';
+	import { superForm } from 'sveltekit-superforms/client';
 
 	export let goal: ReadingGoal;
+	export let inputForm: SuperValidated<CreateGoalSchema>;
+
+	const {
+		errors,
+		delayed,
+		submitting,
+		enhance: sEnhance
+	} = superForm(inputForm, {
+		onUpdated: () => (isEditing = false)
+	});
 
 	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 
 	let isEditing = false;
-	let isFormSubmitting = false;
 
 	let showAddBookModal = false;
 </script>
@@ -66,49 +78,40 @@
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form
-				id="editGoalForm"
-				method="post"
-				action="?/editGoal"
-				use:enhance={() => {
-					isFormSubmitting = true;
-
-					return async ({ result, update }) => {
-						isFormSubmitting = false;
-						update();
-						if (result.type === 'success') {
-							isEditing = false;
-						}
-					};
-				}}
-				class="grid gap-6"
-			>
-				<div>
-					<Label for="numberOfBooks">Hvor mange bøker vil du lese?</Label>
-					<Input
-						id="numberOfBooks"
-						value={goal.numberOfBooks}
-						type="number"
-						name="numberOfBooks"
-						min="1"
-						required
-					/>
-					{#if $page.form?.numberOfBooksError}
-						<p>Er du sikker på at du har oppgitt et gyldig antall bøker?</p>
+			<form id="editGoalForm" method="post" action="?/editGoal" use:sEnhance class="grid gap-6">
+				<div class="grid gap-2">
+					<Label for="numberOfBooks" class={$errors.numberOfBooks ? 'text-destructive' : ''}>
+						Hvor mange bøker vil du lese?
+					</Label>
+					<Input id="numberOfBooks" name="numberOfBooks" type="number" value={goal.numberOfBooks} />
+					{#if $errors.numberOfBooks}
+						<small class="text-destructive">{$errors.numberOfBooks}</small>
 					{/if}
 				</div>
 
-				<div>
-					<Label for="deadline">Til når vil du nå målet ditt?</Label>
-					<Input id="deadline" value={dateString} type="date" name="deadline" required />
-					{#if $page.form?.deadlineError}
-						<p>Er du sikker på at du har oppgitt en gyldig dato?</p>
+				<div class="grid gap-2">
+					<Label for="deadline" class={$errors.numberOfBooks ? 'text-destructive' : ''}>
+						Til når vil du nå målet ditt?
+					</Label>
+					<Input id="deadline" value={dateString} type="date" name="deadline" />
+					{#if $errors.deadline}
+						<small class="text-destructive">{$errors.deadline}</small>
 					{/if}
 				</div>
 
-				{#if isFormSubmitting}
-					<p>Lagrer...</p>
-				{/if}
+				<div class="grid gap-2">
+					<Label for="avgPageCount" class={$errors.avgPageCount ? 'text-destructive' : ''}>
+						Gjennomsnittlig antall sider per bok
+					</Label>
+					<Input id="avgPageCount" name="avgPageCount" type="number" value={goal.avgPageCount} />
+					<small>
+						Brukes for å regne ut hvor mange sider du må lese, før du har lagt til alle de
+						spesifikke bøkene.
+					</small>
+					{#if $errors.avgPageCount}
+						<small class="text-destructive">{$errors.avgPageCount}</small>
+					{/if}
+				</div>
 
 				{#if $page.form?.unauthorized}
 					<p class="text-destructive">Du har ikke tilgang til å gjøre endringer</p>
@@ -119,11 +122,16 @@
 					<p>{$page.form?.fireBaseError}</p>
 				{/if}
 
-				<input type="hidden" name="id" value={goal.id} />
+				<input type="hidden" name="goalId" value={goal.id} />
 			</form>
 		</Card.Content>
 		<Card.Footer class="flex gap-6">
-			<Button form="editGoalForm" type="submit">Lagre</Button>
+			<Button type="submit" form="editGoalForm" disabled={$submitting}>
+				{#if $delayed}
+					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				Lagre
+			</Button>
 			<Button variant="destructive" on:click={() => (isEditing = false)}>Avbryt</Button>
 		</Card.Footer>
 	</Card.Root>
