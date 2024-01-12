@@ -21,11 +21,11 @@ import { z } from 'zod';
 import { createGoalSchema } from './createGoalSchema';
 import { editGoalSchema } from './editGoalSchema';
 import { deleteGoalSchema } from './deleteGoalSchema';
+import { addBookSchema } from './addBookSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
 const pageCountSchema = z.coerce.number().min(1);
-const titleSchema = z.coerce.string();
 const pagesReadSchema = z.coerce.number().min(0);
 
 export const load = async ({ locals, params }) => {
@@ -42,6 +42,7 @@ export const load = async ({ locals, params }) => {
 			createGoalForm: await superValidate(createGoalSchema),
 			editGoalForm: await superValidate(editGoalSchema),
 			deleteGoalForm: await superValidate(deleteGoalSchema),
+			addBookForm: await superValidate(addBookSchema),
 			goals,
 			books: await getBooks(params.userId),
 			isOwner: locals.isOwner
@@ -118,42 +119,27 @@ export const actions = {
 	},
 
 	addBook: async ({ request, locals, params }) => {
-		if (!locals.isOwner) return fail(403, { unauthorized: true });
+		const addBookForm = await superValidate(request, addBookSchema);
 
-		const data = await request.formData();
-
-		const title = data.get('title');
-		const pageCount = data.get('pageCount');
-		const goalId = data.get('goalId');
-
-		const parsedTitle = titleSchema.safeParse(title);
-		if (!parsedTitle.success) {
-			return fail(422, { titleError: true });
-		}
-
-		const parsedPageCount = pageCountSchema.safeParse(pageCount);
-		if (!parsedPageCount.success) {
-			return fail(422, { pageCountError: true });
-		}
-
-		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
-			return fail(422, { goalIdError: true });
-		}
+		if (!locals.isOwner)
+			return fail(403, { addBookForm: { ...addBookForm, valid: false }, unauthorized: true });
+		if (!addBookForm.valid) return fail(400, { addBookForm });
 
 		try {
-			return await addBook(
+			await addBook(
 				params.userId,
-				parsedGoalId.data,
-				parsedTitle.data,
-				parsedPageCount.data
+				addBookForm.data.goalId,
+				addBookForm.data.title,
+				addBookForm.data.pageCount
 			);
 		} catch (error) {
-			console.log(error);
 			return fail(400, {
+				addBookForm: { ...addBookForm, valid: false },
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
+
+		return { addBookForm };
 	},
 
 	addExistingBook: async ({ request, locals, params }) => {

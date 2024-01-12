@@ -42,7 +42,12 @@
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
 	{#each readingGoals as goal}
-		<Goal {goal} createGoalForm={data.createGoalForm} deleteGoalForm={data.deleteGoalForm} />
+		<Goal
+			{goal}
+			createGoalForm={data.createGoalForm}
+			deleteGoalForm={data.deleteGoalForm}
+			addBookForm={data.addBookForm}
+		/>
 	{/each}
 {/if}
 

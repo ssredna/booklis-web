@@ -18,10 +18,12 @@
 	import { isOwner } from '$lib/isOwnerStore';
 	import type { DeleteGoalSchema } from '../../routes/[userId]/deleteGoalSchema';
 	import * as AlertDialog from './ui/alert-dialog';
+	import type { AddBookSchema } from '../../routes/[userId]/addBookSchema';
 
 	export let goal: ReadingGoal;
 	export let createGoalForm: SuperValidated<CreateGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
+	export let addBookForm: SuperValidated<AddBookSchema>;
 
 	const {
 		errors: createErrors,
@@ -29,7 +31,9 @@
 		submitting: createSubmitting,
 		enhance: createEnhance
 	} = superForm(createGoalForm, {
-		onUpdated: () => (isEditing = false)
+		onUpdated: ({ form }) => {
+			if (form.valid) isEditing = false;
+		}
 	});
 
 	const {
@@ -197,6 +201,13 @@
 	</Card.Root>
 {/if}
 
+{#if goal.chosenBooks.length === 0 && goal.activeBooks.length === 0 && goal.readBooks.length === 0 && $isOwner}
+	<h2 class="scroll-m-20 pb-4 text-2xl font-extrabold tracking-tight lg:text-3xl">
+		På tide å komme i gang!
+	</h2>
+{/if}
+<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
+
 {#if goal.activeBooks.length > 0}
 	<h2>Aktive bøker:</h2>
 	{#each goal.activeBooks as activeBook}
@@ -213,9 +224,6 @@
 	{/each}
 {/if}
 
-<button on:click={() => (showAddBookModal = true)}>Legg til bok</button>
-<br />
-
 {#if goal.readBooks.length > 0}
 	<h2>Leste bøker:</h2>
 	{#each goal.readBooks as readBook}
@@ -225,6 +233,4 @@
 	<p>Ingen bøker er fullført enda</p>
 {/if}
 
-{#if showAddBookModal}
-	<AddBookModal {goal} on:close={() => (showAddBookModal = false)} />
-{/if}
+<AddBookModal {goal} inputForm={addBookForm} bind:isOpen={showAddBookModal} />
