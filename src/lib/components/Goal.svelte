@@ -17,6 +17,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { isOwner } from '$lib/isOwnerStore';
 	import type { DeleteGoalSchema } from '../../routes/[userId]/deleteGoalSchema';
+	import * as AlertDialog from './ui/alert-dialog';
 
 	export let goal: ReadingGoal;
 	export let createGoalForm: SuperValidated<CreateGoalSchema>;
@@ -152,20 +153,46 @@
 				</Button>
 				<Button variant="destructive" on:click={() => (isEditing = false)}>Avbryt</Button>
 			</div>
-			<form method="post" action="?/deleteGoal" use:deleteEnhance>
-				<input type="hidden" name="goalId" value={goal.id} />
-				<Button type="submit" variant="destructive" disabled={$deleteSubmitting}>
-					{#if $deleteDelayed}
-						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-					{:else}
+			<AlertDialog.Root>
+				<AlertDialog.Trigger asChild let:builder>
+					<Button variant="destructive" builders={[builder]}>
 						<Trash class="mr-2 h-4 w-4" />
-					{/if}
-					Slett mål
-				</Button>
-				{#if $page.form?.idError}
-					<p>Klarte ikke å slette, prøv igjen</p>
-				{/if}
-			</form>
+						Slett mål
+					</Button>
+				</AlertDialog.Trigger>
+				<AlertDialog.Content>
+					<AlertDialog.Header>
+						<AlertDialog.Title>Er du sikker på at du vil slette målet?</AlertDialog.Title>
+						<AlertDialog.Description>
+							Det går ikke ann å angre denne handlingen. All progresjon på dette målet vil bli
+							slettet. Bøkene du har lagt til vil fortsatt være tilgjengelig.
+						</AlertDialog.Description>
+					</AlertDialog.Header>
+					<form id="deleteGoalForm" method="post" action="?/deleteGoal" use:deleteEnhance>
+						<input type="hidden" name="goalId" value={goal.id} />
+					</form>
+					<AlertDialog.Footer>
+						<AlertDialog.Cancel>Avbryt</AlertDialog.Cancel>
+						<AlertDialog.Action asChild let:builder>
+							<Button
+								{...builder}
+								type="submit"
+								form="deleteGoalForm"
+								variant="destructive"
+								disabled={$deleteSubmitting}
+							>
+								{#if $deleteDelayed}
+									<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+								{/if}
+								Slett mål
+							</Button>
+						</AlertDialog.Action>
+					</AlertDialog.Footer>
+				</AlertDialog.Content>
+			</AlertDialog.Root>
+			{#if $page.form?.idError}
+				<p>Klarte ikke å slette, prøv igjen</p>
+			{/if}
 		</Card.Footer>
 	</Card.Root>
 {/if}
