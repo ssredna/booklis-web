@@ -72,21 +72,20 @@
 				sider igjen i dag
 			</p>
 		</Card.Content>
-		<Card.Footer>
+		<Card.Footer class="flex justify-between">
 			<small>
 				{goal.pagesPerDay()} sider om dagen for å nå målet
 			</small>
+			{#if goal.pagesReadToday !== 0}
+				<form method="post" action="?/resetToday" use:enhance>
+					<input type="hidden" name="goalId" value={goal.id} />
+					<Button type="submit">Nullstill sider lest i dag</Button>
+					{#if $page.form?.resetTodayError}
+						<p>Noe gikk galt under nullstillingen</p>
+					{/if}
+				</form>
+			{/if}
 		</Card.Footer>
-
-		{#if goal.pagesReadToday !== 0}
-			<form method="post" action="?/resetToday" use:enhance>
-				<input type="hidden" name="goalId" value={goal.id} />
-				<input type="submit" value="Nullstill sider lest i dag" />
-				{#if $page.form?.resetTodayError}
-					<p>Noe gikk galt under nullstillingen</p>
-				{/if}
-			</form>
-		{/if}
 	</Card.Root>
 {:else}
 	<Card.Root class="mb-8 w-full max-w-2xl">
