@@ -19,6 +19,7 @@
 	import type { DeleteGoalSchema } from '../../routes/[userId]/deleteGoalSchema';
 	import * as AlertDialog from './ui/alert-dialog';
 	import type { AddBookSchema } from '../../routes/[userId]/addBookSchema';
+	import ChosenBooksCard from './ChosenBooksCard.svelte';
 
 	export let goal: ReadingGoal;
 	export let createGoalForm: SuperValidated<CreateGoalSchema>;
@@ -50,9 +51,9 @@
 </script>
 
 {#if !isEditing}
-	<Card.Root class="mb-8 w-full max-w-2xl">
+	<Card.Root class="mb-8 w-full max-w-xl">
 		<Card.Header>
-			<Card.Title class="flex place-content-between">
+			<Card.Title class="flex place-content-between text-2xl font-extrabold">
 				Lesemål
 				{#if $isOwner}
 					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
@@ -202,26 +203,23 @@
 {/if}
 
 {#if goal.chosenBooks.length === 0 && goal.activeBooks.length === 0 && goal.readBooks.length === 0 && $isOwner}
-	<h2 class="scroll-m-20 pb-4 text-2xl font-extrabold tracking-tight lg:text-3xl">
-		På tide å komme i gang!
-	</h2>
+	<h2 class="pb-4 text-3xl font-extrabold tracking-tight">På tide å komme i gang!</h2>
 {/if}
-<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
 
 {#if goal.activeBooks.length > 0}
 	<h2>Aktive bøker:</h2>
 	{#each goal.activeBooks as activeBook}
 		<ActiveBook {activeBook} {goal} />
 	{/each}
-{:else}
-	<p>Ingen bøker er aktive</p>
 {/if}
 
 {#if goal.chosenBooks.length > 0}
-	<h2>Valgte bøker:</h2>
-	{#each goal.chosenBooks as book}
-		<ChosenBook {book} goalId={goal.id} />
-	{/each}
+	<ChosenBooksCard>
+		{#each goal.chosenBooks as book}
+			<ChosenBook {book} goalId={goal.id} />
+		{/each}
+		<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
+	</ChosenBooksCard>
 {/if}
 
 {#if goal.readBooks.length > 0}
@@ -229,8 +227,6 @@
 	{#each goal.readBooks as readBook}
 		<ReadBook {readBook} goalId={goal.id} />
 	{/each}
-{:else}
-	<p>Ingen bøker er fullført enda</p>
 {/if}
 
 <AddBookModal {goal} inputForm={addBookForm} bind:isOpen={showAddBookModal} />
