@@ -30,7 +30,7 @@
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Lag deg et lesemål
 	</h1>
-	<CreateGoalModal>
+	<CreateGoalModal inputForm={data.form}>
 		<Button size="lg">Opprett mål</Button>
 	</CreateGoalModal>
 {:else if readingGoals.length === 0 && !data.isOwner}

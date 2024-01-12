@@ -16,7 +16,9 @@ import {
 } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
 import { isSameDay } from 'date-fns';
+import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
+import { createGoalSchema } from './createGoalSchema';
 
 const numberOfBooksSchema = z.coerce.number().min(1);
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
@@ -36,52 +38,40 @@ export const load = async ({ locals, params }) => {
 			}
 		});
 		return {
+			form: await superValidate(createGoalSchema),
 			goals,
 			books: await getBooks(params.userId),
 			isOwner: locals.isOwner
 		};
 	} catch (e) {
-		error(400, e instanceof Error ? e.message : 'Unknown error');
+		error(500, e instanceof Error ? e.message : 'Unknown error');
 	}
 };
 
 export const actions = {
-	createGoal: async ({ request, params, locals }) => {
-		if (!locals.isOwner) return fail(403, { unauthorized: true });
+	createGoal: async (event) => {
+		const form = await superValidate(event.request, createGoalSchema);
 
-		const data = await request.formData();
-
-		const numberOfBooks = data.get('numberOfBooks');
-		const deadline = data.get('deadline');
-		const avgPageCount = data.get('avgPageCount');
-
-		const parsedNumberOfBooks = numberOfBooksSchema.safeParse(numberOfBooks);
-		if (!parsedNumberOfBooks.success) {
-			return fail(422, { numberOfBooksError: true });
-		}
-
-		const parsedDeadline = deadlineSchema.safeParse(deadline);
-		if (!parsedDeadline.success) {
-			return fail(422, { deadlineError: true });
-		}
-
-		const parsedAvgPageCount = pageCountSchema.safeParse(avgPageCount);
-		if (!parsedAvgPageCount.success) {
-			return fail(422, { avgPageCountError: true });
-		}
+		if (!event.locals.isOwner) return fail(403, { form, unauthorized: true });
+		if (!form.valid) return fail(400, { form });
 
 		try {
-			return await createGoal(
-				params.userId,
-				parsedNumberOfBooks.data,
-				parsedDeadline.data,
-				parsedAvgPageCount.data
+			await createGoal(
+				event.params.userId,
+				form.data.numberOfBooks,
+				form.data.deadline,
+				form.data.avgPageCount
 			);
 		} catch (error) {
 			return fail(400, {
+				form,
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
+
+		return {
+			form
+		};
 	},
 
 	deleteGoal: async ({ request, locals, params }) => {
