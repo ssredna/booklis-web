@@ -20,6 +20,8 @@
 	import * as AlertDialog from './ui/alert-dialog';
 	import type { AddBookSchema } from '../../routes/[userId]/addBookSchema';
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
+	import ActiveBooksCard from './ActiveBooksCard.svelte';
+	import { Separator } from './ui/separator';
 
 	export let goal: ReadingGoal;
 	export let createGoalForm: SuperValidated<CreateGoalSchema>;
@@ -207,10 +209,14 @@
 {/if}
 
 {#if goal.activeBooks.length > 0}
-	<h2>Aktive bøker:</h2>
-	{#each goal.activeBooks as activeBook}
-		<ActiveBook {activeBook} {goal} />
-	{/each}
+	<ActiveBooksCard>
+		{#each goal.activeBooks as activeBook, i}
+			<ActiveBook {activeBook} {goal} />
+			{#if i < goal.activeBooks.length - 1}
+				<Separator />
+			{/if}
+		{/each}
+	</ActiveBooksCard>
 {/if}
 
 {#if goal.chosenBooks.length > 0}

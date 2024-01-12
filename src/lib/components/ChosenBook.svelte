@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { Book } from '$lib/core/book';
-	import { Trash } from 'lucide-svelte';
+	import { X } from 'lucide-svelte';
 	import { Button } from './ui/button';
 
 	export let book: Book;
@@ -24,7 +24,7 @@
 			<input type="hidden" name="bookId" value={book.id} required />
 			<input type="hidden" name="goalId" value={goalId} required />
 			<Button type="submit" variant="destructive">
-				<Trash class="h-4 w-4" />
+				<X class="h-4 w-4" />
 			</Button>
 		</form>
 	</div>
