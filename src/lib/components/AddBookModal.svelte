@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { books } from '$lib/booksStore';
-	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import * as Dialog from './ui/dialog';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
@@ -11,8 +10,10 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import AddExistingBookButton from './AddExistingBookButton.svelte';
+	import type { Writable } from 'svelte/store';
+	import type { Goal } from '$lib/core/goal';
 
-	export let goal: ReadingGoal;
+	export let goal: Writable<Goal>;
 	export let inputForm: SuperValidated<AddBookSchema>;
 
 	const { form, errors, delayed, submitting, enhance } = superForm(inputForm, {
@@ -24,9 +25,9 @@
 
 	$: filteredBooks = $books.filter(
 		(book) =>
-			!goal.chosenBooks.some((chosenBook) => chosenBook.id === book.id) &&
-			!goal.activeBooks.some((activeBook) => activeBook.book.id === book.id) &&
-			!goal.readBooks.some((readBook) => readBook.book.id === book.id)
+			!$goal.chosenBooks.some((chosenBookId) => chosenBookId === book.id) &&
+			!$goal.activeBooks.some((activeBook) => activeBook.bookId === book.id) &&
+			!$goal.readBooks.some((readBook) => readBook.bookId === book.id)
 	);
 
 	export let isOpen: boolean;
@@ -53,7 +54,7 @@
 				{/if}
 			</div>
 
-			<input type="hidden" name="goalId" value={goal.id} />
+			<input type="hidden" name="goalId" value={$goal.id} />
 
 			{#if $page.form?.unauthorized}
 				<p class="text-destructive">Du har ikke tilgang til å legge til en bok på dette målet.</p>
@@ -76,7 +77,7 @@
 			<h3>Vil du legge til en bok du allerede har?</h3>
 			<div class="flex flex-wrap gap-2">
 				{#each filteredBooks as book}
-					<AddExistingBookButton {book} goalId={goal.id} on:success={() => (isOpen = false)} />
+					<AddExistingBookButton {book} goalId={$goal.id} on:success={() => (isOpen = false)} />
 				{/each}
 			</div>
 		{/if}

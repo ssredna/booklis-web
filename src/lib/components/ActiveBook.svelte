@@ -2,12 +2,13 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import type { ActiveBook } from '$lib/core/activeBook';
-	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import { Check, X } from 'lucide-svelte';
 	import { Button } from './ui/button';
+	import type { Writable } from 'svelte/store';
+	import type { Goal } from '$lib/core/goal';
 
 	export let activeBook: ActiveBook;
-	export let goal: ReadingGoal;
+	export let goal: Writable<Goal>;
 
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
@@ -26,7 +27,7 @@
 			action="?/updatePagesRead"
 			method="post"
 			use:enhance={({ formData }) => {
-				formData.append('pagesReadToday', String(goal.pagesReadToday));
+				formData.append('pagesReadToday', String($goal.pagesReadToday));
 				isFormSubmitting = true;
 
 				return async ({ update }) => {
@@ -43,7 +44,7 @@
 				name="pagesRead"
 				bind:value={activeBook.pagesRead}
 				on:mouseup={() => {
-					goal.pagesReadToday += increase;
+					$goal.pagesReadToday += increase;
 					pagesReadForm.requestSubmit();
 				}}
 				on:mousedown={() => (oldPagesRead = activeBook.pagesRead)}
@@ -51,7 +52,7 @@
 				class="w-full py-2"
 			/>
 			<input type="hidden" value={activeBook.id} name="activeBookId" required />
-			<input type="hidden" value={goal.id} name="goalId" required />
+			<input type="hidden" value={$goal.id} name="goalId" required />
 
 			{#if isFormSubmitting}
 				Lagrer...
@@ -75,7 +76,7 @@
 		class="place-self-center justify-self-end"
 	>
 		<input type="hidden" name="bookId" value={activeBook.book.id} required />
-		<input type="hidden" name="goalId" value={goal.id} required />
+		<input type="hidden" name="goalId" value={$goal.id} required />
 		<input type="hidden" name="activeBookId" value={activeBook.id} required />
 		<Button type="submit" variant="outline">
 			<X class="h-4 w-4" />
@@ -84,7 +85,7 @@
 
 	{#if activeBook.pagesRead === activeBook.book.pageCount}
 		<form action="?/finishBook" method="post" use:enhance>
-			<input type="hidden" name="goalId" value={goal.id} required />
+			<input type="hidden" name="goalId" value={$goal.id} required />
 			<input type="hidden" name="activeBookId" value={activeBook.id} required />
 			<input type="hidden" name="bookId" value={activeBook.book.id} required />
 			<input type="hidden" name="startDate" value={activeBook.startDate} required />
