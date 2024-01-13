@@ -45,7 +45,7 @@
 	{#each readingGoals as goal}
 		<Goal
 			{goal}
-			createGoalForm={data.createGoalForm}
+			editGoalForm={data.editGoalForm}
 			deleteGoalForm={data.deleteGoalForm}
 			addBookForm={data.addBookForm}
 		/>
