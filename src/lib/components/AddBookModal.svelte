@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
 	import { books } from '$lib/booksStore';
 	import type { ReadingGoal } from '$lib/core/readingGoal';
 	import * as Dialog from './ui/dialog';
@@ -11,24 +10,17 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
+	import AddExistingBookButton from './AddExistingBookButton.svelte';
 
 	export let goal: ReadingGoal;
 	export let inputForm: SuperValidated<AddBookSchema>;
 
-	const {
-		form,
-		errors,
-		delayed,
-		submitting,
-		enhance: addEnhance
-	} = superForm(inputForm, {
+	const { form, errors, delayed, submitting, enhance } = superForm(inputForm, {
 		onUpdated: ({ form }) => {
 			if (form.valid) isOpen = false;
 		},
 		resetForm: true
 	});
-
-	let isFormSubmitting = false;
 
 	$: filteredBooks = $books.filter(
 		(book) =>
@@ -44,7 +36,7 @@
 	<Dialog.Trigger />
 	<Dialog.Content>
 		<Dialog.Header>Legg til bok</Dialog.Header>
-		<form method="post" action="?/addBook" use:addEnhance class="grid gap-6 py-4">
+		<form method="post" action="?/addBook" use:enhance class="grid gap-6 py-4">
 			<div class="grid gap-2">
 				<Label for="title">Hva heter boken?</Label>
 				<Input id="title" type="text" name="title" bind:value={$form.title} />
@@ -82,30 +74,11 @@
 
 		{#if filteredBooks.length > 0}
 			<h3>Vil du legge til en bok du allerede har?</h3>
-
-			{#each filteredBooks as book}
-				<form
-					action="?/addExistingBook"
-					method="post"
-					use:enhance={() => {
-						isFormSubmitting = true;
-
-						return async ({ result, update }) => {
-							isFormSubmitting = false;
-							update();
-							if (result.type === 'success') {
-								isOpen = false;
-							}
-						};
-					}}
-				>
-					<input type="hidden" name="bookId" value={book.id} />
-					<input type="hidden" name="goalId" value={goal.id} />
-					<Button type="submit">
-						{book.title}
-					</Button>
-				</form>
-			{/each}
+			<div class="flex flex-wrap gap-2">
+				{#each filteredBooks as book}
+					<AddExistingBookButton {book} goalId={goal.id} on:success={() => (isOpen = false)} />
+				{/each}
+			</div>
 		{/if}
 	</Dialog.Content>
 </Dialog.Root>

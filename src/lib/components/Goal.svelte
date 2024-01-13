@@ -79,6 +79,7 @@
 
 {#if goal.chosenBooks.length === 0 && goal.activeBooks.length === 0 && goal.readBooks.length === 0 && $isOwner}
 	<h2 class="pb-4 text-3xl font-extrabold tracking-tight">På tide å komme i gang!</h2>
+	<Button on:click={() => (showAddBookModal = true)} class="mb-4">Legg til bok</Button>
 {/if}
 
 {#if goal.activeBooks.length > 0}
