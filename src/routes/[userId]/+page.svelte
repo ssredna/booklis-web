@@ -7,6 +7,7 @@
 	import { Book } from '$lib/core/book.js';
 	import { ReadingGoal } from '$lib/core/readingGoal.js';
 	import { isOwner } from '$lib/isOwnerStore.js';
+	import { signOut } from '@auth/sveltekit/client';
 
 	export let data;
 
@@ -59,3 +60,5 @@
 		{/each}
 	</MyBooksCard>
 {/if}
+
+<Button on:click={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>
