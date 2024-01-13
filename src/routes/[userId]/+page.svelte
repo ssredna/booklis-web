@@ -2,6 +2,7 @@
 	import { books } from '$lib/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
+	import MyBooksCard from '$lib/components/MyBooksCard.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Book } from '$lib/core/book.js';
 	import { ReadingGoal } from '$lib/core/readingGoal.js';
@@ -52,8 +53,9 @@
 {/if}
 
 {#if data.books.length !== 0}
-	<h1>Mine bøker:</h1>
-	{#each data.books as book}
-		<p>{book.title}</p>
-	{/each}
+	<MyBooksCard>
+		{#each data.books as book}
+			<p>{book.title}</p>
+		{/each}
+	</MyBooksCard>
 {/if}
