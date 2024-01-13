@@ -13,7 +13,7 @@
 		<h4 class="text-xl font-bold tracking-tight">{book.title}</h4>
 		<small>{book.pageCount} sider</small>
 	</div>
-	<div class="flex place-content-between">
+	<div class="flex place-content-between items-center">
 		<form action="?/startBook" method="post" use:enhance>
 			<input type="hidden" name="bookId" value={book.id} required />
 			<input type="hidden" name="goalId" value={goalId} required />
@@ -23,7 +23,7 @@
 		<form action="?/removeBook" method="post" use:enhance>
 			<input type="hidden" name="bookId" value={book.id} required />
 			<input type="hidden" name="goalId" value={goalId} required />
-			<Button type="submit" variant="destructive">
+			<Button type="submit" variant="outline">
 				<X class="h-4 w-4" />
 			</Button>
 		</form>

@@ -22,6 +22,7 @@
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
 	import ActiveBooksCard from './ActiveBooksCard.svelte';
 	import { Separator } from './ui/separator';
+	import ReadBooksCard from './ReadBooksCard.svelte';
 
 	export let goal: ReadingGoal;
 	export let createGoalForm: SuperValidated<CreateGoalSchema>;
@@ -228,10 +229,11 @@
 {/if}
 
 {#if goal.readBooks.length > 0}
-	<h2>Leste bøker:</h2>
-	{#each goal.readBooks as readBook}
-		<ReadBook {readBook} goalId={goal.id} />
-	{/each}
+	<ReadBooksCard>
+		{#each goal.readBooks as readBook}
+			<ReadBook {readBook} goalId={goal.id} />
+		{/each}
+	</ReadBooksCard>
 {/if}
 
 <AddBookModal {goal} inputForm={addBookForm} bind:isOpen={showAddBookModal} />

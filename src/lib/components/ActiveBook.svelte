@@ -77,7 +77,7 @@
 		<input type="hidden" name="bookId" value={activeBook.book.id} required />
 		<input type="hidden" name="goalId" value={goal.id} required />
 		<input type="hidden" name="activeBookId" value={activeBook.id} required />
-		<Button type="submit" variant="destructive">
+		<Button type="submit" variant="outline">
 			<X class="h-4 w-4" />
 		</Button>
 	</form>
