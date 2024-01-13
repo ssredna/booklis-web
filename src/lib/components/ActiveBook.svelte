@@ -7,14 +7,15 @@
 	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
 	import { books } from '$lib/booksStore';
-	import { Book } from '$lib/core/book';
 
 	export let activeBook: ActiveBook;
 	export let goal: Writable<Goal>;
 
-	$: book =
-		$books.find((book) => book.id === activeBook.bookId) ??
-		new Book('Error', 'Error, did not find book', 0);
+	$: book = $books.find((book) => book.id === activeBook.bookId) ?? {
+		id: 'Error',
+		title: 'Error, did not find book',
+		pageCount: 0
+	};
 
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;

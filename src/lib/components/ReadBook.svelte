@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { books } from '$lib/booksStore';
-	import { Book } from '$lib/core/book';
 	import type { ReadBook } from '$lib/core/readBook';
 	import { Button } from './ui/button';
 	import dateFormat from 'dateformat';
@@ -10,9 +9,11 @@
 	export let readBook: ReadBook;
 	export let goalId: string;
 
-	$: book =
-		$books.find((book) => book.id === readBook.bookId) ??
-		new Book('Error', 'Error, did not find book', 0);
+	$: book = $books.find((book) => book.id === readBook.bookId) ?? {
+		id: 'Error',
+		title: 'Error, did not find book',
+		pageCount: 0
+	};
 
 	$: formattedStartDate = dateFormat(readBook.startDate, 'yyyy-mm-dd');
 	$: formattedEndDate = dateFormat(readBook.endDate, 'yyyy-mm-dd');

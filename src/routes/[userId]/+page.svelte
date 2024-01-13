@@ -4,13 +4,12 @@
 	import Goal from '$lib/components/Goal.svelte';
 	import MyBooksCard from '$lib/components/MyBooksCard.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { Book } from '$lib/core/book.js';
 	import { isOwner } from '$lib/isOwnerStore.js';
 	import { signOut } from '@auth/sveltekit/client';
 
 	export let data;
 
-	$: books.set(data.books.map((book) => new Book(book.id, book.title, book.pageCount)));
+	$: books.set(data.books);
 	$: isOwner.set(data.isOwner);
 </script>
 

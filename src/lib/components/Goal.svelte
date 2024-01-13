@@ -22,7 +22,6 @@
 	import { type Goal } from '$lib/core/goal';
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
-	import { Book } from '$lib/core/book';
 	import { writable } from 'svelte/store';
 
 	export let goalData: Goal;
@@ -69,7 +68,7 @@
 
 	$: chosenBooks = $goal.chosenBooks.map((bookId) => {
 		const book = $books.find((book) => book.id === bookId);
-		if (!book) return new Book('Error', 'Error, did not find book', 0);
+		if (!book) return { id: 'Error', title: 'Error, did not find book', pageCount: 0 };
 		return book;
 	});
 
