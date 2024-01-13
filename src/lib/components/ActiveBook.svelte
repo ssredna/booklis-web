@@ -7,60 +7,74 @@
 	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
 	import { books } from '$lib/booksStore';
+	import { Slider } from './ui/slider';
 
 	export let activeBook: ActiveBook;
 	export let goal: Writable<Goal>;
 
 	$: book = $books.find((book) => book.id === activeBook.bookId);
 
+	let sliderValue = [activeBook.pagesRead];
+	$: activeBook.pagesRead = sliderValue[0];
+
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
 
 	let oldPagesRead = activeBook.pagesRead;
 	$: increase = activeBook.pagesRead - oldPagesRead;
+
+	let isDirty = false;
 </script>
+
+<svelte:window
+	on:click={() => {
+		// Couldn't find a way to register clicks on the slider, so this is a workaround
+		if (isDirty) {
+			$goal.pagesReadToday = Math.max($goal.pagesReadToday + increase, 0);
+			oldPagesRead = activeBook.pagesRead;
+			pagesReadForm.requestSubmit();
+		}
+	}}
+/>
 
 {#if book}
 	<div class="grid grid-cols-4">
 		<div class="col-span-3">
 			<h4 class="text-xl font-bold tracking-tight">{book.title}</h4>
-			<small>Lest {activeBook.pagesRead} av {book.pageCount} sider</small>
+			<span class="flex place-content-between">
+				<small>Lest {activeBook.pagesRead} av {book.pageCount} sider</small>
+				{#if isFormSubmitting}
+					<small>Lagrer...</small>
+				{/if}
+			</span>
 
 			<form
 				bind:this={pagesReadForm}
 				action="?/updatePagesRead"
 				method="post"
-				use:enhance={() => {
+				use:enhance={({ formData }) => {
+					formData.append('pagesReadToday', String($goal.pagesReadToday));
 					isFormSubmitting = true;
 
 					return async ({ update }) => {
 						await update();
+						isDirty = false;
 						isFormSubmitting = false;
 					};
 				}}
 			>
-				<input
-					type="range"
-					min="0"
+				<Slider
+					bind:value={sliderValue}
+					min={0}
 					max={book.pageCount}
-					step="1"
-					name="pagesRead"
-					bind:value={activeBook.pagesRead}
-					on:change={() => {
-						$goal.pagesReadToday = Math.max($goal.pagesReadToday + increase, 0);
-						oldPagesRead = activeBook.pagesRead;
-						pagesReadForm.requestSubmit();
+					onValueChange={() => {
+						isDirty = true;
 					}}
-					disabled={isFormSubmitting}
-					class="w-full py-2"
+					class="mb-2 mt-4"
 				/>
-				<input type="hidden" value={$goal.pagesReadToday} name="pagesReadToday" required />
+				<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
 				<input type="hidden" value={activeBook.id} name="activeBookId" required />
 				<input type="hidden" value={$goal.id} name="goalId" required />
-
-				{#if isFormSubmitting}
-					Lagrer...
-				{/if}
 
 				{#if $page.form?.updatePagesReadError}
 					<p>Noe gikk galt i lagringen</p>
@@ -94,7 +108,7 @@
 				<input type="hidden" name="bookId" value={book.id} required />
 				<input type="hidden" name="startDate" value={activeBook.startDate} required />
 
-				<Button type="submit">
+				<Button type="submit" class="mt-2">
 					<Check class="mr-2 h-4 w-4" />
 					Fullfør bok
 				</Button>
