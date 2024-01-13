@@ -6,51 +6,57 @@
 	import { Button } from './ui/button';
 	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
+	import { books } from '$lib/booksStore';
+	import { Book } from '$lib/core/book';
 
 	export let activeBook: ActiveBook;
 	export let goal: Writable<Goal>;
 
+	$: book =
+		$books.find((book) => book.id === activeBook.bookId) ??
+		new Book('Error', 'Error, did not find book', 0);
+
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
 
-	let oldPagesRead: number;
+	let oldPagesRead = activeBook.pagesRead;
 	$: increase = activeBook.pagesRead - oldPagesRead;
 </script>
 
 <div class="grid grid-cols-4">
 	<div class="col-span-3">
-		<h4 class="text-xl font-bold tracking-tight">{activeBook.book.title}</h4>
-		<small>Lest {activeBook.pagesRead} av {activeBook.book.pageCount} sider</small>
+		<h4 class="text-xl font-bold tracking-tight">{book.title}</h4>
+		<small>Lest {activeBook.pagesRead} av {book.pageCount} sider</small>
 
 		<form
 			bind:this={pagesReadForm}
 			action="?/updatePagesRead"
 			method="post"
-			use:enhance={({ formData }) => {
-				formData.append('pagesReadToday', String($goal.pagesReadToday));
+			use:enhance={() => {
 				isFormSubmitting = true;
 
 				return async ({ update }) => {
-					isFormSubmitting = false;
 					await update();
+					isFormSubmitting = false;
 				};
 			}}
 		>
 			<input
 				type="range"
 				min="0"
-				max={activeBook.book.pageCount}
+				max={book.pageCount}
 				step="1"
 				name="pagesRead"
 				bind:value={activeBook.pagesRead}
-				on:mouseup={() => {
-					$goal.pagesReadToday += increase;
+				on:change={() => {
+					$goal.pagesReadToday = Math.max($goal.pagesReadToday + increase, 0);
+					oldPagesRead = activeBook.pagesRead;
 					pagesReadForm.requestSubmit();
 				}}
-				on:mousedown={() => (oldPagesRead = activeBook.pagesRead)}
 				disabled={isFormSubmitting}
 				class="w-full py-2"
 			/>
+			<input type="hidden" value={$goal.pagesReadToday} name="pagesReadToday" required />
 			<input type="hidden" value={activeBook.id} name="activeBookId" required />
 			<input type="hidden" value={$goal.id} name="goalId" required />
 
@@ -75,7 +81,7 @@
 		use:enhance
 		class="place-self-center justify-self-end"
 	>
-		<input type="hidden" name="bookId" value={activeBook.book.id} required />
+		<input type="hidden" name="bookId" value={book.id} required />
 		<input type="hidden" name="goalId" value={$goal.id} required />
 		<input type="hidden" name="activeBookId" value={activeBook.id} required />
 		<Button type="submit" variant="outline">
@@ -83,11 +89,11 @@
 		</Button>
 	</form>
 
-	{#if activeBook.pagesRead === activeBook.book.pageCount}
+	{#if activeBook.pagesRead === book.pageCount}
 		<form action="?/finishBook" method="post" use:enhance>
 			<input type="hidden" name="goalId" value={$goal.id} required />
 			<input type="hidden" name="activeBookId" value={activeBook.id} required />
-			<input type="hidden" name="bookId" value={activeBook.book.id} required />
+			<input type="hidden" name="bookId" value={book.id} required />
 			<input type="hidden" name="startDate" value={activeBook.startDate} required />
 
 			<Button type="submit">

@@ -23,7 +23,6 @@
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
 	import { Book } from '$lib/core/book';
-	import { ActiveBook as ActiveBookClass } from '$lib/core/activeBook';
 	import { ReadBook as ReadBookClass } from '$lib/core/readBook';
 	import { writable } from 'svelte/store';
 
@@ -73,18 +72,6 @@
 		const book = $books.find((book) => book.id === bookId);
 		if (!book) return new Book('Error', 'Error, did not find book', 0);
 		return book;
-	});
-
-	$: activeBooks = $goal.activeBooks.map((activeBook) => {
-		const book = $books.find((book) => book.id === activeBook.bookId);
-		if (!book)
-			return new ActiveBookClass('Error', new Book('Error', 'Error, did not find book', 0));
-		return new ActiveBookClass(
-			activeBook.id,
-			book,
-			activeBook.pagesRead,
-			new Date(activeBook.startDate)
-		);
 	});
 
 	$: readBooks = $goal.readBooks.map((readBook) => {
@@ -161,7 +148,7 @@
 
 {#if $goal.activeBooks.length > 0}
 	<ActiveBooksCard>
-		{#each activeBooks as activeBook, i}
+		{#each $goal.activeBooks as activeBook, i}
 			<ActiveBook {activeBook} {goal} />
 			{#if i < $goal.activeBooks.length - 1}
 				<Separator />
