@@ -7,7 +7,7 @@
 	import { Input } from './ui/input';
 	import { Button } from './ui/button';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { AddBookSchema } from '../../routes/[userId]/addBookSchema';
+	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';

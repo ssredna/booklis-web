@@ -13,12 +13,12 @@
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { CreateGoalSchema } from '../../routes/[userId]/createGoalSchema';
+	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { superForm } from 'sveltekit-superforms/client';
 	import { isOwner } from '$lib/isOwnerStore';
-	import type { DeleteGoalSchema } from '../../routes/[userId]/deleteGoalSchema';
+	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import * as AlertDialog from './ui/alert-dialog';
-	import type { AddBookSchema } from '../../routes/[userId]/addBookSchema';
+	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
 	import ActiveBooksCard from './ActiveBooksCard.svelte';
 	import { Separator } from './ui/separator';

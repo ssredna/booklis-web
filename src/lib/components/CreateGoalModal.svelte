@@ -3,7 +3,7 @@
 	import dateFormat from 'dateformat';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import type { SuperValidated } from 'sveltekit-superforms';
-	import { type CreateGoalSchema } from '../../routes/[userId]/createGoalSchema';
+	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { dateProxy, superForm } from 'sveltekit-superforms/client';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';

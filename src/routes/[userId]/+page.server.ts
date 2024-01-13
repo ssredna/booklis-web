@@ -18,10 +18,10 @@ import { fail, error } from '@sveltejs/kit';
 import { isSameDay } from 'date-fns';
 import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
-import { createGoalSchema } from './createGoalSchema';
-import { editGoalSchema } from './editGoalSchema';
-import { deleteGoalSchema } from './deleteGoalSchema';
-import { addBookSchema } from './addBookSchema';
+import { createGoalSchema } from '$lib/schemas/createGoalSchema';
+import { editGoalSchema } from '$lib/schemas/editGoalSchema';
+import { deleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
+import { addBookSchema } from '$lib/schemas/addBookSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
