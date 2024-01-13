@@ -66,12 +66,6 @@
 
 	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - $goal.pagesReadToday, 0), pagesPerDay);
 
-	$: chosenBooks = $goal.chosenBooks.map((bookId) => {
-		const book = $books.find((book) => book.id === bookId);
-		if (!book) return { id: 'Error', title: 'Error, did not find book', pageCount: 0 };
-		return book;
-	});
-
 	$: dateString = dateFormat($goal.deadline, 'yyyy-mm-dd');
 
 	let isEditing = false;
@@ -141,8 +135,8 @@
 
 {#if $goal.chosenBooks.length > 0}
 	<ChosenBooksCard>
-		{#each chosenBooks as book}
-			<ChosenBook {book} goalId={$goal.id} />
+		{#each $goal.chosenBooks as bookId}
+			<ChosenBook chosenBookId={bookId} goalId={$goal.id} />
 		{/each}
 		<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
 	</ChosenBooksCard>
