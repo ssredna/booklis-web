@@ -35,7 +35,7 @@
 	$: dateString = dateFormat($goal.deadline, 'yyyy-mm-dd');
 </script>
 
-<Card.Root class="mb-8 w-full max-w-2xl">
+<Card.Root class="mb-8 w-full max-w-xl">
 	<Card.Header>
 		<Card.Title>Rediger målet</Card.Title>
 		<Card.Description>
