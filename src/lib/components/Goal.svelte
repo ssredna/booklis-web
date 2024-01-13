@@ -23,7 +23,6 @@
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
 	import { Book } from '$lib/core/book';
-	import { ReadBook as ReadBookClass } from '$lib/core/readBook';
 	import { writable } from 'svelte/store';
 
 	export let goalData: Goal;
@@ -72,22 +71,6 @@
 		const book = $books.find((book) => book.id === bookId);
 		if (!book) return new Book('Error', 'Error, did not find book', 0);
 		return book;
-	});
-
-	$: readBooks = $goal.readBooks.map((readBook) => {
-		const book = $books.find((book) => book.id === readBook.bookId);
-		if (!book)
-			return new ReadBookClass(
-				'Error',
-				new Book('Error', 'Error, did not find book', 0),
-				new Date()
-			);
-		return new ReadBookClass(
-			readBook.id,
-			book,
-			new Date(readBook.startDate),
-			new Date(readBook.endDate)
-		);
 	});
 
 	$: dateString = dateFormat($goal.deadline, 'yyyy-mm-dd');
@@ -168,7 +151,7 @@
 
 {#if $goal.readBooks.length > 0}
 	<ReadBooksCard>
-		{#each readBooks as readBook}
+		{#each $goal.readBooks as readBook}
 			<ReadBook {readBook} goalId={$goal.id} />
 		{/each}
 	</ReadBooksCard>
