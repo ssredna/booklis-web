@@ -1,14 +1,14 @@
 <script>
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { page } from '$app/stores';
+	import { Button } from '$lib/components/ui/button';
 </script>
 
+<p class="mb-2 text-5xl font-bold">Velkommen til Booklis</p>
 {#if $page.data.session?.user}
-	<p>Signed in as {$page.data.session.user.email}</p>
-	<button on:click={() => signOut()}>Sign out</button>
+	<Button size="lg" href="/home" class="my-4">Trykk her for å gå til lesemålet dit</Button>
+	<Button variant="outline" on:click={() => signOut()}>Trykk her for å logge ut</Button>
 {:else}
-	<p>Not signed in.</p>
-	<button on:click={() => signIn('google')}>Sign in</button>
+	<p class="mb-4 text-lg">Logg inn for å komme i gang med lesemål</p>
+	<Button on:click={() => signIn('google', { callbackUrl: '/home' })}>Logg inn</Button>
 {/if}
-
-<a href="/home">Home</a>
