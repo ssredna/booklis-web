@@ -10,6 +10,7 @@ import {
 	arrayRemove
 } from 'firebase/firestore';
 import { db } from './firebase';
+import { isSameDay } from 'date-fns';
 
 export async function createGoal(
 	userId: string,
@@ -32,6 +33,16 @@ export async function getGoals(userId: string) {
 	const goalsSnapshot = await getDocs(collection(db, 'users', userId, 'goals'));
 	const goals = Promise.all(
 		goalsSnapshot.docs.map(async (goalDoc) => {
+			const today = new Date();
+			const whatTheGoalThinkIsToday = goalDoc.data().todaysDate.toDate();
+
+			let todaysDate = today.toString();
+			let pagesReadToday = 0;
+			if (isSameDay(today, whatTheGoalThinkIsToday)) {
+				todaysDate = whatTheGoalThinkIsToday.toString();
+				pagesReadToday = goalDoc.data().pagesReadToday as number;
+			}
+
 			const chosenBooks = (goalDoc.data().chosenBooks as string[]) ?? [];
 
 			const activeBooksSnapshot = await getDocs(
@@ -63,8 +74,8 @@ export async function getGoals(userId: string) {
 				numberOfBooks: goalDoc.data().numberOfBooks as number,
 				deadline: goalDoc.data().deadline.toDate().toString() as string,
 				avgPageCount: goalDoc.data().avgPageCount as number,
-				pagesReadToday: goalDoc.data().pagesReadToday as number,
-				todaysDate: goalDoc.data().todaysDate.toDate().toString() as string,
+				pagesReadToday,
+				todaysDate,
 				chosenBooks,
 				activeBooks,
 				readBooks

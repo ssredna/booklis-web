@@ -15,7 +15,6 @@ import {
 	updatePagesRead
 } from '$lib/firebase/firestore.js';
 import { fail, error } from '@sveltejs/kit';
-import { isSameDay } from 'date-fns';
 import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
 import { createGoalSchema } from '$lib/schemas/createGoalSchema';
@@ -31,13 +30,7 @@ const pagesReadSchema = z.coerce.number().min(0);
 export const load = async ({ locals, params }) => {
 	try {
 		const goals = await getGoals(params.userId);
-		const today = new Date();
-		goals.forEach((goal) => {
-			if (!isSameDay(today, new Date(goal.todaysDate))) {
-				goal.todaysDate = today.toString();
-				goal.pagesReadToday = 0;
-			}
-		});
+
 		return {
 			createGoalForm: await superValidate(createGoalSchema),
 			editGoalForm: await superValidate(editGoalSchema),
