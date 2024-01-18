@@ -29,15 +29,16 @@ const pagesReadSchema = z.coerce.number().min(0);
 
 export const load = async ({ locals, params }) => {
 	try {
-		const goals = await getGoals(params.userId);
+		const booksPromise = getBooks(params.userId);
+		const goalsPromise = getGoals(params.userId);
 
 		return {
 			createGoalForm: await superValidate(createGoalSchema),
 			editGoalForm: await superValidate(editGoalSchema),
 			deleteGoalForm: await superValidate(deleteGoalSchema),
 			addBookForm: await superValidate(addBookSchema),
-			goals,
-			books: await getBooks(params.userId),
+			goals: await goalsPromise,
+			books: await booksPromise,
 			isOwner: locals.isOwner
 		};
 	} catch (e) {
