@@ -21,6 +21,7 @@ import { createGoalSchema } from '$lib/schemas/createGoalSchema';
 import { editGoalSchema } from '$lib/schemas/editGoalSchema';
 import { deleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 import { addBookSchema } from '$lib/schemas/addBookSchema';
+import { addExistingBookSchema } from '$lib/schemas/addExistingBookSchema.js';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
@@ -37,6 +38,7 @@ export const load = async ({ locals, params }) => {
 			editGoalForm: await superValidate(editGoalSchema),
 			deleteGoalForm: await superValidate(deleteGoalSchema),
 			addBookForm: await superValidate(addBookSchema),
+			addExistingBookForm: await superValidate(addExistingBookSchema),
 			goals: await goalsPromise,
 			books: await booksPromise,
 			isOwner: locals.isOwner
@@ -137,30 +139,29 @@ export const actions = {
 	},
 
 	addExistingBook: async ({ request, locals, params }) => {
-		if (!locals.isOwner) return fail(403, { unauthorized: true });
+		const addExistingBookForm = await superValidate(request, addExistingBookSchema);
 
-		const data = await request.formData();
-
-		const bookId = data.get('bookId');
-		const goalId = data.get('goalId');
-
-		const parsedBookId = idSchema.safeParse(bookId);
-		if (!parsedBookId.success) {
-			return fail(422, { bookIdError: true });
-		}
-
-		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
-			return fail(422, { goalIdError: true });
-		}
+		if (!locals.isOwner)
+			return fail(403, {
+				addExistingBookForm: { ...addExistingBookForm, valid: false },
+				unauthorized: true
+			});
+		if (!addExistingBookForm.valid) return fail(400, { addExistingBookForm });
 
 		try {
-			return await addExistingBookToGoal(params.userId, parsedGoalId.data, parsedBookId.data);
+			await addExistingBookToGoal(
+				params.userId,
+				addExistingBookForm.data.goalId,
+				addExistingBookForm.data.bookId
+			);
 		} catch (error) {
 			return fail(400, {
+				addExistingBookForm: { ...addExistingBookForm, valid: false },
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
+
+		return { addExistingBookForm };
 	},
 
 	removeBook: async ({ request, locals, params }) => {

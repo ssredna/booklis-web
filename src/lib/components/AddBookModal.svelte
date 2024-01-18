@@ -12,11 +12,13 @@
 	import AddExistingBookButton from './AddExistingBookButton.svelte';
 	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
+	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 
 	export let goal: Writable<Goal>;
-	export let inputForm: SuperValidated<AddBookSchema>;
+	export let addBookForm: SuperValidated<AddBookSchema>;
+	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
-	const { form, errors, delayed, submitting, enhance } = superForm(inputForm, {
+	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {
 			if (form.valid) isOpen = false;
 		},
@@ -77,7 +79,12 @@
 			<h3>Vil du legge til en bok du allerede har?</h3>
 			<div class="flex flex-wrap gap-2">
 				{#each filteredBooks as book}
-					<AddExistingBookButton {book} goalId={$goal.id} on:success={() => (isOpen = false)} />
+					<AddExistingBookButton
+						form={addExistingBookForm}
+						{book}
+						goalId={$goal.id}
+						on:success={() => (isOpen = false)}
+					/>
 				{/each}
 			</div>
 		{/if}

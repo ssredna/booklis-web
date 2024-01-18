@@ -23,11 +23,13 @@
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
 	import { writable } from 'svelte/store';
+	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 
 	export let goalData: Goal;
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
 	export let addBookForm: SuperValidated<AddBookSchema>;
+	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
 	$: goal = writable(goalData);
 
@@ -150,4 +152,4 @@
 	</ReadBooksCard>
 {/if}
 
-<AddBookModal {goal} inputForm={addBookForm} bind:isOpen={showAddBookModal} />
+<AddBookModal {goal} {addBookForm} {addExistingBookForm} bind:isOpen={showAddBookModal} />
