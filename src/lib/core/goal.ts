@@ -4,7 +4,7 @@ export type Goal = {
 	numberOfBooks: number;
 	avgPageCount: number;
 	chosenBooks: string[];
-	activeBooks: { id: string; bookId: string; pagesRead: number; startDate: string }[];
-	readBooks: { id: string; bookId: string; startDate: string; endDate: string }[];
+	activeBooks: string[];
+	readBooks: string[];
 	pagesReadToday: number;
 };

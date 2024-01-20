@@ -5,15 +5,18 @@ import {
 	deleteGoal,
 	editGoal,
 	finishBook,
+	getActiveBooks,
 	getBooks,
+	getChosenBooks,
 	getGoals,
+	getReadBooks,
+	moveBookFromActiveToChosen,
 	reactivateBook,
-	removeActiveBook,
-	removeBook,
+	removeChosenBook,
 	resetToday,
 	startBook,
 	updatePagesRead
-} from '$lib/firebase/firestore.js';
+} from '$lib/firebase/firestore';
 import { fail, error } from '@sveltejs/kit';
 import { superValidate } from 'sveltekit-superforms/client';
 import { z } from 'zod';
@@ -21,7 +24,7 @@ import { createGoalSchema } from '$lib/schemas/createGoalSchema';
 import { editGoalSchema } from '$lib/schemas/editGoalSchema';
 import { deleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 import { addBookSchema } from '$lib/schemas/addBookSchema';
-import { addExistingBookSchema } from '$lib/schemas/addExistingBookSchema.js';
+import { addExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
@@ -32,6 +35,9 @@ export const load = async ({ locals, params }) => {
 	try {
 		const booksPromise = getBooks(params.userId);
 		const goalsPromise = getGoals(params.userId);
+		const activeBooksPromise = getActiveBooks(params.userId);
+		const readBooksPromise = getReadBooks(params.userId);
+		const chosenBooksPromise = getChosenBooks(params.userId);
 
 		return {
 			createGoalForm: await superValidate(createGoalSchema),
@@ -41,6 +47,9 @@ export const load = async ({ locals, params }) => {
 			addExistingBookForm: await superValidate(addExistingBookSchema),
 			goals: await goalsPromise,
 			books: await booksPromise,
+			activeBooks: await activeBooksPromise,
+			readBooks: await readBooksPromise,
+			chosenBooks: await chosenBooksPromise,
 			isOwner: locals.isOwner
 		};
 	} catch (e) {
@@ -168,11 +177,11 @@ export const actions = {
 		if (!locals.isOwner) return fail(403, { unauthorized: true });
 
 		const data = await request.formData();
-		const bookId = data.get('bookId');
+		const chosenBookId = data.get('chosenBookId');
 		const goalId = data.get('goalId');
 
-		const parsedBookId = idSchema.safeParse(bookId);
-		if (!parsedBookId.success) {
+		const parsedChosenBookId = idSchema.safeParse(chosenBookId);
+		if (!parsedChosenBookId.success) {
 			return fail(422, { bookIdError: true });
 		}
 
@@ -182,7 +191,7 @@ export const actions = {
 		}
 
 		try {
-			return await removeBook(params.userId, parsedGoalId.data, parsedBookId.data);
+			return await removeChosenBook(params.userId, parsedGoalId.data, parsedChosenBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -196,6 +205,7 @@ export const actions = {
 		const data = await request.formData();
 		const bookId = data.get('bookId');
 		const goalId = data.get('goalId');
+		const chosenBookId = data.get('chosenBookId');
 
 		const parsedBookId = idSchema.safeParse(bookId);
 		if (!parsedBookId.success) {
@@ -207,8 +217,18 @@ export const actions = {
 			return fail(422, { goalIdError: true });
 		}
 
+		const parsedChosenBookId = idSchema.safeParse(chosenBookId);
+		if (!parsedChosenBookId.success) {
+			return fail(422, { chosenBookIdError: true });
+		}
+
 		try {
-			return await startBook(params.userId, parsedGoalId.data, parsedBookId.data);
+			return await startBook(
+				params.userId,
+				parsedGoalId.data,
+				parsedBookId.data,
+				parsedChosenBookId.data
+			);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -240,7 +260,7 @@ export const actions = {
 		}
 
 		try {
-			return await removeActiveBook(
+			return await moveBookFromActiveToChosen(
 				params.userId,
 				parsedGoalId.data,
 				parsedActiveBookId.data,

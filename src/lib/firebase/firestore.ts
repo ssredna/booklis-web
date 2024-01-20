@@ -7,10 +7,52 @@ import {
 	updateDoc,
 	writeBatch,
 	arrayUnion,
-	arrayRemove
+	arrayRemove,
+	getDoc,
+	runTransaction,
+	deleteField,
+	setDoc
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { isSameDay } from 'date-fns';
+import type { ActiveBook } from '$lib/core/activeBook';
+import type { ReadBook } from '$lib/core/readBook';
+import type { Book } from '$lib/core/book';
+import dateFormat from 'dateformat';
+
+enum Path {
+	ACTIVE_BOOKS = 'activeBooks',
+	READ_BOOKS = 'readBooks',
+	CHOSEN_BOOKS = 'chosenBooks',
+	BOOKS = 'books',
+	GOALS = 'goals'
+}
+
+async function createBookDocumentsIfTheyDontExist(userId: string) {
+	const booksRef = doc(db, Path.BOOKS, userId);
+	const booksSnap = await getDoc(booksRef);
+	if (!booksSnap.exists()) {
+		await setDoc(booksRef, {});
+	}
+
+	const chosenBooksRef = doc(db, Path.CHOSEN_BOOKS, userId);
+	const chosenBooksSnap = await getDoc(chosenBooksRef);
+	if (!chosenBooksSnap.exists()) {
+		await setDoc(chosenBooksRef, {});
+	}
+
+	const activeBooksRef = doc(db, Path.ACTIVE_BOOKS, userId);
+	const activeBooksSnap = await getDoc(activeBooksRef);
+	if (!activeBooksSnap.exists()) {
+		await setDoc(activeBooksRef, {});
+	}
+
+	const readBooksRef = doc(db, Path.READ_BOOKS, userId);
+	const readBooksSnap = await getDoc(readBooksRef);
+	if (!readBooksSnap.exists()) {
+		await setDoc(readBooksRef, {});
+	}
+}
 
 export async function createGoal(
 	userId: string,
@@ -18,7 +60,7 @@ export async function createGoal(
 	deadline: Date,
 	avgPageCount: number
 ) {
-	const docRef = await addDoc(collection(db, 'users', userId, 'goals'), {
+	await addDoc(collection(db, Path.GOALS, userId, 'goals'), {
 		userId,
 		numberOfBooks,
 		deadline,
@@ -26,67 +68,40 @@ export async function createGoal(
 		pagesReadToday: 0,
 		todaysDate: new Date()
 	});
-	return docRef.id;
+	await createBookDocumentsIfTheyDontExist(userId);
 }
 
 export async function getGoals(userId: string) {
-	const goalsSnapshot = await getDocs(collection(db, 'users', userId, 'goals'));
-	const goals = Promise.all(
-		goalsSnapshot.docs.map(async (goalDoc) => {
-			const today = new Date();
-			const whatTheGoalThinkIsToday = goalDoc.data().todaysDate.toDate();
+	const goalsSnapshot = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+	const goals = goalsSnapshot.docs.map((goalDoc) => {
+		const today = new Date();
+		const whatTheGoalThinkIsToday = goalDoc.data().todaysDate.toDate();
 
-			let todaysDate = today.toString();
-			let pagesReadToday = 0;
-			if (isSameDay(today, whatTheGoalThinkIsToday)) {
-				todaysDate = whatTheGoalThinkIsToday.toString();
-				pagesReadToday = goalDoc.data().pagesReadToday as number;
-			}
+		let todaysDate = today.toString();
+		let pagesReadToday = 0;
+		if (isSameDay(today, whatTheGoalThinkIsToday)) {
+			todaysDate = whatTheGoalThinkIsToday.toString();
+			pagesReadToday = goalDoc.data().pagesReadToday as number;
+		}
 
-			const chosenBooks = (goalDoc.data().chosenBooks as string[]) ?? [];
+		return {
+			id: goalDoc.id,
+			numberOfBooks: goalDoc.data().numberOfBooks as number,
+			deadline: goalDoc.data().deadline.toDate().toString() as string,
+			avgPageCount: goalDoc.data().avgPageCount as number,
+			pagesReadToday,
+			todaysDate,
+			chosenBooks: (goalDoc.data().chosenBooks ?? []) as string[],
+			activeBooks: (goalDoc.data().activeBooks ?? []) as string[],
+			readBooks: (goalDoc.data().readBooks ?? []) as string[]
+		};
+	});
 
-			const activeBooksSnapshot = await getDocs(
-				collection(db, 'users', userId, 'goals', goalDoc.id, 'activeBooks')
-			);
-			const activeBooks = activeBooksSnapshot.docs.map((activeBookDoc) => {
-				return {
-					id: activeBookDoc.id,
-					bookId: activeBookDoc.data().bookId as string,
-					pagesRead: activeBookDoc.data().pagesRead as number,
-					startDate: activeBookDoc.data().startDate.toDate().toString() as string
-				};
-			});
-
-			const readBooksSnapshot = await getDocs(
-				collection(db, 'users', userId, 'goals', goalDoc.id, 'readBooks')
-			);
-			const readBooks = readBooksSnapshot.docs.map((readBookDoc) => {
-				return {
-					id: readBookDoc.id,
-					bookId: readBookDoc.data().bookId as string,
-					startDate: readBookDoc.data().startDate.toDate().toString() as string,
-					endDate: readBookDoc.data().endDate.toDate().toString() as string
-				};
-			});
-
-			return {
-				id: goalDoc.id,
-				numberOfBooks: goalDoc.data().numberOfBooks as number,
-				deadline: goalDoc.data().deadline.toDate().toString() as string,
-				avgPageCount: goalDoc.data().avgPageCount as number,
-				pagesReadToday,
-				todaysDate,
-				chosenBooks,
-				activeBooks,
-				readBooks
-			};
-		})
-	);
 	return goals;
 }
 
 export async function deleteGoal(userId: string, goalId: string) {
-	await deleteDoc(doc(db, 'users', userId, 'goals', goalId));
+	await deleteDoc(doc(db, Path.GOALS, userId, 'goals', goalId));
 }
 
 export async function editGoal(
@@ -96,7 +111,7 @@ export async function editGoal(
 	deadline: Date,
 	avgPageCount: number
 ) {
-	await updateDoc(doc(db, 'users', userId, 'goals', goalId), {
+	await updateDoc(doc(db, Path.GOALS, userId, 'goals', goalId), {
 		numberOfBooks,
 		deadline,
 		avgPageCount
@@ -106,73 +121,138 @@ export async function editGoal(
 export async function addBook(userId: string, goalId: string, title: string, pageCount: number) {
 	const batch = writeBatch(db);
 
-	const bookRef = doc(collection(db, 'users', userId, 'books'));
-	batch.set(bookRef, {
-		title: title,
-		pageCount: pageCount
+	const newBookId = crypto.randomUUID();
+	batch.update(doc(db, Path.BOOKS, userId), {
+		[newBookId]: {
+			title: title,
+			pageCount: pageCount
+		}
 	});
 
-	batch.update(doc(db, 'users', userId, 'goals', goalId), {
-		chosenBooks: arrayUnion(bookRef.id)
+	const newChosenBookId = crypto.randomUUID();
+	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
+		[newChosenBookId]: newBookId
+	});
+
+	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+		chosenBooks: arrayUnion(newChosenBookId)
 	});
 
 	await batch.commit();
 }
 
 export async function addExistingBookToGoal(userId: string, goalId: string, bookId: string) {
-	await updateDoc(doc(db, 'users', userId, 'goals', goalId), {
-		chosenBooks: arrayUnion(bookId)
-	});
-}
-
-export async function getBooks(userId: string) {
-	const querySnapshot = await getDocs(collection(db, 'users', userId, 'books'));
-	const books = querySnapshot.docs.map((doc) => ({
-		id: doc.id,
-		title: doc.data().title as string,
-		pageCount: doc.data().pageCount as number
-	}));
-	return books;
-}
-
-export async function removeBook(userId: string, goalId: string, bookId: string) {
-	await updateDoc(doc(db, 'users', userId, 'goals', goalId), {
-		chosenBooks: arrayRemove(bookId)
-	});
-}
-
-export async function startBook(userId: string, goalId: string, bookId: string) {
 	const batch = writeBatch(db);
 
-	const activeBookRef = doc(collection(db, 'users', userId, 'goals', goalId, 'activeBooks'));
-	batch.set(activeBookRef, {
-		bookId: bookId,
-		pagesRead: 0,
-		startDate: new Date()
+	const newChosenBookId = crypto.randomUUID();
+
+	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
+		[newChosenBookId]: bookId
 	});
 
-	batch.update(doc(db, 'users', userId, 'goals', goalId), {
-		chosenBooks: arrayRemove(bookId)
+	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+		chosenBooks: arrayUnion(newChosenBookId)
 	});
 
 	await batch.commit();
 }
 
-export async function removeActiveBook(
+export async function getBooks(userId: string) {
+	const querySnapshot = await getDoc(doc(db, Path.BOOKS, userId));
+	const books = querySnapshot.data() as Record<string, Book>;
+
+	return books ?? {};
+}
+
+export async function removeChosenBook(userId: string, goalId: string, chosenBookId: string) {
+	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+	await runTransaction(db, async (transaction) => {
+		let count = 0;
+		for (const goalDoc of goalDocs.docs) {
+			const goal = await transaction.get(goalDoc.ref);
+			if (goal.data()?.chosenBooks.includes(chosenBookId)) {
+				count += 1;
+			}
+		}
+
+		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			chosenBooks: arrayRemove(chosenBookId)
+		});
+
+		if (count === 1) {
+			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
+				[chosenBookId]: deleteField()
+			});
+		}
+	});
+}
+
+export async function startBook(
+	userId: string,
+	goalId: string,
+	bookId: string,
+	chosenBookId: string
+) {
+	await addActiveBook(userId, goalId, bookId);
+	await removeChosenBook(userId, goalId, chosenBookId);
+}
+
+async function addActiveBook(
+	userId: string,
+	goalId: string,
+	bookId: string,
+	pagesRead?: number,
+	startDate?: string
+) {
+	const batch = writeBatch(db);
+
+	const newActiveBookId = crypto.randomUUID();
+	batch.update(doc(db, Path.ACTIVE_BOOKS, userId), {
+		[newActiveBookId]: {
+			bookId,
+			pagesRead: pagesRead ?? 0,
+			startDate: startDate ?? dateFormat(new Date(), 'yyyy-mm-dd')
+		}
+	});
+
+	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+		activeBooks: arrayUnion(newActiveBookId)
+	});
+
+	await batch.commit();
+}
+
+export async function moveBookFromActiveToChosen(
 	userId: string,
 	goalId: string,
 	activeBookId: string,
 	bookId: string
 ) {
-	const batch = writeBatch(db);
+	await removeActiveBook(userId, goalId, activeBookId);
+	await addExistingBookToGoal(userId, goalId, bookId);
+}
 
-	batch.update(doc(db, 'users', userId, 'goals', goalId), {
-		chosenBooks: arrayUnion(bookId)
+async function removeActiveBook(userId: string, goalId: string, activeBookId: string) {
+	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+	await runTransaction(db, async (transaction) => {
+		let count = 0;
+		for (const goalDoc of goalDocs.docs) {
+			const goal = await transaction.get(goalDoc.ref);
+			if (goal.data()?.activeBooks.includes(activeBookId)) {
+				count += 1;
+			}
+		}
+
+		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			activeBooks: arrayRemove(activeBookId)
+		});
+
+		if (count === 1) {
+			transaction.update(doc(db, Path.ACTIVE_BOOKS, userId), {
+				[activeBookId]: deleteField()
+			});
+		}
 	});
-
-	batch.delete(doc(db, 'users', userId, 'goals', goalId, 'activeBooks', activeBookId));
-
-	await batch.commit();
 }
 
 export async function updatePagesRead(
@@ -184,11 +264,12 @@ export async function updatePagesRead(
 ) {
 	const batch = writeBatch(db);
 
-	batch.update(doc(db, 'users', userId, 'goals', goalId, 'activeBooks', activeBookId), {
-		pagesRead: pagesRead
+	const updateString = `${activeBookId}.pagesRead`;
+	batch.update(doc(db, Path.ACTIVE_BOOKS, userId), {
+		[updateString]: pagesRead
 	});
 
-	batch.update(doc(db, 'users', userId, 'goals', goalId), {
+	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
 		pagesReadToday: pagesReadToday,
 		todaysDate: new Date()
 	});
@@ -197,7 +278,7 @@ export async function updatePagesRead(
 }
 
 export async function resetToday(userId: string, goalId: string) {
-	await updateDoc(doc(db, 'users', userId, 'goals', goalId), {
+	await updateDoc(doc(db, Path.GOALS, userId, 'goals', goalId), {
 		pagesReadToday: 0,
 		todaysDate: new Date()
 	});
@@ -212,14 +293,20 @@ export async function finishBook(
 ) {
 	const batch = writeBatch(db);
 
-	const readBookRef = doc(collection(db, 'users', userId, 'goals', goalId, 'readBooks'));
-	batch.set(readBookRef, {
-		bookId,
-		startDate,
-		endDate: new Date()
+	const newReadBookId = crypto.randomUUID();
+	batch.update(doc(db, Path.READ_BOOKS, userId), {
+		[newReadBookId]: {
+			bookId,
+			startDate: dateFormat(startDate, 'yyyy-mm-dd'),
+			endDate: dateFormat(new Date(), 'yyyy-mm-dd')
+		}
 	});
 
-	batch.delete(doc(db, 'users', userId, 'goals', goalId, 'activeBooks', activeBookId));
+	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+		readBooks: arrayUnion(newReadBookId)
+	});
+
+	await removeActiveBook(userId, goalId, activeBookId);
 
 	await batch.commit();
 }
@@ -232,16 +319,50 @@ export async function reactivateBook(
 	startDate: Date,
 	readBookId: string
 ) {
-	const batch = writeBatch(db);
+	await addActiveBook(userId, goalId, bookId, pageCount, dateFormat(startDate, 'yyyy-mm-dd'));
+	await removeReadBook(userId, goalId, readBookId);
+}
 
-	const activeBookRef = doc(collection(db, 'users', userId, 'goals', goalId, 'activeBooks'));
-	batch.set(activeBookRef, {
-		bookId: bookId,
-		pagesRead: pageCount,
-		startDate
+async function removeReadBook(userId: string, goalId: string, readBookId: string) {
+	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+	await runTransaction(db, async (transaction) => {
+		let count = 0;
+		for (const goalDoc of goalDocs.docs) {
+			const goal = await transaction.get(goalDoc.ref);
+			if (goal.data()?.readBooks.includes(readBookId)) {
+				count += 1;
+			}
+		}
+
+		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			readBooks: arrayRemove(readBookId)
+		});
+
+		if (count === 1) {
+			transaction.update(doc(db, Path.READ_BOOKS, userId), {
+				[readBookId]: deleteField()
+			});
+		}
 	});
+}
 
-	batch.delete(doc(db, 'users', userId, 'goals', goalId, 'readBooks', readBookId));
+export async function getActiveBooks(userId: string) {
+	const querySnapshot = await getDoc(doc(db, Path.ACTIVE_BOOKS, userId));
+	const activeBooks = querySnapshot.data() as Record<string, ActiveBook>;
 
-	await batch.commit();
+	return activeBooks ?? {};
+}
+
+export async function getReadBooks(userId: string) {
+	const querySnapshot = await getDoc(doc(db, Path.READ_BOOKS, userId));
+	const readBooks = querySnapshot.data() as Record<string, ReadBook>;
+
+	return readBooks ?? {};
+}
+
+export async function getChosenBooks(userId: string) {
+	const querySnapshot = await getDoc(doc(db, Path.CHOSEN_BOOKS, userId));
+	const chosenBooks = querySnapshot.data() as Record<string, string>;
+
+	return chosenBooks ?? {};
 }

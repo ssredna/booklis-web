@@ -3,11 +3,13 @@
 	import { X } from 'lucide-svelte';
 	import { Button } from './ui/button';
 	import { books } from '$lib/booksStore';
+	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 
 	export let chosenBookId: string;
 	export let goalId: string;
 
-	$: book = $books.find((book) => book.id === chosenBookId);
+	$: bookId = $chosenBooks[chosenBookId];
+	$: book = $books[bookId];
 </script>
 
 {#if book}
@@ -18,13 +20,14 @@
 		</div>
 		<div class="flex place-content-between items-center">
 			<form action="?/startBook" method="post" use:enhance>
-				<input type="hidden" name="bookId" value={book.id} required />
+				<input type="hidden" name="bookId" value={bookId} required />
 				<input type="hidden" name="goalId" value={goalId} required />
+				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
 				<Button type="submit">Start bok</Button>
 			</form>
 
 			<form action="?/removeBook" method="post" use:enhance>
-				<input type="hidden" name="bookId" value={book.id} required />
+				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
 				<input type="hidden" name="goalId" value={goalId} required />
 				<Button type="submit" variant="outline">
 					<X class="h-4 w-4" />

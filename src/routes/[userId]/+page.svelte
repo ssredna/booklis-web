@@ -1,15 +1,21 @@
 <script lang="ts">
-	import { books } from '$lib/booksStore.js';
+	import { books } from '$lib/booksStore';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
 	import MyBooksCard from '$lib/components/MyBooksCard.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { isOwner } from '$lib/isOwnerStore.js';
+	import { isOwner } from '$lib/isOwnerStore';
+	import { activeBooks } from '$lib/stores/activeBooksStore';
+	import { chosenBooks } from '$lib/stores/chosenBooksStore';
+	import { readBooks } from '$lib/stores/readBooksStore';
 	import { signOut } from '@auth/sveltekit/client';
 
 	export let data;
 
 	$: books.set(data.books);
+	$: chosenBooks.set(data.chosenBooks);
+	$: activeBooks.set(data.activeBooks);
+	$: readBooks.set(data.readBooks);
 	$: isOwner.set(data.isOwner);
 </script>
 
@@ -26,20 +32,22 @@
 	</h1>
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
-	{#each data.goals as goalData}
-		<Goal
-			{goalData}
-			editGoalForm={data.editGoalForm}
-			deleteGoalForm={data.deleteGoalForm}
-			addBookForm={data.addBookForm}
-			addExistingBookForm={data.addExistingBookForm}
-		/>
+	{#each data.goals as goal}
+		{#key goal}
+			<Goal
+				{goal}
+				editGoalForm={data.editGoalForm}
+				deleteGoalForm={data.deleteGoalForm}
+				addBookForm={data.addBookForm}
+				addExistingBookForm={data.addExistingBookForm}
+			/>
+		{/key}
 	{/each}
 {/if}
 
-{#if data.books.length !== 0}
+{#if Object.keys(data.books).length > 0}
 	<MyBooksCard>
-		{#each data.books as book}
+		{#each Object.values(data.books) as book}
 			<p>{book.title}</p>
 		{/each}
 	</MyBooksCard>

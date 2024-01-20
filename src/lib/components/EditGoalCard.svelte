@@ -12,10 +12,9 @@
 	import dateFormat from 'dateformat';
 	import { page } from '$app/stores';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
 
-	export let goal: Writable<Goal>;
+	export let goal: Goal;
 	export let editGoalForm: SuperValidated<EditGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
 
@@ -32,14 +31,14 @@
 		}
 	});
 
-	$: dateString = dateFormat($goal.deadline, 'yyyy-mm-dd');
+	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 </script>
 
 <Card.Root class="mb-8 w-full max-w-xl">
 	<Card.Header>
 		<Card.Title>Rediger målet</Card.Title>
 		<Card.Description>
-			Endre målet "{$goal.numberOfBooks} bøker til {dateString}"
+			Endre målet "{goal.numberOfBooks} bøker til {dateString}"
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>
@@ -48,7 +47,7 @@
 				<Label for="numberOfBooks" class={$createErrors.numberOfBooks ? 'text-destructive' : ''}>
 					Hvor mange bøker vil du lese?
 				</Label>
-				<Input id="numberOfBooks" name="numberOfBooks" type="number" value={$goal.numberOfBooks} />
+				<Input id="numberOfBooks" name="numberOfBooks" type="number" value={goal.numberOfBooks} />
 				{#if $createErrors.numberOfBooks}
 					<small class="text-destructive">{$createErrors.numberOfBooks}</small>
 				{/if}
@@ -68,7 +67,7 @@
 				<Label for="avgPageCount" class={$createErrors.avgPageCount ? 'text-destructive' : ''}>
 					Gjennomsnittlig antall sider per bok
 				</Label>
-				<Input id="avgPageCount" name="avgPageCount" type="number" value={$goal.avgPageCount} />
+				<Input id="avgPageCount" name="avgPageCount" type="number" value={goal.avgPageCount} />
 				<small>
 					Brukes for å regne ut hvor mange sider du må lese, før du har lagt til alle de spesifikke
 					bøkene.
@@ -87,7 +86,7 @@
 				<p>{$page.form?.fireBaseError}</p>
 			{/if}
 
-			<input type="hidden" name="goalId" value={$goal.id} />
+			<input type="hidden" name="goalId" value={goal.id} />
 		</form>
 	</Card.Content>
 	<Card.Footer class="place-content-between">
@@ -100,6 +99,6 @@
 			</Button>
 			<Button variant="destructive" on:click={() => dispatch('finishedEditing')}>Avbryt</Button>
 		</div>
-		<DeleteGoalButton goalId={$goal.id} {deleteGoalForm} />
+		<DeleteGoalButton goalId={goal.id} {deleteGoalForm} />
 	</Card.Footer>
 </Card.Root>

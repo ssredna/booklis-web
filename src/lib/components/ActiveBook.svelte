@@ -1,26 +1,27 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import type { ActiveBook } from '$lib/core/activeBook';
 	import { Check, X } from 'lucide-svelte';
 	import { Button } from './ui/button';
-	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
 	import { books } from '$lib/booksStore';
 	import { Slider } from './ui/slider';
+	import { activeBooks } from '$lib/stores/activeBooksStore';
 
-	export let activeBook: ActiveBook;
-	export let goal: Writable<Goal>;
+	export let activeBookId: string;
+	export let goal: Goal;
 
-	$: book = $books.find((book) => book.id === activeBook.bookId);
+	$: activeBook = $activeBooks[activeBookId];
 
-	let sliderValue = [activeBook.pagesRead];
+	$: book = $books[activeBook.bookId];
+
+	let sliderValue = [$activeBooks[activeBookId].pagesRead];
 	$: activeBook.pagesRead = sliderValue[0];
 
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
 
-	let oldPagesRead = activeBook.pagesRead;
+	let oldPagesRead = $activeBooks[activeBookId].pagesRead;
 	$: increase = activeBook.pagesRead - oldPagesRead;
 
 	let isDirty = false;
@@ -30,7 +31,7 @@
 	on:click={() => {
 		// Couldn't find a way to register clicks on the slider, so this is a workaround
 		if (isDirty) {
-			$goal.pagesReadToday = Math.max($goal.pagesReadToday + increase, 0);
+			goal.pagesReadToday = Math.max(goal.pagesReadToday + increase, 0);
 			oldPagesRead = activeBook.pagesRead;
 			pagesReadForm.requestSubmit();
 		}
@@ -53,7 +54,7 @@
 				action="?/updatePagesRead"
 				method="post"
 				use:enhance={({ formData }) => {
-					formData.append('pagesReadToday', String($goal.pagesReadToday));
+					formData.append('pagesReadToday', String(goal.pagesReadToday));
 					isFormSubmitting = true;
 
 					return async ({ update }) => {
@@ -73,8 +74,8 @@
 					class="mb-2 mt-4"
 				/>
 				<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
-				<input type="hidden" value={activeBook.id} name="activeBookId" required />
-				<input type="hidden" value={$goal.id} name="goalId" required />
+				<input type="hidden" value={activeBookId} name="activeBookId" required />
+				<input type="hidden" value={goal.id} name="goalId" required />
 
 				{#if $page.form?.updatePagesReadError}
 					<p>Noe gikk galt i lagringen</p>
@@ -93,9 +94,9 @@
 			use:enhance
 			class="place-self-center justify-self-end"
 		>
-			<input type="hidden" name="bookId" value={book.id} required />
-			<input type="hidden" name="goalId" value={$goal.id} required />
-			<input type="hidden" name="activeBookId" value={activeBook.id} required />
+			<input type="hidden" name="bookId" value={activeBook.bookId} required />
+			<input type="hidden" name="goalId" value={goal.id} required />
+			<input type="hidden" name="activeBookId" value={activeBookId} required />
 			<Button type="submit" variant="outline">
 				<X class="h-4 w-4" />
 			</Button>
@@ -103,9 +104,9 @@
 
 		{#if activeBook.pagesRead === book.pageCount}
 			<form action="?/finishBook" method="post" use:enhance>
-				<input type="hidden" name="goalId" value={$goal.id} required />
-				<input type="hidden" name="activeBookId" value={activeBook.id} required />
-				<input type="hidden" name="bookId" value={book.id} required />
+				<input type="hidden" name="goalId" value={goal.id} required />
+				<input type="hidden" name="activeBookId" value={activeBookId} required />
+				<input type="hidden" name="bookId" value={activeBook.bookId} required />
 				<input type="hidden" name="startDate" value={activeBook.startDate} required />
 
 				<Button type="submit" class="mt-2">

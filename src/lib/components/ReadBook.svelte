@@ -2,14 +2,16 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import { books } from '$lib/booksStore';
-	import type { ReadBook } from '$lib/core/readBook';
+	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
 	import dateFormat from 'dateformat';
 
-	export let readBook: ReadBook;
+	export let readBookId: string;
 	export let goalId: string;
 
-	$: book = $books.find((book) => book.id === readBook.bookId);
+	$: readBook = $readBooks[readBookId];
+
+	$: book = $books[readBook.bookId];
 
 	$: formattedStartDate = dateFormat(readBook.startDate, 'yyyy-mm-dd');
 	$: formattedEndDate = dateFormat(readBook.endDate, 'yyyy-mm-dd');
@@ -25,8 +27,8 @@
 		</div>
 		<form method="post" action="?/reactivateBook" use:enhance>
 			<input type="hidden" name="goalId" value={goalId} required />
-			<input type="hidden" name="bookId" value={book.id} required />
-			<input type="hidden" name="readBookId" value={readBook.id} required />
+			<input type="hidden" name="bookId" value={readBook.bookId} required />
+			<input type="hidden" name="readBookId" value={readBookId} required />
 			<input type="hidden" name="startDate" value={readBook.startDate} required />
 			<input type="hidden" name="pageCount" value={book.pageCount} required />
 

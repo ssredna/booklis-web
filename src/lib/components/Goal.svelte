@@ -22,53 +22,52 @@
 	import { type Goal } from '$lib/core/goal';
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
-	import { writable } from 'svelte/store';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
+	import { activeBooks } from '$lib/stores/activeBooksStore';
 
-	export let goalData: Goal;
+	export let goal: Goal;
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
 	export let addBookForm: SuperValidated<AddBookSchema>;
 	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
-	$: goal = writable(goalData);
-
-	$: pagesLeftInActiveBooks = $goal.activeBooks.reduce((pagesLeftTotal, activeBook) => {
-		const book = $books.find((book) => book.id === activeBook.bookId);
+	$: pagesLeftInActiveBooks = goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
+		const activeBook = $activeBooks[activeBookId];
+		const book = $books[activeBook.bookId];
 		const pagesInBook = book?.pageCount ?? 0;
 		return pagesLeftTotal + (pagesInBook - activeBook.pagesRead);
 	}, 0);
 
-	$: pagesLeftInChosenBooks = $goal.chosenBooks.reduce((pagesLeftTotal, chosenBook) => {
-		const book = $books.find((book) => book.id === chosenBook);
+	$: pagesLeftInChosenBooks = goal.chosenBooks.reduce((pagesLeftTotal, chosenBook) => {
+		const book = $books[chosenBook];
 		const pagesInBook = book?.pageCount ?? 0;
 		return pagesLeftTotal + pagesInBook;
 	}, 0);
 
 	$: pagesLeftInUnknownBooks =
-		($goal.numberOfBooks -
-			$goal.chosenBooks.length -
-			$goal.activeBooks.length -
-			$goal.readBooks.length) *
-		$goal.avgPageCount;
+		(goal.numberOfBooks -
+			goal.chosenBooks.length -
+			goal.activeBooks.length -
+			goal.readBooks.length) *
+		goal.avgPageCount;
 
 	$: totalPagesLeftInBooks =
 		pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLeftInUnknownBooks;
 
-	$: numberOfBooksLeft = $goal.numberOfBooks - $goal.readBooks.length;
+	$: numberOfBooksLeft = goal.numberOfBooks - goal.readBooks.length;
 
 	$: pagesToRead =
-		numberOfBooksLeft >= $goal.activeBooks.length
+		numberOfBooksLeft >= goal.activeBooks.length
 			? totalPagesLeftInBooks
-			: (totalPagesLeftInBooks / $goal.activeBooks.length) * numberOfBooksLeft;
+			: (totalPagesLeftInBooks / goal.activeBooks.length) * numberOfBooksLeft;
 
-	$: daysLeft = differenceInDays($goal.deadline, new Date());
+	$: daysLeft = differenceInDays(goal.deadline, new Date());
 
 	$: pagesPerDay = Math.ceil(pagesToRead / daysLeft);
 
-	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - $goal.pagesReadToday, 0), pagesPerDay);
+	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay);
 
-	$: dateString = dateFormat($goal.deadline, 'yyyy-mm-dd');
+	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 
 	let isEditing = false;
 
@@ -87,7 +86,7 @@
 					</Button>
 				{/if}
 			</Card.Title>
-			<Card.Description>{$goal.numberOfBooks} bøker til {dateString}</Card.Description>
+			<Card.Description>{goal.numberOfBooks} bøker til {dateString}</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<p class="text-xl">
@@ -99,9 +98,9 @@
 			<small>
 				{pagesPerDay} sider om dagen for å nå målet
 			</small>
-			{#if $goal.pagesReadToday !== 0}
+			{#if goal.pagesReadToday !== 0}
 				<form method="post" action="?/resetToday" use:enhance>
-					<input type="hidden" name="goalId" value={$goal.id} />
+					<input type="hidden" name="goalId" value={goal.id} />
 					<Button type="submit">Nullstill sider lest i dag</Button>
 					{#if $page.form?.resetTodayError}
 						<p>Noe gikk galt under nullstillingen</p>
@@ -119,35 +118,35 @@
 	/>
 {/if}
 
-{#if $goal.chosenBooks.length === 0 && $goal.activeBooks.length === 0 && $goal.readBooks.length === 0 && $isOwner}
+{#if goal.chosenBooks.length === 0 && goal.activeBooks.length === 0 && goal.readBooks.length === 0 && $isOwner}
 	<h2 class="pb-4 text-3xl font-extrabold tracking-tight">På tide å komme i gang!</h2>
 	<Button on:click={() => (showAddBookModal = true)} class="mb-4">Legg til bok</Button>
 {/if}
 
-{#if $goal.activeBooks.length > 0}
+{#if goal.activeBooks.length > 0}
 	<ActiveBooksCard>
-		{#each $goal.activeBooks as activeBook, i}
-			<ActiveBook {activeBook} {goal} />
-			{#if i < $goal.activeBooks.length - 1}
+		{#each goal.activeBooks as activeBookId, i (activeBookId)}
+			<ActiveBook {activeBookId} {goal} />
+			{#if i < goal.activeBooks.length - 1}
 				<Separator />
 			{/if}
 		{/each}
 	</ActiveBooksCard>
 {/if}
 
-{#if $goal.chosenBooks.length > 0}
+{#if goal.chosenBooks.length > 0}
 	<ChosenBooksCard>
-		{#each $goal.chosenBooks as bookId}
-			<ChosenBook chosenBookId={bookId} goalId={$goal.id} />
+		{#each goal.chosenBooks as bookId}
+			<ChosenBook chosenBookId={bookId} goalId={goal.id} />
 		{/each}
 		<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
 	</ChosenBooksCard>
 {/if}
 
-{#if $goal.readBooks.length > 0}
+{#if goal.readBooks.length > 0}
 	<ReadBooksCard>
-		{#each $goal.readBooks as readBook}
-			<ReadBook {readBook} goalId={$goal.id} />
+		{#each goal.readBooks as readBookId}
+			<ReadBook {readBookId} goalId={goal.id} />
 		{/each}
 	</ReadBooksCard>
 {/if}

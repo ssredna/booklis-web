@@ -10,11 +10,13 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import AddExistingBookButton from './AddExistingBookButton.svelte';
-	import type { Writable } from 'svelte/store';
 	import type { Goal } from '$lib/core/goal';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
+	import { activeBooks } from '$lib/stores/activeBooksStore';
+	import { readBooks } from '$lib/stores/readBooksStore';
+	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 
-	export let goal: Writable<Goal>;
+	export let goal: Goal;
 	export let addBookForm: SuperValidated<AddBookSchema>;
 	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
@@ -25,11 +27,11 @@
 		resetForm: true
 	});
 
-	$: filteredBooks = $books.filter(
+	$: filteredBooks = Object.entries($books).filter(
 		(book) =>
-			!$goal.chosenBooks.some((chosenBookId) => chosenBookId === book.id) &&
-			!$goal.activeBooks.some((activeBook) => activeBook.bookId === book.id) &&
-			!$goal.readBooks.some((readBook) => readBook.bookId === book.id)
+			!goal.chosenBooks.some((chosenBookId) => $chosenBooks[chosenBookId] === book[0]) &&
+			!goal.activeBooks.some((activeBookId) => $activeBooks[activeBookId].bookId === book[0]) &&
+			!goal.readBooks.some((readBookId) => $readBooks[readBookId].bookId === book[0])
 	);
 
 	export let isOpen: boolean;
@@ -56,7 +58,7 @@
 				{/if}
 			</div>
 
-			<input type="hidden" name="goalId" value={$goal.id} />
+			<input type="hidden" name="goalId" value={goal.id} />
 
 			{#if $page.form?.unauthorized}
 				<p class="text-destructive">Du har ikke tilgang til å legge til en bok på dette målet.</p>
@@ -81,8 +83,8 @@
 				{#each filteredBooks as book}
 					<AddExistingBookButton
 						form={addExistingBookForm}
-						{book}
-						goalId={$goal.id}
+						bookId={book[0]}
+						goalId={goal.id}
 						on:success={() => (isOpen = false)}
 					/>
 				{/each}
