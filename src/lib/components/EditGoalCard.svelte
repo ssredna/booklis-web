@@ -12,7 +12,7 @@
 	import dateFormat from 'dateformat';
 	import { page } from '$app/stores';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import type { Goal } from '$lib/core/goal';
+	import type { Goal } from '$lib/types/goal';
 
 	export let goal: Goal;
 	export let editGoalForm: SuperValidated<EditGoalSchema>;

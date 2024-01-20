@@ -10,7 +10,7 @@
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import AddExistingBookButton from './AddExistingBookButton.svelte';
-	import type { Goal } from '$lib/core/goal';
+	import type { Goal } from '$lib/types/goal';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';

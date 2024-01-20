@@ -3,7 +3,7 @@
 	import { page } from '$app/stores';
 	import { Check, X } from 'lucide-svelte';
 	import { Button } from './ui/button';
-	import type { Goal } from '$lib/core/goal';
+	import type { Goal } from '$lib/types/goal';
 	import { books } from '$lib/booksStore';
 	import { Slider } from './ui/slider';
 	import { activeBooks } from '$lib/stores/activeBooksStore';

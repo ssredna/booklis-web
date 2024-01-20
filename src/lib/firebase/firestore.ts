@@ -15,9 +15,9 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { isSameDay } from 'date-fns';
-import type { ActiveBook } from '$lib/core/activeBook';
-import type { ReadBook } from '$lib/core/readBook';
-import type { Book } from '$lib/core/book';
+import type { ActiveBook } from '$lib/types/activeBook';
+import type { ReadBook } from '$lib/types/readBook';
+import type { Book } from '$lib/types/book';
 import dateFormat from 'dateformat';
 
 enum Path {

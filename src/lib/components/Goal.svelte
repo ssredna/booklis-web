@@ -19,7 +19,7 @@
 	import { Separator } from './ui/separator';
 	import ReadBooksCard from './ReadBooksCard.svelte';
 	import EditGoalCard from './EditGoalCard.svelte';
-	import { type Goal } from '$lib/core/goal';
+	import { type Goal } from '$lib/types/goal';
 	import { books } from '$lib/booksStore';
 	import { differenceInDays } from 'date-fns';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
