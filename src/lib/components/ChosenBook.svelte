@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { X } from 'lucide-svelte';
 	import { Button } from './ui/button';
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 
 	export let chosenBookId: string;

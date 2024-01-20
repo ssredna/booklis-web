@@ -11,7 +11,7 @@
 	import { Edit } from 'lucide-svelte';
 	import type { SuperValidated } from 'sveltekit-superforms';
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
-	import { isOwner } from '$lib/isOwnerStore';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
@@ -20,7 +20,7 @@
 	import ReadBooksCard from './ReadBooksCard.svelte';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type Goal } from '$lib/types/goal';
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore';
 	import { differenceInDays } from 'date-fns';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 	import { activeBooks } from '$lib/stores/activeBooksStore';

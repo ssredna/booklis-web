@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
 	import MyBooksCard from '$lib/components/MyBooksCard.svelte';
 	import { Button } from '$lib/components/ui/button';
-	import { isOwner } from '$lib/isOwnerStore';
+	import { isOwner } from '$lib/stores/isOwnerStore.js';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';

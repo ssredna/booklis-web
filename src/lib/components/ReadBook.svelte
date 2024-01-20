@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
 	import dateFormat from 'dateformat';

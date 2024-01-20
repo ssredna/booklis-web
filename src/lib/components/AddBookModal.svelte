@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore';
 	import * as Dialog from './ui/dialog';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';

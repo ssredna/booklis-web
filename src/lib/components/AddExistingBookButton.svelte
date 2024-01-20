@@ -5,7 +5,7 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Loader2 } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
-	import { books } from '$lib/booksStore';
+	import { books } from '$lib/stores/booksStore';
 
 	export let bookId: string;
 	export let goalId: string;
