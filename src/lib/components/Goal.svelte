@@ -145,7 +145,7 @@
 {#if goal.readBooks.length > 0}
 	<ReadBooksCard>
 		{#each goal.readBooks as readBookId}
-			<ReadBook {readBookId} goalId={goal.id} />
+			<ReadBook {readBookId} />
 		{/each}
 	</ReadBooksCard>
 {/if}

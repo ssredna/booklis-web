@@ -4,14 +4,14 @@ import {
 	createGoal,
 	deleteGoal,
 	editGoal,
-	finishBook,
+	moveBookFromActiveToRead,
 	getActiveBooks,
 	getBooks,
 	getChosenBooks,
 	getGoals,
 	getReadBooks,
 	moveBookFromActiveToChosen,
-	reactivateBook,
+	moveBookFromReadToActive,
 	removeChosenBook,
 	resetToday,
 	moveBookFromChosenToActive,
@@ -336,18 +336,20 @@ export const actions = {
 
 		const data = await request.formData();
 
-		const goalId = data.get('goalId');
+		const goalIds = data.get('goalIds');
 		const activeBookId = data.get('activeBookId');
 		const bookId = data.get('bookId');
 		const startDate = data.get('startDate');
 
-		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedGoalIdsString = z.string().parse(goalIds);
+		const goalIdsList = parsedGoalIdsString.split(',');
+		const parsedGoalIds = idsSchema.safeParse(goalIdsList);
 		const parsedActiveBookId = idSchema.safeParse(activeBookId);
 		const parsedBookId = idSchema.safeParse(bookId);
 		const parsedStartDate = deadlineSchema.safeParse(startDate);
 
 		if (
-			!parsedGoalId.success ||
+			!parsedGoalIds.success ||
 			!parsedActiveBookId.success ||
 			!parsedBookId.success ||
 			!parsedStartDate.success
@@ -356,9 +358,9 @@ export const actions = {
 		}
 
 		try {
-			await finishBook(
+			await moveBookFromActiveToRead(
 				params.userId,
-				parsedGoalId.data,
+				parsedGoalIds.data,
 				parsedActiveBookId.data,
 				parsedBookId.data,
 				parsedStartDate.data
@@ -375,20 +377,22 @@ export const actions = {
 
 		const data = await request.formData();
 
-		const goalId = data.get('goalId');
+		const goalIds = data.get('goalIds');
 		const bookId = data.get('bookId');
 		const readBookId = data.get('readBookId');
 		const startDate = data.get('startDate');
 		const pageCount = data.get('pageCount');
 
-		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedGoalIdsString = z.string().parse(goalIds);
+		const goalIdsList = parsedGoalIdsString.split(',');
+		const parsedGoalIds = idsSchema.safeParse(goalIdsList);
 		const parsedBookId = idSchema.safeParse(bookId);
 		const parsedReadBookId = idSchema.safeParse(readBookId);
 		const parsedStartDate = deadlineSchema.safeParse(startDate);
 		const parsedPageCount = pageCountSchema.safeParse(pageCount);
 
 		if (
-			!parsedGoalId.success ||
+			!parsedGoalIds.success ||
 			!parsedReadBookId.success ||
 			!parsedBookId.success ||
 			!parsedStartDate.success ||
@@ -398,9 +402,9 @@ export const actions = {
 		}
 
 		try {
-			await reactivateBook(
+			await moveBookFromReadToActive(
 				params.userId,
-				parsedGoalId.data,
+				parsedGoalIds.data,
 				parsedBookId.data,
 				parsedPageCount.data,
 				parsedStartDate.data,

@@ -104,7 +104,7 @@
 
 		{#if activeBook.pagesRead === book.pageCount}
 			<form action="?/finishBook" method="post" use:enhance>
-				<input type="hidden" name="goalId" value={goal.id} required />
+				<input type="hidden" name="goalIds" value={activeBook.goals} required />
 				<input type="hidden" name="activeBookId" value={activeBookId} required />
 				<input type="hidden" name="bookId" value={activeBook.bookId} required />
 				<input type="hidden" name="startDate" value={activeBook.startDate} required />

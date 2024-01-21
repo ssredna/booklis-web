@@ -7,7 +7,6 @@
 	import dateFormat from 'dateformat';
 
 	export let readBookId: string;
-	export let goalId: string;
 
 	$: readBook = $readBooks[readBookId];
 
@@ -26,7 +25,7 @@
 			</small>
 		</div>
 		<form method="post" action="?/reactivateBook" use:enhance>
-			<input type="hidden" name="goalId" value={goalId} required />
+			<input type="hidden" name="goalIds" value={readBook.goals} required />
 			<input type="hidden" name="bookId" value={readBook.bookId} required />
 			<input type="hidden" name="readBookId" value={readBookId} required />
 			<input type="hidden" name="startDate" value={readBook.startDate} required />

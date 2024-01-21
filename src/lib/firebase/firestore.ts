@@ -309,13 +309,18 @@ export async function resetToday(userId: string) {
 	await batch.commit();
 }
 
-export async function finishBook(
+export async function moveBookFromActiveToRead(
 	userId: string,
-	goalId: string,
+	goalIds: string[],
 	activeBookId: string,
 	bookId: string,
 	startDate: Date
 ) {
+	await addReadBook(userId, goalIds, bookId, startDate);
+	await removeActiveBook(userId, goalIds, activeBookId);
+}
+
+async function addReadBook(userId: string, goalIds: string[], bookId: string, startDate: Date) {
 	const batch = writeBatch(db);
 
 	const newReadBookId = crypto.randomUUID();
@@ -323,49 +328,52 @@ export async function finishBook(
 		[newReadBookId]: {
 			bookId,
 			startDate: dateFormat(startDate, 'yyyy-mm-dd'),
-			endDate: dateFormat(new Date(), 'yyyy-mm-dd')
+			endDate: dateFormat(new Date(), 'yyyy-mm-dd'),
+			goals: goalIds
 		}
 	});
 
-	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-		readBooks: arrayUnion(newReadBookId)
-	});
-
-	await removeActiveBook(userId, [goalId], activeBookId);
+	for (const goalId of goalIds) {
+		batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			readBooks: arrayUnion(newReadBookId)
+		});
+	}
 
 	await batch.commit();
 }
 
-export async function reactivateBook(
+export async function moveBookFromReadToActive(
 	userId: string,
-	goalId: string,
+	goalIds: string[],
 	bookId: string,
 	pageCount: number,
 	startDate: Date,
 	readBookId: string
 ) {
-	await addActiveBook(userId, [goalId], bookId, pageCount, dateFormat(startDate, 'yyyy-mm-dd'));
-	await removeReadBook(userId, goalId, readBookId);
+	await addActiveBook(userId, goalIds, bookId, pageCount, dateFormat(startDate, 'yyyy-mm-dd'));
+	await removeReadBook(userId, goalIds, readBookId);
 }
 
-async function removeReadBook(userId: string, goalId: string, readBookId: string) {
-	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+async function removeReadBook(userId: string, goalIds: string[], readBookId: string) {
 	await runTransaction(db, async (transaction) => {
-		let count = 0;
-		for (const goalDoc of goalDocs.docs) {
-			const goal = await transaction.get(goalDoc.ref);
-			if (goal.data()?.readBooks.includes(readBookId)) {
-				count += 1;
-			}
+		const readBookSnap = await transaction.get(doc(db, Path.READ_BOOKS, userId));
+		const readBook = readBookSnap.data() as Record<string, ReadBook>;
+		const partOfOtherGoals = readBook[readBookId].goals.length > goalIds.length;
+
+		for (const goalId of goalIds) {
+			transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+				readBooks: arrayRemove(readBookId)
+			});
 		}
 
-		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-			readBooks: arrayRemove(readBookId)
-		});
-
-		if (count === 1) {
+		if (!partOfOtherGoals) {
 			transaction.update(doc(db, Path.READ_BOOKS, userId), {
 				[readBookId]: deleteField()
+			});
+		} else {
+			const goalsString = `${readBookId}.goals`;
+			transaction.update(doc(db, Path.READ_BOOKS, userId), {
+				[goalsString]: arrayRemove(goalIds)
 			});
 		}
 	});
