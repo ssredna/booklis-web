@@ -75,7 +75,7 @@
 				/>
 				<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
 				<input type="hidden" value={activeBookId} name="activeBookId" required />
-				<input type="hidden" value={goal.id} name="goalId" required />
+				<input type="hidden" value={activeBook.goals} name="goalIds" required />
 
 				{#if $page.form?.updatePagesReadError}
 					<p>Noe gikk galt i lagringen</p>

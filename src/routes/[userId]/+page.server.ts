@@ -284,12 +284,14 @@ export const actions = {
 		const data = await request.formData();
 
 		const activeBookId = data.get('activeBookId');
-		const goalId = data.get('goalId');
+		const goalIds = data.get('goalIds');
 		const pagesRead = data.get('pagesRead');
 		const pagesReadToday = data.get('pagesReadToday');
 
 		const parsedActiveBookId = idSchema.safeParse(activeBookId);
-		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedGoalIdsString = z.string().parse(goalIds);
+		const goalIdsList = parsedGoalIdsString.split(',');
+		const parsedGoalId = idsSchema.safeParse(goalIdsList);
 		const parsedPagesRead = pagesReadSchema.safeParse(pagesRead);
 		const parsedPagesReadToday = pagesReadSchema.safeParse(pagesReadToday);
 
