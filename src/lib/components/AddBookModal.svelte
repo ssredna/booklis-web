@@ -29,7 +29,7 @@
 
 	$: filteredBooks = Object.entries($books).filter(
 		(book) =>
-			!goal.chosenBooks.some((chosenBookId) => $chosenBooks[chosenBookId] === book[0]) &&
+			!goal.chosenBooks.some((chosenBookId) => $chosenBooks[chosenBookId].bookId === book[0]) &&
 			!goal.activeBooks.some((activeBookId) => $activeBooks[activeBookId].bookId === book[0]) &&
 			!goal.readBooks.some((readBookId) => $readBooks[readBookId].bookId === book[0])
 	);

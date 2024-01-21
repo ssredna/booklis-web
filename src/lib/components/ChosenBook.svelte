@@ -8,8 +8,8 @@
 	export let chosenBookId: string;
 	export let goalId: string;
 
-	$: bookId = $chosenBooks[chosenBookId];
-	$: book = $books[bookId];
+	$: chosenBook = $chosenBooks[chosenBookId];
+	$: book = $books[chosenBook.bookId];
 </script>
 
 {#if book}
@@ -20,7 +20,7 @@
 		</div>
 		<div class="flex place-content-between items-center">
 			<form action="?/startBook" method="post" use:enhance>
-				<input type="hidden" name="bookId" value={bookId} required />
+				<input type="hidden" name="bookId" value={chosenBook.bookId} required />
 				<input type="hidden" name="goalId" value={goalId} required />
 				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
 				<Button type="submit">Start bok</Button>

@@ -19,6 +19,7 @@ import type { ActiveBook } from '$lib/types/activeBook';
 import type { ReadBook } from '$lib/types/readBook';
 import type { Book } from '$lib/types/book';
 import dateFormat from 'dateformat';
+import type { ChosenBook } from '$lib/types/chosenBook';
 
 enum Path {
 	ACTIVE_BOOKS = 'activeBooks',
@@ -131,7 +132,9 @@ export async function addBook(userId: string, goalId: string, title: string, pag
 
 	const newChosenBookId = crypto.randomUUID();
 	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
-		[newChosenBookId]: newBookId
+		[newChosenBookId]: {
+			bookId: newBookId
+		}
 	});
 
 	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
@@ -145,9 +148,10 @@ export async function addExistingBookToGoal(userId: string, goalId: string, book
 	const batch = writeBatch(db);
 
 	const newChosenBookId = crypto.randomUUID();
-
 	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
-		[newChosenBookId]: bookId
+		[newChosenBookId]: {
+			bookId
+		}
 	});
 
 	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
@@ -362,7 +366,7 @@ export async function getReadBooks(userId: string) {
 
 export async function getChosenBooks(userId: string) {
 	const querySnapshot = await getDoc(doc(db, Path.CHOSEN_BOOKS, userId));
-	const chosenBooks = querySnapshot.data() as Record<string, string>;
+	const chosenBooks = querySnapshot.data() as Record<string, ChosenBook>;
 
 	return chosenBooks ?? {};
 }
