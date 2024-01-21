@@ -24,6 +24,7 @@
 	import { differenceInDays } from 'date-fns';
 	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
+	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 
 	export let goal: Goal;
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
@@ -38,8 +39,9 @@
 		return pagesLeftTotal + (pagesInBook - activeBook.pagesRead);
 	}, 0);
 
-	$: pagesLeftInChosenBooks = goal.chosenBooks.reduce((pagesLeftTotal, chosenBook) => {
-		const book = $books[chosenBook];
+	$: pagesLeftInChosenBooks = goal.chosenBooks.reduce((pagesLeftTotal, chosenBookId) => {
+		const chosenBook = $chosenBooks[chosenBookId];
+		const book = $books[chosenBook.bookId];
 		const pagesInBook = book?.pageCount ?? 0;
 		return pagesLeftTotal + pagesInBook;
 	}, 0);
