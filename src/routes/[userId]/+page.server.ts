@@ -1,6 +1,6 @@
 import {
 	addBook,
-	addExistingBookToGoal,
+	addExistingBookToGoals,
 	createGoal,
 	deleteGoal,
 	editGoal,
@@ -14,7 +14,7 @@ import {
 	reactivateBook,
 	removeChosenBook,
 	resetToday,
-	startBook,
+	moveBookFromChosenToActive,
 	updatePagesRead
 } from '$lib/firebase/firestore';
 import { fail, error } from '@sveltejs/kit';
@@ -28,6 +28,7 @@ import { addExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
+const idsSchema = z.coerce.string().array();
 const pageCountSchema = z.coerce.number().min(1);
 const pagesReadSchema = z.coerce.number().min(0);
 
@@ -158,9 +159,9 @@ export const actions = {
 		if (!addExistingBookForm.valid) return fail(400, { addExistingBookForm });
 
 		try {
-			await addExistingBookToGoal(
+			await addExistingBookToGoals(
 				params.userId,
-				addExistingBookForm.data.goalId,
+				[addExistingBookForm.data.goalId],
 				addExistingBookForm.data.bookId
 			);
 		} catch (error) {
@@ -191,7 +192,7 @@ export const actions = {
 		}
 
 		try {
-			return await removeChosenBook(params.userId, parsedGoalId.data, parsedChosenBookId.data);
+			return await removeChosenBook(params.userId, [parsedGoalId.data], parsedChosenBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
@@ -204,7 +205,7 @@ export const actions = {
 
 		const data = await request.formData();
 		const bookId = data.get('bookId');
-		const goalId = data.get('goalId');
+		const goalIds = data.get('goalIds');
 		const chosenBookId = data.get('chosenBookId');
 
 		const parsedBookId = idSchema.safeParse(bookId);
@@ -212,8 +213,10 @@ export const actions = {
 			return fail(422, { bookIdError: true });
 		}
 
-		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
+		const parsedGoalIdsString = z.string().parse(goalIds);
+		const goalIdsList = parsedGoalIdsString.split(',');
+		const parsedGoalIds = idsSchema.safeParse(goalIdsList);
+		if (!parsedGoalIds.success) {
 			return fail(422, { goalIdError: true });
 		}
 
@@ -223,9 +226,9 @@ export const actions = {
 		}
 
 		try {
-			return await startBook(
+			return await moveBookFromChosenToActive(
 				params.userId,
-				parsedGoalId.data,
+				parsedGoalIds.data,
 				parsedBookId.data,
 				parsedChosenBookId.data
 			);
@@ -242,7 +245,7 @@ export const actions = {
 		const data = await request.formData();
 		const bookId = data.get('bookId');
 		const activeBookId = data.get('activeBookId');
-		const goalId = data.get('goalId');
+		const goalIds = data.get('goalIds');
 
 		const parsedBookId = idSchema.safeParse(bookId);
 		if (!parsedBookId.success) {
@@ -254,7 +257,9 @@ export const actions = {
 			return fail(422, { activeBookIdError: true });
 		}
 
-		const parsedGoalId = idSchema.safeParse(goalId);
+		const parsedGoalIdsString = z.string().parse(goalIds);
+		const goalIdsList = parsedGoalIdsString.split(',');
+		const parsedGoalId = idsSchema.safeParse(goalIdsList);
 		if (!parsedGoalId.success) {
 			return fail(422, { goalIdError: true });
 		}

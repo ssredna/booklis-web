@@ -21,7 +21,7 @@
 		<div class="flex place-content-between items-center">
 			<form action="?/startBook" method="post" use:enhance>
 				<input type="hidden" name="bookId" value={chosenBook.bookId} required />
-				<input type="hidden" name="goalId" value={goalId} required />
+				<input type="hidden" name="goalIds" value={chosenBook.goals} required />
 				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
 				<Button type="submit">Start bok</Button>
 			</form>

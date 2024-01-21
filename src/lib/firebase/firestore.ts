@@ -145,20 +145,22 @@ export async function addBook(userId: string, goalId: string, title: string, pag
 	await batch.commit();
 }
 
-export async function addExistingBookToGoal(userId: string, goalId: string, bookId: string) {
+export async function addExistingBookToGoals(userId: string, goalIds: string[], bookId: string) {
 	const batch = writeBatch(db);
 
 	const newChosenBookId = crypto.randomUUID();
 	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
 		[newChosenBookId]: {
 			bookId,
-			goals: arrayUnion(goalId)
+			goals: arrayUnion(...goalIds)
 		}
 	});
 
-	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-		chosenBooks: arrayUnion(newChosenBookId)
-	});
+	for (const goalId of goalIds) {
+		batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			chosenBooks: arrayUnion(newChosenBookId)
+		});
+	}
 
 	await batch.commit();
 }
@@ -170,15 +172,17 @@ export async function getBooks(userId: string) {
 	return books ?? {};
 }
 
-export async function removeChosenBook(userId: string, goalId: string, chosenBookId: string) {
+export async function removeChosenBook(userId: string, goalIds: string[], chosenBookId: string) {
 	await runTransaction(db, async (transaction) => {
 		const chosenBookSnap = await transaction.get(doc(db, Path.CHOSEN_BOOKS, userId));
 		const chosenBook = chosenBookSnap.data() as Record<string, ChosenBook>;
-		const partOfOtherGoals = chosenBook[chosenBookId].goals.length > 1;
+		const partOfOtherGoals = chosenBook[chosenBookId].goals.length > goalIds.length;
 
-		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-			chosenBooks: arrayRemove(chosenBookId)
-		});
+		for (const goalId of goalIds) {
+			transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+				chosenBooks: arrayRemove(chosenBookId)
+			});
+		}
 
 		if (!partOfOtherGoals) {
 			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
@@ -187,25 +191,25 @@ export async function removeChosenBook(userId: string, goalId: string, chosenBoo
 		} else {
 			const goalsString = `${chosenBookId}.goals`;
 			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
-				[goalsString]: arrayRemove(goalId)
+				[goalsString]: arrayRemove(goalIds)
 			});
 		}
 	});
 }
 
-export async function startBook(
+export async function moveBookFromChosenToActive(
 	userId: string,
-	goalId: string,
+	goalIds: string[],
 	bookId: string,
 	chosenBookId: string
 ) {
-	await addActiveBook(userId, goalId, bookId);
-	await removeChosenBook(userId, goalId, chosenBookId);
+	await addActiveBook(userId, goalIds, bookId);
+	await removeChosenBook(userId, goalIds, chosenBookId);
 }
 
 async function addActiveBook(
 	userId: string,
-	goalId: string,
+	goalIds: string[],
 	bookId: string,
 	pagesRead?: number,
 	startDate?: string
@@ -217,45 +221,50 @@ async function addActiveBook(
 		[newActiveBookId]: {
 			bookId,
 			pagesRead: pagesRead ?? 0,
-			startDate: startDate ?? dateFormat(new Date(), 'yyyy-mm-dd')
+			startDate: startDate ?? dateFormat(new Date(), 'yyyy-mm-dd'),
+			goals: goalIds
 		}
 	});
 
-	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-		activeBooks: arrayUnion(newActiveBookId)
-	});
+	for (const goalId of goalIds) {
+		batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+			activeBooks: arrayUnion(newActiveBookId)
+		});
+	}
 
 	await batch.commit();
 }
 
 export async function moveBookFromActiveToChosen(
 	userId: string,
-	goalId: string,
+	goalIds: string[],
 	activeBookId: string,
 	bookId: string
 ) {
-	await removeActiveBook(userId, goalId, activeBookId);
-	await addExistingBookToGoal(userId, goalId, bookId);
+	await removeActiveBook(userId, goalIds, activeBookId);
+	await addExistingBookToGoals(userId, goalIds, bookId);
 }
 
-async function removeActiveBook(userId: string, goalId: string, activeBookId: string) {
-	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+async function removeActiveBook(userId: string, goalIds: string[], activeBookId: string) {
 	await runTransaction(db, async (transaction) => {
-		let count = 0;
-		for (const goalDoc of goalDocs.docs) {
-			const goal = await transaction.get(goalDoc.ref);
-			if (goal.data()?.activeBooks.includes(activeBookId)) {
-				count += 1;
-			}
+		const activeBookSnap = await transaction.get(doc(db, Path.ACTIVE_BOOKS, userId));
+		const activeBook = activeBookSnap.data() as Record<string, ActiveBook>;
+		const partOfOtherGoals = activeBook[activeBookId].goals.length > goalIds.length;
+
+		for (const goalId of goalIds) {
+			transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+				activeBooks: arrayRemove(activeBookId)
+			});
 		}
 
-		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-			activeBooks: arrayRemove(activeBookId)
-		});
-
-		if (count === 1) {
+		if (!partOfOtherGoals) {
 			transaction.update(doc(db, Path.ACTIVE_BOOKS, userId), {
 				[activeBookId]: deleteField()
+			});
+		} else {
+			const goalsString = `${activeBookId}.goals`;
+			transaction.update(doc(db, Path.ACTIVE_BOOKS, userId), {
+				[goalsString]: arrayRemove(goalIds)
 			});
 		}
 	});
@@ -312,7 +321,7 @@ export async function finishBook(
 		readBooks: arrayUnion(newReadBookId)
 	});
 
-	await removeActiveBook(userId, goalId, activeBookId);
+	await removeActiveBook(userId, [goalId], activeBookId);
 
 	await batch.commit();
 }
@@ -325,7 +334,7 @@ export async function reactivateBook(
 	startDate: Date,
 	readBookId: string
 ) {
-	await addActiveBook(userId, goalId, bookId, pageCount, dateFormat(startDate, 'yyyy-mm-dd'));
+	await addActiveBook(userId, [goalId], bookId, pageCount, dateFormat(startDate, 'yyyy-mm-dd'));
 	await removeReadBook(userId, goalId, readBookId);
 }
 

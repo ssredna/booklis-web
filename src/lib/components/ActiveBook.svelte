@@ -95,7 +95,7 @@
 			class="place-self-center justify-self-end"
 		>
 			<input type="hidden" name="bookId" value={activeBook.bookId} required />
-			<input type="hidden" name="goalId" value={goal.id} required />
+			<input type="hidden" name="goalIds" value={activeBook.goals} required />
 			<input type="hidden" name="activeBookId" value={activeBookId} required />
 			<Button type="submit" variant="outline">
 				<X class="h-4 w-4" />
