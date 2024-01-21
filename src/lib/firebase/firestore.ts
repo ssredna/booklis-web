@@ -294,11 +294,19 @@ export async function updatePagesRead(
 	await batch.commit();
 }
 
-export async function resetToday(userId: string, goalId: string) {
-	await updateDoc(doc(db, Path.GOALS, userId, 'goals', goalId), {
-		pagesReadToday: 0,
-		todaysDate: new Date()
-	});
+export async function resetToday(userId: string) {
+	const batch = writeBatch(db);
+
+	const goalsSnap = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
+
+	for (const goalSnap of goalsSnap.docs) {
+		batch.update(goalSnap.ref, {
+			pagesReadToday: 0,
+			todaysDate: new Date()
+		});
+	}
+
+	await batch.commit();
 }
 
 export async function finishBook(

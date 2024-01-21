@@ -100,7 +100,6 @@
 			</small>
 			{#if goal.pagesReadToday !== 0}
 				<form method="post" action="?/resetToday" use:enhance>
-					<input type="hidden" name="goalId" value={goal.id} />
 					<Button type="submit">Nullstill sider lest i dag</Button>
 					{#if $page.form?.resetTodayError}
 						<p>Noe gikk galt under nullstillingen</p>

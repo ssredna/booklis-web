@@ -319,20 +319,11 @@ export const actions = {
 		}
 	},
 
-	resetToday: async ({ request, locals, params }) => {
+	resetToday: async ({ locals, params }) => {
 		if (!locals.isOwner) return fail(403, { unauthorized: true });
 
-		const data = await request.formData();
-
-		const goalId = data.get('goalId');
-
-		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
-			return fail(422, { resetTodayError: true });
-		}
-
 		try {
-			return await resetToday(params.userId, parsedGoalId.data);
+			return await resetToday(params.userId);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
