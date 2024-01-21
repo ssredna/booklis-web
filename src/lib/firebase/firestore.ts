@@ -133,7 +133,8 @@ export async function addBook(userId: string, goalId: string, title: string, pag
 	const newChosenBookId = crypto.randomUUID();
 	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
 		[newChosenBookId]: {
-			bookId: newBookId
+			bookId: newBookId,
+			goals: arrayUnion(goalId)
 		}
 	});
 
@@ -150,7 +151,8 @@ export async function addExistingBookToGoal(userId: string, goalId: string, book
 	const newChosenBookId = crypto.randomUUID();
 	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
 		[newChosenBookId]: {
-			bookId
+			bookId,
+			goals: arrayUnion(goalId)
 		}
 	});
 
@@ -169,23 +171,23 @@ export async function getBooks(userId: string) {
 }
 
 export async function removeChosenBook(userId: string, goalId: string, chosenBookId: string) {
-	const goalDocs = await getDocs(collection(db, Path.GOALS, userId, 'goals'));
 	await runTransaction(db, async (transaction) => {
-		let count = 0;
-		for (const goalDoc of goalDocs.docs) {
-			const goal = await transaction.get(goalDoc.ref);
-			if (goal.data()?.chosenBooks.includes(chosenBookId)) {
-				count += 1;
-			}
-		}
+		const chosenBookSnap = await transaction.get(doc(db, Path.CHOSEN_BOOKS, userId));
+		const chosenBook = chosenBookSnap.data() as Record<string, ChosenBook>;
+		const partOfOtherGoals = chosenBook[chosenBookId].goals.length > 1;
 
 		transaction.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
 			chosenBooks: arrayRemove(chosenBookId)
 		});
 
-		if (count === 1) {
+		if (!partOfOtherGoals) {
 			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
 				[chosenBookId]: deleteField()
+			});
+		} else {
+			const goalsString = `${chosenBookId}.goals`;
+			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
+				[goalsString]: arrayRemove(goalId)
 			});
 		}
 	});
