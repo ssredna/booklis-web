@@ -277,9 +277,11 @@ async function removeActiveBook(userId: string, goalIds: string[], activeBookId:
 export async function updatePagesRead(
 	userId: string,
 	activeBookId: string,
-	goalIds: string[],
-	pagesRead: number,
-	pagesReadToday: number
+	goalIdsAndPagesReadToday: {
+		goalId: string;
+		pagesReadToday: number;
+	}[],
+	pagesRead: number
 ) {
 	const batch = writeBatch(db);
 
@@ -288,9 +290,9 @@ export async function updatePagesRead(
 		[updateString]: pagesRead
 	});
 
-	for (const goalId of goalIds) {
-		batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-			pagesReadToday: pagesReadToday,
+	for (const goalIdAndPageReadToday of goalIdsAndPagesReadToday) {
+		batch.update(doc(db, Path.GOALS, userId, 'goals', goalIdAndPageReadToday.goalId), {
+			pagesReadToday: goalIdAndPageReadToday.pagesReadToday,
 			todaysDate: new Date()
 		});
 	}

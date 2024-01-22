@@ -31,6 +31,12 @@ const idSchema = z.string();
 const idsSchema = z.coerce.string().array();
 const pageCountSchema = z.coerce.number().min(1);
 const pagesReadSchema = z.coerce.number().min(0);
+const goalIdsAndPagesReadTodaySchema = z
+	.object({
+		goalId: idSchema,
+		pagesReadToday: pagesReadSchema
+	})
+	.array();
 
 export const load = async ({ locals, params }) => {
 	try {
@@ -284,22 +290,26 @@ export const actions = {
 		const data = await request.formData();
 
 		const activeBookId = data.get('activeBookId');
-		const goalIds = data.get('goalIds');
 		const pagesRead = data.get('pagesRead');
 		const pagesReadToday = data.get('pagesReadToday');
 
 		const parsedActiveBookId = idSchema.safeParse(activeBookId);
-		const parsedGoalIdsString = z.string().parse(goalIds);
-		const goalIdsList = parsedGoalIdsString.split(',');
-		const parsedGoalId = idsSchema.safeParse(goalIdsList);
 		const parsedPagesRead = pagesReadSchema.safeParse(pagesRead);
-		const parsedPagesReadToday = pagesReadSchema.safeParse(pagesReadToday);
+
+		const parsedPagesReadTodayString = z.string().parse(pagesReadToday);
+		const goalIdsAndPagesReadToday = parsedPagesReadTodayString
+			.split(';')
+			.map((goalIdAndPagesReadToday) => {
+				const [goalId, pagesReadToday] = goalIdAndPagesReadToday.split(',');
+				return { goalId, pagesReadToday: Number(pagesReadToday) };
+			});
+		const parsedGoalIdsAndPagesReadToday =
+			goalIdsAndPagesReadTodaySchema.safeParse(goalIdsAndPagesReadToday);
 
 		if (
-			!parsedGoalId.success ||
 			!parsedPagesRead.success ||
 			!parsedActiveBookId.success ||
-			!parsedPagesReadToday.success
+			!parsedGoalIdsAndPagesReadToday.success
 		) {
 			return fail(422, { updatePagesReadError: true });
 		}
@@ -308,9 +318,8 @@ export const actions = {
 			return await updatePagesRead(
 				params.userId,
 				parsedActiveBookId.data,
-				parsedGoalId.data,
-				parsedPagesRead.data,
-				parsedPagesReadToday.data
+				parsedGoalIdsAndPagesReadToday.data,
+				parsedPagesRead.data
 			);
 		} catch (error) {
 			return fail(400, {

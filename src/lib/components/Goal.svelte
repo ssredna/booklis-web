@@ -127,7 +127,7 @@
 {#if goal.activeBooks.length > 0}
 	<ActiveBooksCard>
 		{#each goal.activeBooks as activeBookId, i (activeBookId)}
-			<ActiveBook {activeBookId} {goal} />
+			<ActiveBook {activeBookId} />
 			{#if i < goal.activeBooks.length - 1}
 				<Separator />
 			{/if}

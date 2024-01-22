@@ -3,16 +3,14 @@
 	import { page } from '$app/stores';
 	import { Check, X } from 'lucide-svelte';
 	import { Button } from './ui/button';
-	import type { Goal } from '$lib/types/goal';
 	import { books } from '$lib/stores/booksStore';
 	import { Slider } from './ui/slider';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
+	import { goals } from '$lib/stores/goalsStore';
 
 	export let activeBookId: string;
-	export let goal: Goal;
 
 	$: activeBook = $activeBooks[activeBookId];
-
 	$: book = $books[activeBook.bookId];
 
 	let sliderValue = [$activeBooks[activeBookId].pagesRead];
@@ -31,7 +29,9 @@
 	on:click={() => {
 		// Couldn't find a way to register clicks on the slider, so this is a workaround
 		if (isDirty) {
-			goal.pagesReadToday = Math.max(goal.pagesReadToday + increase, 0);
+			activeBook.goals.forEach((goalId) => {
+				$goals[goalId].pagesReadToday = Math.max($goals[goalId].pagesReadToday + increase, 0);
+			});
 			oldPagesRead = activeBook.pagesRead;
 			pagesReadForm.requestSubmit();
 		}
@@ -54,7 +54,10 @@
 				action="?/updatePagesRead"
 				method="post"
 				use:enhance={({ formData }) => {
-					formData.append('pagesReadToday', String(goal.pagesReadToday));
+					const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
+						return [goalId, String($goals[goalId].pagesReadToday)];
+					});
+					formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
 					isFormSubmitting = true;
 
 					return async ({ update }) => {
@@ -75,7 +78,6 @@
 				/>
 				<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
 				<input type="hidden" value={activeBookId} name="activeBookId" required />
-				<input type="hidden" value={activeBook.goals} name="goalIds" required />
 
 				{#if $page.form?.updatePagesReadError}
 					<p>Noe gikk galt i lagringen</p>

@@ -9,10 +9,12 @@
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { signOut } from '@auth/sveltekit/client';
+	import { goals } from '$lib/stores/goalsStore';
 
 	export let data;
 
 	$: books.set(data.books);
+	$: goals.set(data.goals);
 	$: chosenBooks.set(data.chosenBooks);
 	$: activeBooks.set(data.activeBooks);
 	$: readBooks.set(data.readBooks);
