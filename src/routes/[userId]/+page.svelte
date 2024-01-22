@@ -19,20 +19,20 @@
 	$: isOwner.set(data.isOwner);
 </script>
 
-{#if data.goals.length === 0 && data.isOwner}
+{#if Object.keys(data.goals).length === 0 && data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Lag deg et lesemål
 	</h1>
 	<CreateGoalModal inputForm={data.createGoalForm}>
 		<Button size="lg" class="mb-4">Opprett mål</Button>
 	</CreateGoalModal>
-{:else if data.goals.length === 0 && !data.isOwner}
+{:else if Object.keys(data.goals).length === 0 && !data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Her er det ingen lesemål
 	</h1>
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
-	{#each data.goals as goal}
+	{#each Object.values(data.goals) as goal}
 		{#key goal}
 			<Goal
 				{goal}

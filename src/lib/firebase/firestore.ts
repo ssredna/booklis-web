@@ -20,6 +20,7 @@ import type { ReadBook } from '$lib/types/readBook';
 import type { Book } from '$lib/types/book';
 import dateFormat from 'dateformat';
 import type { ChosenBook } from '$lib/types/chosenBook';
+import type { Goal } from '$lib/types/goal';
 
 enum Path {
 	ACTIVE_BOOKS = 'activeBooks',
@@ -85,20 +86,23 @@ export async function getGoals(userId: string) {
 			pagesReadToday = goalDoc.data().pagesReadToday as number;
 		}
 
-		return {
-			id: goalDoc.id,
-			numberOfBooks: goalDoc.data().numberOfBooks as number,
-			deadline: goalDoc.data().deadline.toDate().toString() as string,
-			avgPageCount: goalDoc.data().avgPageCount as number,
-			pagesReadToday,
-			todaysDate,
-			chosenBooks: (goalDoc.data().chosenBooks ?? []) as string[],
-			activeBooks: (goalDoc.data().activeBooks ?? []) as string[],
-			readBooks: (goalDoc.data().readBooks ?? []) as string[]
-		};
+		return [
+			goalDoc.id,
+			{
+				id: goalDoc.id,
+				numberOfBooks: goalDoc.data().numberOfBooks as number,
+				deadline: goalDoc.data().deadline.toDate().toString() as string,
+				avgPageCount: goalDoc.data().avgPageCount as number,
+				pagesReadToday,
+				todaysDate,
+				chosenBooks: (goalDoc.data().chosenBooks ?? []) as string[],
+				activeBooks: (goalDoc.data().activeBooks ?? []) as string[],
+				readBooks: (goalDoc.data().readBooks ?? []) as string[]
+			}
+		];
 	});
 
-	return goals;
+	return Object.fromEntries(goals) as Record<string, Goal>;
 }
 
 export async function deleteGoal(userId: string, goalId: string) {
