@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { X } from 'lucide-svelte';
 	import { Button } from './ui/button';
 	import { books } from '$lib/stores/booksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
+	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
 
 	export let chosenBookId: string;
-	export let goalId: string;
 
 	$: chosenBook = $chosenBooks[chosenBookId];
 	$: book = $books[chosenBook.bookId];
@@ -26,13 +25,7 @@
 				<Button type="submit">Start bok</Button>
 			</form>
 
-			<form action="?/removeBook" method="post" use:enhance>
-				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
-				<input type="hidden" name="goalId" value={goalId} required />
-				<Button type="submit" variant="outline">
-					<X class="h-4 w-4" />
-				</Button>
-			</form>
+			<RemoveChosenBookButton {chosenBookId} />
 		</div>
 	</div>
 {:else}

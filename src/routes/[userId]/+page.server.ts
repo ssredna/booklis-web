@@ -185,20 +185,20 @@ export const actions = {
 
 		const data = await request.formData();
 		const chosenBookId = data.get('chosenBookId');
-		const goalId = data.get('goalId');
+		const goalIds = data.getAll('goalIds');
 
 		const parsedChosenBookId = idSchema.safeParse(chosenBookId);
 		if (!parsedChosenBookId.success) {
 			return fail(422, { bookIdError: true });
 		}
 
-		const parsedGoalId = idSchema.safeParse(goalId);
-		if (!parsedGoalId.success) {
+		const parsedGoalIds = idsSchema.safeParse(goalIds);
+		if (!parsedGoalIds.success) {
 			return fail(422, { goalIdError: true });
 		}
 
 		try {
-			return await removeChosenBook(params.userId, [parsedGoalId.data], parsedChosenBookId.data);
+			return await removeChosenBook(params.userId, parsedGoalIds.data, parsedChosenBookId.data);
 		} catch (error) {
 			return fail(400, {
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'

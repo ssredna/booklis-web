@@ -5,7 +5,6 @@
 	import AddBookModal from './AddBookModal.svelte';
 	import ChosenBook from './ChosenBook.svelte';
 	import ActiveBook from './ActiveBook.svelte';
-	import ReadBook from './ReadBook.svelte';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
@@ -17,7 +16,6 @@
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
 	import ActiveBooksCard from './ActiveBooksCard.svelte';
 	import { Separator } from './ui/separator';
-	import ReadBooksCard from './ReadBooksCard.svelte';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type Goal } from '$lib/types/goal';
 	import { books } from '$lib/stores/booksStore';
@@ -138,7 +136,7 @@
 {#if goal.chosenBooks.length > 0}
 	<ChosenBooksCard>
 		{#each goal.chosenBooks as bookId}
-			<ChosenBook chosenBookId={bookId} goalId={goal.id} />
+			<ChosenBook chosenBookId={bookId} />
 		{/each}
 		<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
 	</ChosenBooksCard>
