@@ -144,12 +144,4 @@
 	</ChosenBooksCard>
 {/if}
 
-{#if goal.readBooks.length > 0}
-	<ReadBooksCard>
-		{#each goal.readBooks as readBookId}
-			<ReadBook {readBookId} />
-		{/each}
-	</ReadBooksCard>
-{/if}
-
 <AddBookModal {goal} {addBookForm} {addExistingBookForm} bind:isOpen={showAddBookModal} />

@@ -10,6 +10,8 @@
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { signOut } from '@auth/sveltekit/client';
 	import { goals } from '$lib/stores/goalsStore';
+	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
+	import ReadBook from '$lib/components/ReadBook.svelte';
 
 	export let data;
 
@@ -45,6 +47,16 @@
 			/>
 		{/key}
 	{/each}
+{/if}
+
+{#if Object.keys(data.readBooks).length > 0}
+	{#key data.readBooks}
+		<ReadBooksCard>
+			{#each Object.keys(data.readBooks) as readBookId}
+				<ReadBook {readBookId} />
+			{/each}
+		</ReadBooksCard>
+	{/key}
 {/if}
 
 {#if Object.keys(data.books).length > 0}
