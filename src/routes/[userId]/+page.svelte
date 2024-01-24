@@ -13,6 +13,8 @@
 	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
 	import ReadBook from '$lib/components/ReadBook.svelte';
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
+	import ChosenBooksCard from '$lib/components/ChosenBooksCard.svelte';
+	import ChosenBook from '$lib/components/ChosenBook.svelte';
 
 	export let data;
 
@@ -49,6 +51,16 @@
 			/>
 		{/key}
 	{/each}
+{/if}
+
+{#if Object.keys(data.chosenBooks).length > 0}
+	{#key data.chosenBooks}
+		<ChosenBooksCard>
+			{#each Object.keys(data.chosenBooks) as chosenBookId}
+				<ChosenBook {chosenBookId} />
+			{/each}
+		</ChosenBooksCard>
+	{/key}
 {/if}
 
 <Button on:click={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>

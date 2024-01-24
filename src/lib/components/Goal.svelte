@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
-	import ChosenBook from './ChosenBook.svelte';
 	import ActiveBook from './ActiveBook.svelte';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
@@ -11,7 +10,6 @@
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import ChosenBooksCard from './ChosenBooksCard.svelte';
 	import ActiveBooksCard from './ActiveBooksCard.svelte';
 	import { Separator } from './ui/separator';
 	import EditGoalCard from './EditGoalCard.svelte';
@@ -119,12 +117,4 @@
 			{/if}
 		{/each}
 	</ActiveBooksCard>
-{/if}
-
-{#if goal.chosenBooks.length > 0}
-	<ChosenBooksCard>
-		{#each goal.chosenBooks as bookId}
-			<ChosenBook chosenBookId={bookId} />
-		{/each}
-	</ChosenBooksCard>
 {/if}
