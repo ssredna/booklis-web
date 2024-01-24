@@ -68,7 +68,10 @@ export async function createGoal(
 		deadline,
 		avgPageCount,
 		pagesReadToday: 0,
-		todaysDate: new Date()
+		todaysDate: new Date(),
+		chosenBooks: [],
+		activeBooks: [],
+		readBooks: []
 	});
 	await createBookDocumentsIfTheyDontExist(userId);
 }
