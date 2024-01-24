@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
-	import AddBookModal from './AddBookModal.svelte';
 	import ChosenBook from './ChosenBook.svelte';
 	import ActiveBook from './ActiveBook.svelte';
 	import * as Card from './ui/card';
@@ -12,7 +11,6 @@
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
 	import ChosenBooksCard from './ChosenBooksCard.svelte';
 	import ActiveBooksCard from './ActiveBooksCard.svelte';
 	import { Separator } from './ui/separator';
@@ -26,7 +24,6 @@
 	export let goal: Goal;
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
-	export let addBookForm: SuperValidated<AddBookSchema>;
 
 	$: pagesLeftInActiveBooks = goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
 		const activeBook = $activeBooks[activeBookId];
@@ -68,8 +65,6 @@
 	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
 
 	let isEditing = false;
-
-	let showAddBookModal = false;
 </script>
 
 {#if !isEditing}
@@ -115,11 +110,6 @@
 	/>
 {/if}
 
-{#if goal.chosenBooks.length === 0 && goal.activeBooks.length === 0 && goal.readBooks.length === 0 && $isOwner}
-	<h2 class="pb-4 text-3xl font-extrabold tracking-tight">På tide å komme i gang!</h2>
-	<Button on:click={() => (showAddBookModal = true)} class="mb-4">Legg til bok</Button>
-{/if}
-
 {#if goal.activeBooks.length > 0}
 	<ActiveBooksCard>
 		{#each goal.activeBooks as activeBookId, i (activeBookId)}
@@ -136,8 +126,5 @@
 		{#each goal.chosenBooks as bookId}
 			<ChosenBook chosenBookId={bookId} />
 		{/each}
-		<Button on:click={() => (showAddBookModal = true)}>Legg til bok</Button>
 	</ChosenBooksCard>
 {/if}
-
-<AddBookModal {addBookForm} bind:isOpen={showAddBookModal} />

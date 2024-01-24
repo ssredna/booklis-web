@@ -12,8 +12,11 @@
 	import { goals } from '$lib/stores/goalsStore';
 	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
 	import ReadBook from '$lib/components/ReadBook.svelte';
+	import AddBookModal from '$lib/components/AddBookModal.svelte';
 
 	export let data;
+
+	let showAddBookModal = false;
 
 	$: books.set(data.books);
 	$: goals.set(data.goals);
@@ -47,6 +50,9 @@
 		{/key}
 	{/each}
 {/if}
+
+<Button on:click={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
+<AddBookModal addBookForm={data.addBookForm} bind:isOpen={showAddBookModal} />
 
 {#if Object.keys(data.readBooks).length > 0}
 	{#key data.readBooks}
