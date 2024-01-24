@@ -64,7 +64,8 @@
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="flex place-content-between">
-				{goal.numberOfBooks} bøker til {dateString}
+				{goal.numberOfBooks}
+				{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
 				{#if $isOwner}
 					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
 						<Edit class="mr-2 h-4 w-4" />

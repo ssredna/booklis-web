@@ -23,7 +23,8 @@
 			{#each chosenBook.goals as goalId}
 				<br />
 				<small>
-					&ensp; - {$goals[goalId].numberOfBooks} bøker til {dateFormat(
+					&ensp; - {$goals[goalId].numberOfBooks}
+					{$goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
 						$goals[goalId].deadline,
 						'yyyy-mm-dd'
 					)}

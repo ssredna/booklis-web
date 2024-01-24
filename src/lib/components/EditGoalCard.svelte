@@ -38,7 +38,8 @@
 	<Card.Header>
 		<Card.Title>Rediger målet</Card.Title>
 		<Card.Description>
-			Endre målet "{goal.numberOfBooks} bøker til {dateString}"
+			Endre målet "{goal.numberOfBooks}
+			{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}"
 		</Card.Description>
 	</Card.Header>
 	<Card.Content>

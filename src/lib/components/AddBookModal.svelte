@@ -50,7 +50,11 @@
 				{#each Object.values($goals) as goal}
 					<Label>
 						<input type="checkbox" name="goalIds" value={goal.id} class="mr-2" />
-						{goal.numberOfBooks} bøker til {dateFormat(goal.deadline, 'yyyy-mm-dd')}
+						{goal.numberOfBooks}
+						{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
+							goal.deadline,
+							'yyyy-mm-dd'
+						)}
 					</Label>
 				{/each}
 				{#if $errors.goalIds}
