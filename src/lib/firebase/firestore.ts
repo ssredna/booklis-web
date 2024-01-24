@@ -123,7 +123,7 @@ export async function editGoal(
 	});
 }
 
-export async function addBook(userId: string, goalId: string, title: string, pageCount: number) {
+export async function addBook(userId: string, goalIds: string[], title: string, pageCount: number) {
 	const batch = writeBatch(db);
 
 	const newBookId = crypto.randomUUID();
@@ -134,17 +134,21 @@ export async function addBook(userId: string, goalId: string, title: string, pag
 		}
 	});
 
-	const newChosenBookId = crypto.randomUUID();
-	batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
-		[newChosenBookId]: {
-			bookId: newBookId,
-			goals: arrayUnion(goalId)
-		}
-	});
+	if (goalIds.length > 0) {
+		const newChosenBookId = crypto.randomUUID();
+		batch.update(doc(db, Path.CHOSEN_BOOKS, userId), {
+			[newChosenBookId]: {
+				bookId: newBookId,
+				goals: arrayUnion(...goalIds)
+			}
+		});
 
-	batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
-		chosenBooks: arrayUnion(newChosenBookId)
-	});
+		for (const goalId of goalIds) {
+			batch.update(doc(db, Path.GOALS, userId, 'goals', goalId), {
+				chosenBooks: arrayUnion(newChosenBookId)
+			});
+		}
+	}
 
 	await batch.commit();
 }

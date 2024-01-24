@@ -43,7 +43,6 @@
 				editGoalForm={data.editGoalForm}
 				deleteGoalForm={data.deleteGoalForm}
 				addBookForm={data.addBookForm}
-				addExistingBookForm={data.addExistingBookForm}
 			/>
 		{/key}
 	{/each}

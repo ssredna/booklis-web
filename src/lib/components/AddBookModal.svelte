@@ -9,16 +9,10 @@
 	import { superForm } from 'sveltekit-superforms/client';
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
-	import AddExistingBookButton from './AddExistingBookButton.svelte';
-	import type { Goal } from '$lib/types/goal';
-	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
-	import { activeBooks } from '$lib/stores/activeBooksStore';
-	import { readBooks } from '$lib/stores/readBooksStore';
-	import { chosenBooks } from '$lib/stores/chosenBooksStore';
+	import { goals } from '$lib/stores/goalsStore';
+	import dateFormat from 'dateformat';
 
-	export let goal: Goal;
 	export let addBookForm: SuperValidated<AddBookSchema>;
-	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
 	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {
@@ -26,13 +20,6 @@
 		},
 		resetForm: true
 	});
-
-	$: filteredBooks = Object.entries($books).filter(
-		(book) =>
-			!goal.chosenBooks.some((chosenBookId) => $chosenBooks[chosenBookId].bookId === book[0]) &&
-			!goal.activeBooks.some((activeBookId) => $activeBooks[activeBookId].bookId === book[0]) &&
-			!goal.readBooks.some((readBookId) => $readBooks[readBookId].bookId === book[0])
-	);
 
 	export let isOpen: boolean;
 </script>
@@ -58,7 +45,18 @@
 				{/if}
 			</div>
 
-			<input type="hidden" name="goalId" value={goal.id} />
+			<div class="grid gap-4">
+				<Label>Hvilke mål vil du legge boken til i?</Label>
+				{#each Object.values($goals) as goal}
+					<Label>
+						<input type="checkbox" name="goalIds" value={goal.id} class="mr-2" />
+						{goal.numberOfBooks} bøker til {dateFormat(goal.deadline, 'yyyy-mm-dd')}
+					</Label>
+				{/each}
+				{#if $errors.goalIds}
+					<small class="text-destructive">{$errors.goalIds._errors}</small>
+				{/if}
+			</div>
 
 			{#if $page.form?.unauthorized}
 				<p class="text-destructive">Du har ikke tilgang til å legge til en bok på dette målet.</p>
@@ -75,20 +73,28 @@
 				{/if}
 				Legg til bok
 			</Button>
-		</form>
 
-		{#if filteredBooks.length > 0}
-			<h3>Vil du legge til en bok du allerede har?</h3>
-			<div class="flex flex-wrap gap-2">
-				{#each filteredBooks as book}
-					<AddExistingBookButton
-						form={addExistingBookForm}
-						bookId={book[0]}
-						goalId={goal.id}
-						on:success={() => (isOpen = false)}
-					/>
-				{/each}
-			</div>
-		{/if}
+			{#if Object.keys($books).length > 0}
+				<h3>Vil du legge til en bok du allerede har?</h3>
+				<div class="flex flex-wrap gap-2">
+					{#each Object.entries($books) as [bookId, book]}
+						<Button
+							type="submit"
+							formaction="?/addExistingBook"
+							name="bookId"
+							value={bookId}
+							variant="outline"
+							disabled={$submitting}
+						>
+							{book.title}
+						</Button>
+					{/each}
+				</div>
+
+				{#if $errors.bookId}
+					<small class="text-destructive">{$errors.bookId}</small>
+				{/if}
+			{/if}
+		</form>
 	</Dialog.Content>
 </Dialog.Root>

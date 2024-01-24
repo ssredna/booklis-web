@@ -24,7 +24,6 @@ import { createGoalSchema } from '$lib/schemas/createGoalSchema';
 import { editGoalSchema } from '$lib/schemas/editGoalSchema';
 import { deleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 import { addBookSchema } from '$lib/schemas/addBookSchema';
-import { addExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 
 const deadlineSchema = z.coerce.date().max(new Date('4000-01-01'));
 const idSchema = z.string();
@@ -51,7 +50,6 @@ export const load = async ({ locals, params }) => {
 			editGoalForm: await superValidate(editGoalSchema),
 			deleteGoalForm: await superValidate(deleteGoalSchema),
 			addBookForm: await superValidate(addBookSchema),
-			addExistingBookForm: await superValidate(addExistingBookSchema),
 			goals: await goalsPromise,
 			books: await booksPromise,
 			activeBooks: await activeBooksPromise,
@@ -137,10 +135,25 @@ export const actions = {
 			return fail(403, { addBookForm: { ...addBookForm, valid: false }, unauthorized: true });
 		if (!addBookForm.valid) return fail(400, { addBookForm });
 
+		// This form can be submitted in two different variants,
+		// so we also has to perform another manual check here
+		if (!addBookForm.data.title || !addBookForm.data.pageCount)
+			return fail(400, {
+				addBookForm: {
+					...addBookForm,
+					valid: false,
+					errors: {
+						...addBookForm.errors,
+						title: !addBookForm.data.title ? 'Boka må ha en tittel' : undefined,
+						pageCount: !addBookForm.data.pageCount ? 'Boka må ha minst én side' : undefined
+					}
+				}
+			});
+
 		try {
 			await addBook(
 				params.userId,
-				addBookForm.data.goalId,
+				addBookForm.data.goalIds,
 				addBookForm.data.title,
 				addBookForm.data.pageCount
 			);
@@ -155,29 +168,49 @@ export const actions = {
 	},
 
 	addExistingBook: async ({ request, locals, params }) => {
-		const addExistingBookForm = await superValidate(request, addExistingBookSchema);
+		const addBookForm = await superValidate(request, addBookSchema);
 
 		if (!locals.isOwner)
 			return fail(403, {
-				addExistingBookForm: { ...addExistingBookForm, valid: false },
+				addBookForm: { ...addBookForm, valid: false },
 				unauthorized: true
 			});
-		if (!addExistingBookForm.valid) return fail(400, { addExistingBookForm });
+		if (!addBookForm.valid) return fail(400, { addBookForm });
+		if (!addBookForm.data.bookId)
+			return fail(400, {
+				addBookForm: {
+					...addBookForm,
+					valid: false,
+					errors: { bookId: 'Noe gikk galt med å legge til boken, prøv igjen senere.' }
+				}
+			});
+		if (addBookForm.data.goalIds.length === 0)
+			return fail(400, {
+				addBookForm: {
+					...addBookForm,
+					valid: false,
+					errors: {
+						goalIds: {
+							_errors: 'Du må velge minst ett mål som boka skal legges til'
+						}
+					}
+				}
+			});
 
 		try {
 			await addExistingBookToGoals(
 				params.userId,
-				[addExistingBookForm.data.goalId],
-				addExistingBookForm.data.bookId
+				addBookForm.data.goalIds,
+				addBookForm.data.bookId
 			);
 		} catch (error) {
 			return fail(400, {
-				addExistingBookForm: { ...addExistingBookForm, valid: false },
+				addBookForm: { ...addBookForm, valid: false },
 				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
 			});
 		}
 
-		return { addExistingBookForm };
+		return { addBookForm };
 	},
 
 	removeBook: async ({ request, locals, params }) => {

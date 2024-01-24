@@ -20,7 +20,6 @@
 	import { type Goal } from '$lib/types/goal';
 	import { books } from '$lib/stores/booksStore';
 	import { differenceInDays } from 'date-fns';
-	import type { AddExistingBookSchema } from '$lib/schemas/addExistingBookSchema';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 
@@ -28,7 +27,6 @@
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
 	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
 	export let addBookForm: SuperValidated<AddBookSchema>;
-	export let addExistingBookForm: SuperValidated<AddExistingBookSchema>;
 
 	$: pagesLeftInActiveBooks = goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
 		const activeBook = $activeBooks[activeBookId];
@@ -142,4 +140,4 @@
 	</ChosenBooksCard>
 {/if}
 
-<AddBookModal {goal} {addBookForm} {addExistingBookForm} bind:isOpen={showAddBookModal} />
+<AddBookModal {addBookForm} bind:isOpen={showAddBookModal} />
