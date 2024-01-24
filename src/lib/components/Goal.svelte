@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
-	import ActiveBook from './ActiveBook.svelte';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
@@ -10,8 +9,6 @@
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import ActiveBooksCard from './ActiveBooksCard.svelte';
-	import { Separator } from './ui/separator';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type Goal } from '$lib/types/goal';
 	import { books } from '$lib/stores/booksStore';
@@ -106,15 +103,4 @@
 		{deleteGoalForm}
 		on:finishedEditing={() => (isEditing = false)}
 	/>
-{/if}
-
-{#if goal.activeBooks.length > 0}
-	<ActiveBooksCard>
-		{#each goal.activeBooks as activeBookId, i (activeBookId)}
-			<ActiveBook {activeBookId} />
-			{#if i < goal.activeBooks.length - 1}
-				<Separator />
-			{/if}
-		{/each}
-	</ActiveBooksCard>
 {/if}

@@ -15,6 +15,9 @@
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
 	import ChosenBooksCard from '$lib/components/ChosenBooksCard.svelte';
 	import ChosenBook from '$lib/components/ChosenBook.svelte';
+	import ActiveBooksCard from '$lib/components/ActiveBooksCard.svelte';
+	import ActiveBook from '$lib/components/ActiveBook.svelte';
+	import { Separator } from '$lib/components/ui/separator';
 
 	export let data;
 
@@ -43,14 +46,22 @@
 {:else}
 	{#each Object.values(data.goals) as goal}
 		{#key goal}
-			<Goal
-				{goal}
-				editGoalForm={data.editGoalForm}
-				deleteGoalForm={data.deleteGoalForm}
-				addBookForm={data.addBookForm}
-			/>
+			<Goal {goal} editGoalForm={data.editGoalForm} deleteGoalForm={data.deleteGoalForm} />
 		{/key}
 	{/each}
+{/if}
+
+{#if Object.keys(data.activeBooks).length > 0}
+	{#key data.activeBooks}
+		<ActiveBooksCard>
+			{#each Object.keys(data.activeBooks) as activeBookId, i (activeBookId)}
+				<ActiveBook {activeBookId} />
+				{#if i < Object.keys(data.activeBooks).length - 1}
+					<Separator />
+				{/if}
+			{/each}
+		</ActiveBooksCard>
+	{/key}
 {/if}
 
 {#if Object.keys(data.chosenBooks).length > 0}
