@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
@@ -63,10 +61,10 @@
 </script>
 
 {#if !isEditing}
-	<Card.Root class="mb-8 w-full max-w-xl">
+	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
-			<Card.Title class="flex place-content-between text-2xl font-extrabold">
-				Lesemål
+			<Card.Title class="flex place-content-between">
+				{goal.numberOfBooks} bøker til {dateString}
 				{#if $isOwner}
 					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
 						<Edit class="mr-2 h-4 w-4" />
@@ -74,7 +72,7 @@
 					</Button>
 				{/if}
 			</Card.Title>
-			<Card.Description>{goal.numberOfBooks} bøker til {dateString}</Card.Description>
+			<Card.Description>{pagesPerDay} sider om dagen for å nå målet</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<p class="text-xl">
@@ -82,19 +80,6 @@
 				sider igjen i dag
 			</p>
 		</Card.Content>
-		<Card.Footer class="flex justify-between">
-			<small>
-				{pagesPerDay} sider om dagen for å nå målet
-			</small>
-			{#if goal.pagesReadToday !== 0}
-				<form method="post" action="?/resetToday" use:enhance>
-					<Button type="submit">Nullstill sider lest i dag</Button>
-					{#if $page.form?.resetTodayError}
-						<p>Noe gikk galt under nullstillingen</p>
-					{/if}
-				</form>
-			{/if}
-		</Card.Footer>
 	</Card.Root>
 {:else}
 	<EditGoalCard

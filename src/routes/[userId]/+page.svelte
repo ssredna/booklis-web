@@ -18,6 +18,7 @@
 	import ActiveBooksCard from '$lib/components/ActiveBooksCard.svelte';
 	import ActiveBook from '$lib/components/ActiveBook.svelte';
 	import { Separator } from '$lib/components/ui/separator';
+	import GoalsCard from '$lib/components/GoalsCard.svelte';
 
 	export let data;
 
@@ -44,11 +45,13 @@
 	</h1>
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
-	{#each Object.values(data.goals) as goal}
-		{#key goal}
-			<Goal {goal} editGoalForm={data.editGoalForm} deleteGoalForm={data.deleteGoalForm} />
-		{/key}
-	{/each}
+	{#key data.goals}
+		<GoalsCard createGoalForm={data.createGoalForm}>
+			{#each Object.values(data.goals) as goal}
+				<Goal {goal} editGoalForm={data.editGoalForm} deleteGoalForm={data.deleteGoalForm} />
+			{/each}
+		</GoalsCard>
+	{/key}
 {/if}
 
 {#if Object.keys(data.activeBooks).length > 0}
