@@ -106,6 +106,28 @@ export async function getGoals(userId: string) {
 }
 
 export async function deleteGoal(userId: string, goalId: string) {
+	const goalDoc = await getDoc(doc(db, Path.GOALS, userId, 'goals', goalId));
+
+	const chosenBooks = goalDoc.data()?.chosenBooks as string[];
+	const activeBooks = goalDoc.data()?.activeBooks as string[];
+	const readBooks = goalDoc.data()?.readBooks as string[];
+
+	const promises: Promise<void>[] = [];
+
+	for (const chosenBookId of chosenBooks) {
+		promises.push(removeChosenBook(userId, [goalId], chosenBookId));
+	}
+
+	for (const activeBookId of activeBooks) {
+		promises.push(removeActiveBook(userId, [goalId], activeBookId));
+	}
+
+	for (const readBookId of readBooks) {
+		promises.push(removeReadBook(userId, [goalId], readBookId));
+	}
+
+	await Promise.all(promises);
+
 	await deleteDoc(doc(db, Path.GOALS, userId, 'goals', goalId));
 }
 
@@ -199,7 +221,7 @@ export async function removeChosenBook(userId: string, goalIds: string[], chosen
 		} else {
 			const goalsString = `${chosenBookId}.goals`;
 			transaction.update(doc(db, Path.CHOSEN_BOOKS, userId), {
-				[goalsString]: arrayRemove(goalIds)
+				[goalsString]: arrayRemove(...goalIds)
 			});
 		}
 	});
@@ -272,7 +294,7 @@ async function removeActiveBook(userId: string, goalIds: string[], activeBookId:
 		} else {
 			const goalsString = `${activeBookId}.goals`;
 			transaction.update(doc(db, Path.ACTIVE_BOOKS, userId), {
-				[goalsString]: arrayRemove(goalIds)
+				[goalsString]: arrayRemove(...goalIds)
 			});
 		}
 	});
@@ -383,7 +405,7 @@ async function removeReadBook(userId: string, goalIds: string[], readBookId: str
 		} else {
 			const goalsString = `${readBookId}.goals`;
 			transaction.update(doc(db, Path.READ_BOOKS, userId), {
-				[goalsString]: arrayRemove(goalIds)
+				[goalsString]: arrayRemove(...goalIds)
 			});
 		}
 	});
