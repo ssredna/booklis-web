@@ -51,7 +51,9 @@
 
 	$: daysLeft = differenceInDays(goal.deadline, new Date());
 
-	$: pagesPerDay = Math.ceil(pagesToRead / daysLeft);
+	$: pagesPerDay = Math.ceil((pagesToRead + goal.pagesReadToday) / daysLeft);
+
+	$: pagesPerDayTomorrow = Math.ceil(pagesToRead / (daysLeft - 1));
 
 	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay);
 
@@ -73,7 +75,10 @@
 					</Button>
 				{/if}
 			</Card.Title>
-			<Card.Description>{pagesPerDay} sider om dagen for å nå målet</Card.Description>
+			<Card.Description>
+				{goal.pagesReadToday <= pagesPerDay ? pagesPerDay : pagesPerDayTomorrow} sider om dagen for å
+				nå målet
+			</Card.Description>
 		</Card.Header>
 		<Card.Content>
 			<p class="text-xl">
