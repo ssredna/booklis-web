@@ -70,8 +70,11 @@
 {#if Object.keys(data.chosenBooks).length > 0}
 	{#key data.chosenBooks}
 		<ChosenBooksCard>
-			{#each Object.keys(data.chosenBooks) as chosenBookId}
+			{#each Object.keys(data.chosenBooks) as chosenBookId, i}
 				<ChosenBook {chosenBookId} />
+				{#if i < Object.keys(data.chosenBooks).length - 1}
+					<Separator />
+				{/if}
 			{/each}
 		</ChosenBooksCard>
 	{/key}

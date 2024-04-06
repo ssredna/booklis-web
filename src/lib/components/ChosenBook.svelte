@@ -31,7 +31,7 @@
 				</small>
 			{/each}
 		</div>
-		<div class="flex place-content-between pt-2">
+		<div class="flex flex-col items-end gap-2 pt-2 lg:flex-row lg:place-content-between">
 			<form action="?/startBook" method="post" use:enhance>
 				<input type="hidden" name="bookId" value={chosenBook.bookId} required />
 				<input type="hidden" name="goalIds" value={chosenBook.goals} required />
