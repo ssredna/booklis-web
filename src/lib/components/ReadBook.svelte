@@ -17,7 +17,7 @@
 </script>
 
 {#if book}
-	<div class="flex place-content-between items-center">
+	<div class="flex flex-col gap-2 lg:flex-row lg:place-content-between lg:items-center">
 		<div>
 			<h4 class="text-lg/none font-bold tracking-tight">{book.title}</h4>
 			<small>

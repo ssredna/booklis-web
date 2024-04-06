@@ -86,8 +86,11 @@
 {#if Object.keys(data.readBooks).length > 0}
 	{#key data.readBooks}
 		<ReadBooksCard>
-			{#each Object.keys(data.readBooks) as readBookId}
+			{#each Object.keys(data.readBooks) as readBookId, i}
 				<ReadBook {readBookId} />
+				{#if i < Object.keys(data.readBooks).length - 1}
+					<Separator />
+				{/if}
 			{/each}
 		</ReadBooksCard>
 	{/key}
