@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
+	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { books } from '$lib/stores/booksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
-	import dateFormat from 'dateformat';
 
 	export let readBookId: string;
 
@@ -12,8 +12,8 @@
 
 	$: book = $books[readBook.bookId];
 
-	$: formattedStartDate = dateFormat(readBook.startDate, 'yyyy-mm-dd');
-	$: formattedEndDate = dateFormat(readBook.endDate, 'yyyy-mm-dd');
+	$: formattedStartDate = dateFormatterShort.format(new Date(readBook.startDate));
+	$: formattedEndDate = dateFormatterShort.format(new Date(readBook.endDate));
 </script>
 
 {#if book}

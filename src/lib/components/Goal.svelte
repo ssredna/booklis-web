@@ -1,5 +1,4 @@
 <script lang="ts">
-	import dateFormat from 'dateformat';
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
@@ -13,6 +12,7 @@
 	import { differenceInDays } from 'date-fns';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
+	import { dateFormatterShort } from '$lib/dateFormatters';
 
 	export let goal: Goal;
 	export let editGoalForm: SuperValidated<CreateGoalSchema>;
@@ -57,7 +57,7 @@
 
 	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay);
 
-	$: dateString = dateFormat(goal.deadline, 'yyyy-mm-dd');
+	$: dateString = dateFormatterShort.format(new Date(goal.deadline));
 
 	let isEditing = false;
 </script>

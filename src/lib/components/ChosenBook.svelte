@@ -5,7 +5,7 @@
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
 	import { goals } from '$lib/stores/goalsStore';
-	import dateFormat from 'dateformat';
+	import { dateFormatterShort } from '$lib/dateFormatters';
 
 	export let chosenBookId: string;
 
@@ -24,9 +24,8 @@
 				<br />
 				<small>
 					&ensp; - {$goals[goalId].numberOfBooks}
-					{$goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
-						$goals[goalId].deadline,
-						'yyyy-mm-dd'
+					{$goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormatterShort.format(
+						new Date($goals[goalId].deadline)
 					)}
 				</small>
 			{/each}
