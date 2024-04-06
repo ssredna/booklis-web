@@ -25,12 +25,12 @@
 
 	<Card.Footer class="flex justify-between">
 		<CreateGoalModal inputForm={createGoalForm}>
-			<Button variant="ghost">Legg til nytt mål</Button>
+			<Button>Legg til nytt mål</Button>
 		</CreateGoalModal>
 
 		{#if readAnyPagesToday}
 			<form method="post" action="?/resetToday" use:enhance>
-				<Button type="submit">Nullstill sider lest i dag</Button>
+				<Button variant="destructive" type="submit">Nullstill sider lest i dag</Button>
 				{#if $page.form?.resetTodayError}
 					<p>Noe gikk galt under nullstillingen</p>
 				{/if}

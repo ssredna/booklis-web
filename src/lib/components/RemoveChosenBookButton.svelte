@@ -14,8 +14,8 @@
 
 <AlertDialog.Root>
 	<AlertDialog.Trigger asChild let:builder>
-		<Button variant="outline" builders={[builder]}>
-			<X class="h-4 w-4" />
+		<Button variant="destructive" size="icon" builders={[builder]}>
+			<X class="size-4" />
 		</Button>
 	</AlertDialog.Trigger>
 

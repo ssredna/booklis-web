@@ -99,8 +99,8 @@
 			<input type="hidden" name="bookId" value={activeBook.bookId} required />
 			<input type="hidden" name="goalIds" value={activeBook.goals} required />
 			<input type="hidden" name="activeBookId" value={activeBookId} required />
-			<Button type="submit" variant="outline">
-				<X class="h-4 w-4" />
+			<Button type="submit" size="icon" variant="destructive">
+				<X class="size-4" />
 			</Button>
 		</form>
 
@@ -112,7 +112,7 @@
 				<input type="hidden" name="startDate" value={activeBook.startDate} required />
 
 				<Button type="submit" class="mt-2">
-					<Check class="mr-2 h-4 w-4" />
+					<Check class="mr-2 size-4" />
 					Fullfør bok
 				</Button>
 
