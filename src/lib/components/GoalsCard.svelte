@@ -23,7 +23,7 @@
 		<slot />
 	</Card.Content>
 
-	<Card.Footer class="flex justify-between">
+	<Card.Footer class="flex flex-col items-start gap-2 lg:flex-row lg:justify-between">
 		<CreateGoalModal inputForm={createGoalForm}>
 			<Button>Legg til nytt mål</Button>
 		</CreateGoalModal>

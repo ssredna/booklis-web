@@ -70,8 +70,8 @@
 				{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
 				{#if $isOwner}
 					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
-						<Edit class="mr-2 h-4 w-4" />
-						Rediger mål
+						<Edit class="mr-2 size-4" />
+						<span class="hidden lg:contents">Rediger mål</span>
 					</Button>
 				{/if}
 			</Card.Title>
