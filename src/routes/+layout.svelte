@@ -2,6 +2,6 @@
 	import '../app.pcss';
 </script>
 
-<main class="flex flex-col items-center justify-center min-h-screen p-4">
+<main class="flex min-h-screen flex-col items-center justify-center p-2 lg:p-4">
 	<slot />
 </main>
