@@ -48,46 +48,6 @@
 					<small>Lagrer...</small>
 				{/if}
 			</span>
-
-			<form
-				bind:this={pagesReadForm}
-				action="?/updatePagesRead"
-				method="post"
-				use:enhance={({ formData }) => {
-					const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
-						return [goalId, String($goals[goalId].pagesReadToday)];
-					});
-					formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
-					isFormSubmitting = true;
-
-					return async ({ update }) => {
-						await update();
-						isDirty = false;
-						isFormSubmitting = false;
-					};
-				}}
-			>
-				<Slider
-					bind:value={sliderValue}
-					min={0}
-					max={book.pageCount}
-					onValueChange={() => {
-						isDirty = true;
-					}}
-					class="mb-2 mt-4"
-				/>
-				<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
-				<input type="hidden" value={activeBookId} name="activeBookId" required />
-
-				{#if $page.form?.updatePagesReadError}
-					<p>Noe gikk galt i lagringen</p>
-				{/if}
-
-				<noscript>
-					<!-- If js is disabled there is no way to submit the form, so this is a backup -->
-					<input type="submit" value="Lagre" />
-				</noscript>
-			</form>
 		</div>
 
 		<form
@@ -122,6 +82,46 @@
 			</form>
 		{/if}
 	</div>
+
+	<form
+		bind:this={pagesReadForm}
+		action="?/updatePagesRead"
+		method="post"
+		use:enhance={({ formData }) => {
+			const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
+				return [goalId, String($goals[goalId].pagesReadToday)];
+			});
+			formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
+			isFormSubmitting = true;
+
+			return async ({ update }) => {
+				await update();
+				isDirty = false;
+				isFormSubmitting = false;
+			};
+		}}
+	>
+		<Slider
+			bind:value={sliderValue}
+			min={0}
+			max={book.pageCount}
+			onValueChange={() => {
+				isDirty = true;
+			}}
+			class="mb-2 mt-4"
+		/>
+		<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
+		<input type="hidden" value={activeBookId} name="activeBookId" required />
+
+		{#if $page.form?.updatePagesReadError}
+			<p>Noe gikk galt i lagringen</p>
+		{/if}
+
+		<noscript>
+			<!-- If js is disabled there is no way to submit the form, so this is a backup -->
+			<input type="submit" value="Lagre" />
+		</noscript>
+	</form>
 {:else}
 	<small class="text-destructive">
 		Noe gikk galt, klarte ikke å finne boken med id: "{activeBook.bookId}"
