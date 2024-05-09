@@ -63,24 +63,6 @@
 				<X class="size-4" />
 			</Button>
 		</form>
-
-		{#if activeBook.pagesRead === book.pageCount}
-			<form action="?/finishBook" method="post" use:enhance>
-				<input type="hidden" name="goalIds" value={activeBook.goals} required />
-				<input type="hidden" name="activeBookId" value={activeBookId} required />
-				<input type="hidden" name="bookId" value={activeBook.bookId} required />
-				<input type="hidden" name="startDate" value={activeBook.startDate} required />
-
-				<Button type="submit" class="mt-2">
-					<Check class="mr-2 size-4" />
-					Fullfør bok
-				</Button>
-
-				{#if $page.form?.finishBookError}
-					<p>Noe gikk galt under flyttingen av boken til fullført</p>
-				{/if}
-			</form>
-		{/if}
 	</div>
 
 	<form
@@ -122,6 +104,24 @@
 			<input type="submit" value="Lagre" />
 		</noscript>
 	</form>
+
+	{#if activeBook.pagesRead === book.pageCount}
+		<form action="?/finishBook" method="post" use:enhance>
+			<input type="hidden" name="goalIds" value={activeBook.goals} required />
+			<input type="hidden" name="activeBookId" value={activeBookId} required />
+			<input type="hidden" name="bookId" value={activeBook.bookId} required />
+			<input type="hidden" name="startDate" value={activeBook.startDate} required />
+
+			<Button type="submit" class="float-end">
+				<Check class="mr-2 size-4" />
+				Fullfør bok
+			</Button>
+
+			{#if $page.form?.finishBookError}
+				<p>Noe gikk galt under flyttingen av boken til fullført</p>
+			{/if}
+		</form>
+	{/if}
 {:else}
 	<small class="text-destructive">
 		Noe gikk galt, klarte ikke å finne boken med id: "{activeBook.bookId}"
