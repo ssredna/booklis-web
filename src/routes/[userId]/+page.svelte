@@ -19,6 +19,7 @@
 	// import ActiveBook from '$lib/components/ActiveBook.svelte';
 	// import { Separator } from '$lib/components/ui/separator';
 	// import GoalsCard from '$lib/components/GoalsCard.svelte';
+	import MyBooks from '$lib/components/MyBooks.svelte';
 
 	// export let data;
 
@@ -31,6 +32,8 @@
 	// $: readBooks.set(data.readBooks);
 	// $: isOwner.set(data.isOwner);
 </script>
+
+<MyBooks />
 
 <!-- {#if Object.keys(data.goals).length === 0 && data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
