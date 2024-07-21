@@ -4,7 +4,7 @@ import { GOOGLE_ID, GOOGLE_SECRET } from '$env/static/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
-const authentication = SvelteKitAuth({
+const { handle: authentication } = SvelteKitAuth({
 	providers: [
 		Google({
 			clientId: GOOGLE_ID,
@@ -28,7 +28,7 @@ const authentication = SvelteKitAuth({
 
 const redirectToUserPage = (async ({ event, resolve }) => {
 	if (event.url.pathname === '/home') {
-		const session = await event.locals.getSession();
+		const session = await event.locals.auth();
 		if (!session?.user) redirect(303, '/');
 		redirect(303, '/' + session.user.id);
 	}
@@ -38,7 +38,7 @@ const redirectToUserPage = (async ({ event, resolve }) => {
 
 const isOwner = (async ({ event, resolve }) => {
 	if (event.params.userId) {
-		const session = await event.locals.getSession();
+		const session = await event.locals.auth();
 
 		const isOwner = !!session?.user && session.user.id === event.params.userId;
 
