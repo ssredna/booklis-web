@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { client } from '$lib/client';
+	import EditBookModal from './EditBookModal.svelte';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
 
@@ -10,6 +11,7 @@
 	let { bookId }: BookProps = $props();
 
 	let bookPromise = client.fetchById('books', bookId);
+	let showEditBookModal = $state(false);
 </script>
 
 {#await bookPromise then book}
@@ -21,9 +23,16 @@
 					{book.totalPages} sider
 				</small>
 			</div>
-			<Button type="submit" size="icon" variant="outline" class="flex-shrink-0">
+			<Button
+				size="icon"
+				variant="outline"
+				class="flex-shrink-0"
+				onclick={() => (showEditBookModal = true)}
+			>
 				<Edit class="size-4" />
 			</Button>
 		</article>
 	{/if}
 {/await}
+
+<EditBookModal {bookId} bind:isOpen={showEditBookModal} />
