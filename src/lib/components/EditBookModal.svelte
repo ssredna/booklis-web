@@ -27,6 +27,12 @@
 		const newTotalPages = parseInt(event.currentTarget.value);
 		await updateBookTotalPages(_id, newTotalPages);
 	};
+
+	const closeOnEnterHandler = (event: KeyboardEvent) => {
+		if (event.key === 'Enter') {
+			isOpen = false;
+		}
+	};
 </script>
 
 <Dialog.Root bind:open={isOpen}>
@@ -36,12 +42,21 @@
 		<div class="grid gap-6 py-4">
 			<div class="grid gap-2">
 				<Label for="title">Tittel</Label>
-				<Input value={book.title} oninput={updateBookTitleHandler} />
+				<Input
+					value={book.title}
+					oninput={updateBookTitleHandler}
+					onkeypress={closeOnEnterHandler}
+				/>
 			</div>
 
 			<div class="grid gap-2">
 				<Label for="pageCount">Antall sider</Label>
-				<Input type="number" value={book.totalPages} oninput={updateBookTotalPagesHandler} />
+				<Input
+					type="number"
+					value={book.totalPages}
+					oninput={updateBookTotalPagesHandler}
+					onkeypress={closeOnEnterHandler}
+				/>
 			</div>
 		</div>
 
