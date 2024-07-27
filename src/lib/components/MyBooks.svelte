@@ -1,12 +1,10 @@
 <script lang="ts">
-	import { client } from '$lib/client';
-	import { myBooksQuery } from '$lib/queries/books.svelte';
-	import { useQuery } from '@triplit/svelte';
+	import { getBookIds } from '$lib/queries/books.svelte';
 	import * as Card from './ui/card';
 	import AddBookButton from './AddBookButton.svelte';
 	import Book from './Book.svelte';
 
-	let data = useQuery(client, myBooksQuery);
+	let data = getBookIds();
 	let bookIdsArray = $derived(data.results ? Array.from(data.results) : []);
 </script>
 

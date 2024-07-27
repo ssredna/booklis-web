@@ -1,7 +1,9 @@
 import { client } from '$lib/client';
 import { useQuery } from '@triplit/svelte';
 
-export const myBooksQuery = client.query('books').select(['id']);
+export const getBookIds = () => {
+	return useQuery(client, client.query('books').select(['id']));
+};
 
 export const getBook = (bookId: string) => {
 	return useQuery(client, client.query('books').id(bookId));
