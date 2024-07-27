@@ -20,3 +20,7 @@ export const updateBookTotalPages = async (bookId: string, newTotalPages: number
 		book.totalPages = newTotalPages;
 	});
 };
+
+export const deleteBook = async (bookId: string) => {
+	return client.delete('books', bookId);
+};

@@ -1,11 +1,10 @@
 <script lang="ts">
-	import { Button } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import { Input } from './ui/input';
 	import { Label } from './ui/label';
-	import { Trash2 } from 'lucide-svelte';
 	import type { FormEventHandler } from 'svelte/elements';
 	import { getBook, updateBookTitle, updateBookTotalPages } from '$lib/queries/books.svelte';
+	import DeleteBookButton from './DeleteBookButton.svelte';
 
 	type EditBookProps = {
 		isOpen: boolean;
@@ -61,9 +60,7 @@
 		</div>
 
 		<Dialog.Footer>
-			<Button size="icon" variant="destructive" class="flex-shrink-0">
-				<Trash2 class="size-4" />
-			</Button>
+			<DeleteBookButton bookId={_id} title={book.title} />
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>
