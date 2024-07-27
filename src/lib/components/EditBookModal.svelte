@@ -28,11 +28,11 @@
 		await updateBookTotalPages(_id, newTotalPages);
 	};
 
-	const closeOnEnterHandler = (event: KeyboardEvent) => {
+	function closeOnEnterHandler(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			closeModal();
 		}
-	};
+	}
 
 	function closeModal() {
 		isOpen = false;

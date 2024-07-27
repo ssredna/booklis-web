@@ -11,9 +11,9 @@
 
 	let { bookId, title }: BookProps = $props();
 
-	const deleteBookHandler = async () => {
+	async function deleteBookHandler() {
 		await deleteBook(bookId);
-	};
+	}
 </script>
 
 <AlertDialog.Root>
