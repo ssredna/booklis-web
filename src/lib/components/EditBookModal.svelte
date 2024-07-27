@@ -5,6 +5,7 @@
 	import type { FormEventHandler } from 'svelte/elements';
 	import { getBook, updateBookTitle, updateBookTotalPages } from '$lib/queries/books.svelte';
 	import DeleteBookButton from './DeleteBookButton.svelte';
+	import { Button } from './ui/button';
 
 	type EditBookProps = {
 		isOpen: boolean;
@@ -29,9 +30,13 @@
 
 	const closeOnEnterHandler = (event: KeyboardEvent) => {
 		if (event.key === 'Enter') {
-			isOpen = false;
+			closeModal();
 		}
 	};
+
+	function closeModal() {
+		isOpen = false;
+	}
 </script>
 
 <Dialog.Root bind:open={isOpen}>
@@ -59,7 +64,8 @@
 			</div>
 		</div>
 
-		<Dialog.Footer>
+		<Dialog.Footer class="flex flex-row justify-between">
+			<Button onclick={closeModal} class="mr-4 flex-grow">Ferdig</Button>
 			<DeleteBookButton bookId={_id} title={book.title} />
 		</Dialog.Footer>
 	</Dialog.Content>
