@@ -1,6 +1,11 @@
 import { client } from '$lib/client';
+import { useQuery } from '@triplit/svelte';
 
 export const myBooksQuery = client.query('books').select(['id']);
+
+export const getBook = (bookId: string) => {
+	return useQuery(client, client.query('books').id(bookId));
+};
 
 export const updateBookTitle = async (bookId: string, newTitle: string) => {
 	return client.update('books', bookId, async (book) => {

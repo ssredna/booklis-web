@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { client } from '$lib/client';
-	import { useQuery } from '@triplit/svelte';
 	import { Button } from './ui/button';
 	import * as Dialog from './ui/dialog';
 	import { Input } from './ui/input';
 	import { Label } from './ui/label';
 	import { Trash2 } from 'lucide-svelte';
 	import type { FormEventHandler } from 'svelte/elements';
-	import { updateBookTitle, updateBookTotalPages } from '$lib/queries/books.svelte';
+	import { getBook, updateBookTitle, updateBookTotalPages } from '$lib/queries/books.svelte';
 
 	type EditBookProps = {
 		isOpen: boolean;
@@ -16,7 +14,7 @@
 
 	let { isOpen = $bindable(), bookId }: EditBookProps = $props();
 
-	let bookData = useQuery(client, client.query('books').id(bookId));
+	let bookData = getBook(bookId);
 	let bookArray = $derived(bookData.results ? Array.from(bookData.results) : []);
 	let [_id, book] = $derived(bookArray[0]);
 

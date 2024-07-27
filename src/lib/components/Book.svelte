@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { client } from '$lib/client';
-	import { useQuery } from '@triplit/svelte';
 	import EditBookModal from './EditBookModal.svelte';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
+	import { getBook } from '$lib/queries/books.svelte';
 
 	type BookProps = {
 		bookId: string;
@@ -11,7 +10,7 @@
 
 	let { bookId }: BookProps = $props();
 
-	let bookData = useQuery(client, client.query('books').id(bookId));
+	let bookData = getBook(bookId);
 	let bookArray = $derived(bookData.results ? Array.from(bookData.results) : []);
 	let [_id, book] = $derived(bookArray[0]);
 
