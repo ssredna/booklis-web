@@ -7,6 +7,7 @@
 	import { Label } from './ui/label';
 	import { Trash2 } from 'lucide-svelte';
 	import type { FormEventHandler } from 'svelte/elements';
+	import { updateBookTitle, updateBookTotalPages } from '$lib/queries/books.svelte';
 
 	type EditBookProps = {
 		isOpen: boolean;
@@ -19,18 +20,14 @@
 	let bookArray = $derived(bookData.results ? Array.from(bookData.results) : []);
 	let [_id, book] = $derived(bookArray[0]);
 
-	const updateBookTitle: FormEventHandler<HTMLInputElement> = async (event) => {
+	const updateBookTitleHandler: FormEventHandler<HTMLInputElement> = async (event) => {
 		const newTitle = event.currentTarget.value;
-		await client.update('books', _id, async (dbBook) => {
-			dbBook.title = newTitle;
-		});
+		await updateBookTitle(_id, newTitle);
 	};
 
-	const updateBookTotalPages: FormEventHandler<HTMLInputElement> = async (event) => {
-		const newTotalPages = event.currentTarget.value;
-		await client.update('books', _id, async (dbBook) => {
-			dbBook.totalPages = Number(newTotalPages);
-		});
+	const updateBookTotalPagesHandler: FormEventHandler<HTMLInputElement> = async (event) => {
+		const newTotalPages = parseInt(event.currentTarget.value);
+		await updateBookTotalPages(_id, newTotalPages);
 	};
 </script>
 
@@ -41,12 +38,12 @@
 		<div class="grid gap-6 py-4">
 			<div class="grid gap-2">
 				<Label for="title">Tittel</Label>
-				<Input value={book.title} oninput={updateBookTitle} />
+				<Input value={book.title} oninput={updateBookTitleHandler} />
 			</div>
 
 			<div class="grid gap-2">
 				<Label for="pageCount">Antall sider</Label>
-				<Input type="number" value={book.totalPages} oninput={updateBookTotalPages} />
+				<Input type="number" value={book.totalPages} oninput={updateBookTotalPagesHandler} />
 			</div>
 		</div>
 
