@@ -1,14 +1,38 @@
-.DS_Store
-node_modules
-/build
-/.svelte-kit
-/package
-.env
-.env.*
-!.env.example
-vite.config.js.timestamp-*
-vite.config.ts.timestamp-*
+# Dependencies
+node_modules/
+
+# SvelteKit / Vite build output
+.svelte-kit/
+build/
+dist/
+package/
+
+# Vercel local output
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+
+# Vite timestamp files
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Secrets
 booklis_service_account_key.json

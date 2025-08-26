@@ -1,26 +1,24 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
-import Google from '@auth/sveltekit/providers/google';
+import Google from '@auth/core/providers/google';
 import { GOOGLE_ID, GOOGLE_SECRET } from '$env/static/private';
 import { redirect, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 
-const authentication = SvelteKitAuth({
+const { handle: authHandle } = SvelteKitAuth({
 	providers: [
 		Google({
 			clientId: GOOGLE_ID,
 			clientSecret: GOOGLE_SECRET,
 			authorization: {
-				params: {
-					prompt: 'consent',
-					access_type: 'offline',
-					response_type: 'code'
-				}
+				params: { prompt: 'consent', access_type: 'offline', response_type: 'code' }
 			}
 		})
 	],
 	callbacks: {
-		session: ({ session, token }) => {
-			session.user = { ...session.user, id: token.sub ?? '' };
+		session: (args) => {
+			const { session } = args;
+			const sub = 'token' in args ? args.token?.sub : undefined;
+			session.user = { ...session.user, id: sub ?? '' };
 			return session;
 		}
 	}
@@ -48,4 +46,4 @@ const isOwner = (async ({ event, resolve }) => {
 	return resolve(event);
 }) satisfies Handle;
 
-export const handle = sequence(authentication, redirectToUserPage, isOwner);
+export const handle = sequence(authHandle, redirectToUserPage, isOwner);
