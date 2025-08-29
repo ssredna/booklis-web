@@ -5,9 +5,9 @@
 	import { Input } from './ui/input';
 	import { Label } from './ui/label';
 	import DeleteGoalButton from './DeleteGoalButton.svelte';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { EditGoalSchema } from '$lib/schemas/editGoalSchema';
-	import { superForm } from 'sveltekit-superforms/client';
+	import { superForm } from 'sveltekit-superforms';
 	import { createEventDispatcher } from 'svelte';
 	import dateFormat from 'dateformat';
 	import { page } from '$app/stores';
@@ -15,8 +15,8 @@
 	import type { Goal } from '$lib/types/goal';
 
 	export let goal: Goal;
-	export let editGoalForm: SuperValidated<EditGoalSchema>;
-	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
+	export let editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
+	export let deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
 
 	const dispatch = createEventDispatcher();
 

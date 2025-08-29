@@ -4,15 +4,15 @@
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
 	import { Button } from './ui/button';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
-	import { superForm } from 'sveltekit-superforms/client';
+	import { superForm } from 'sveltekit-superforms';
 	import { Loader2 } from 'lucide-svelte';
 	import { page } from '$app/stores';
 	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
 
-	export let addBookForm: SuperValidated<AddBookSchema>;
+	export let addBookForm: SuperValidated<Infer<AddBookSchema>>;
 
 	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {

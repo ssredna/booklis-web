@@ -2,11 +2,11 @@
 	import { Loader2, Trash } from 'lucide-svelte';
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
-	import { superForm } from 'sveltekit-superforms/client';
+	import { superForm } from 'sveltekit-superforms';
 
-	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
+	export let deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
 	export let goalId: string;
 
 	const { delayed, submitting, enhance } = superForm(deleteGoalForm);

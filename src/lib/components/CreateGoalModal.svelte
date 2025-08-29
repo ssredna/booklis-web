@@ -2,15 +2,15 @@
 	import { page } from '$app/stores';
 	import dateFormat from 'dateformat';
 	import * as Dialog from '$lib/components/ui/dialog';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
-	import { dateProxy, superForm } from 'sveltekit-superforms/client';
+	import { dateProxy, superForm } from 'sveltekit-superforms';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
 	import { Button } from './ui/button';
 	import { Loader2 } from 'lucide-svelte';
 
-	export let inputForm: SuperValidated<CreateGoalSchema>;
+	export let inputForm: SuperValidated<Infer<CreateGoalSchema>>;
 
 	const { form, errors, delayed, submitting, enhance } = superForm(inputForm);
 

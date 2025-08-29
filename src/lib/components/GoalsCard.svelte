@@ -3,12 +3,12 @@
 	import { page } from '$app/stores';
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { goals } from '$lib/stores/goalsStore';
-	import type { SuperValidated } from 'sveltekit-superforms';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import CreateGoalModal from './CreateGoalModal.svelte';
 	import { Button } from './ui/button';
 	import * as Card from './ui/card';
 
-	export let createGoalForm: SuperValidated<CreateGoalSchema>;
+	export let createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
 
 	$: readAnyPagesToday = Object.values($goals).some((goal) => goal.pagesReadToday > 0);
 </script>

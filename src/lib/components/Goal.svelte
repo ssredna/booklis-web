@@ -2,8 +2,8 @@
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
 	import { Edit } from 'lucide-svelte';
-	import type { SuperValidated } from 'sveltekit-superforms';
-	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
+	import type { SuperValidated, Infer } from 'sveltekit-superforms';
+	import type { EditGoalSchema } from '$lib/schemas/editGoalSchema';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import EditGoalCard from './EditGoalCard.svelte';
@@ -15,8 +15,8 @@
 	import { dateFormatterShort } from '$lib/dateFormatters';
 
 	export let goal: Goal;
-	export let editGoalForm: SuperValidated<CreateGoalSchema>;
-	export let deleteGoalForm: SuperValidated<DeleteGoalSchema>;
+	export let editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
+	export let deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
 
 	$: pagesLeftInActiveBooks = goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
 		const activeBook = $activeBooks[activeBookId];

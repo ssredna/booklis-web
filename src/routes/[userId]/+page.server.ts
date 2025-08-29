@@ -18,7 +18,8 @@ import {
 	updatePagesRead
 } from '$lib/firebase/firestore';
 import { fail, error } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms/client';
+import { superValidate } from 'sveltekit-superforms';
+import { zod } from 'sveltekit-superforms/adapters';
 import { z } from 'zod';
 import { createGoalSchema } from '$lib/schemas/createGoalSchema';
 import { editGoalSchema } from '$lib/schemas/editGoalSchema';
@@ -31,10 +32,7 @@ const idsSchema = z.coerce.string().array();
 const pageCountSchema = z.coerce.number().min(1);
 const pagesReadSchema = z.coerce.number().min(0);
 const goalIdsAndPagesReadTodaySchema = z
-	.object({
-		goalId: idSchema,
-		pagesReadToday: pagesReadSchema
-	})
+	.object({ goalId: idSchema, pagesReadToday: pagesReadSchema })
 	.array();
 
 export const load = async ({ locals, params }) => {
@@ -46,10 +44,10 @@ export const load = async ({ locals, params }) => {
 		const chosenBooksPromise = getChosenBooks(params.userId);
 
 		return {
-			createGoalForm: await superValidate(createGoalSchema),
-			editGoalForm: await superValidate(editGoalSchema),
-			deleteGoalForm: await superValidate(deleteGoalSchema),
-			addBookForm: await superValidate(addBookSchema),
+			createGoalForm: await superValidate(zod(createGoalSchema)),
+			editGoalForm: await superValidate(zod(editGoalSchema)),
+			deleteGoalForm: await superValidate(zod(deleteGoalSchema)),
+			addBookForm: await superValidate(zod(addBookSchema)),
 			goals: await goalsPromise,
 			books: await booksPromise,
 			activeBooks: await activeBooksPromise,
@@ -64,7 +62,7 @@ export const load = async ({ locals, params }) => {
 
 export const actions = {
 	createGoal: async (event) => {
-		const createGoalForm = await superValidate(event.request, createGoalSchema);
+		const createGoalForm = await superValidate(event.request, zod(createGoalSchema));
 
 		if (!event.locals.isOwner) return fail(403, { createGoalForm, unauthorized: true });
 		if (!createGoalForm.valid) return fail(400, { createGoalForm });
@@ -87,7 +85,7 @@ export const actions = {
 	},
 
 	deleteGoal: async ({ request, locals, params }) => {
-		const deleteGoalForm = await superValidate(request, deleteGoalSchema);
+		const deleteGoalForm = await superValidate(request, zod(deleteGoalSchema));
 
 		if (!locals.isOwner) return fail(403, { deleteGoalForm, unauthorized: true });
 		if (!deleteGoalForm.valid) return fail(400, { deleteGoalForm });
@@ -105,7 +103,7 @@ export const actions = {
 	},
 
 	editGoal: async ({ request, locals, params }) => {
-		const editGoalForm = await superValidate(request, editGoalSchema);
+		const editGoalForm = await superValidate(request, zod(editGoalSchema));
 
 		if (!locals.isOwner) return fail(403, { editGoalForm, unauthorized: true });
 		if (!editGoalForm.valid) return fail(400, { editGoalForm });
@@ -129,7 +127,7 @@ export const actions = {
 	},
 
 	addBook: async ({ request, locals, params }) => {
-		const addBookForm = await superValidate(request, addBookSchema);
+		const addBookForm = await superValidate(request, zod(addBookSchema));
 
 		if (!locals.isOwner)
 			return fail(403, { addBookForm: { ...addBookForm, valid: false }, unauthorized: true });
@@ -168,13 +166,10 @@ export const actions = {
 	},
 
 	addExistingBook: async ({ request, locals, params }) => {
-		const addBookForm = await superValidate(request, addBookSchema);
+		const addBookForm = await superValidate(request, zod(addBookSchema));
 
 		if (!locals.isOwner)
-			return fail(403, {
-				addBookForm: { ...addBookForm, valid: false },
-				unauthorized: true
-			});
+			return fail(403, { addBookForm: { ...addBookForm, valid: false }, unauthorized: true });
 		if (!addBookForm.valid) return fail(400, { addBookForm });
 		if (!addBookForm.data.bookId)
 			return fail(400, {
@@ -189,11 +184,7 @@ export const actions = {
 				addBookForm: {
 					...addBookForm,
 					valid: false,
-					errors: {
-						goalIds: {
-							_errors: 'Du må velge minst ett mål som boka skal legges til'
-						}
-					}
+					errors: { goalIds: { _errors: 'Du må velge minst ett mål som boka skal legges til' } }
 				}
 			});
 
@@ -233,9 +224,7 @@ export const actions = {
 		try {
 			return await removeChosenBook(params.userId, parsedGoalIds.data, parsedChosenBookId.data);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -272,9 +261,7 @@ export const actions = {
 				parsedChosenBookId.data
 			);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -311,9 +298,7 @@ export const actions = {
 				parsedBookId.data
 			);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -355,9 +340,7 @@ export const actions = {
 				parsedPagesRead.data
 			);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -367,9 +350,7 @@ export const actions = {
 		try {
 			return await resetToday(params.userId);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -408,9 +389,7 @@ export const actions = {
 				parsedStartDate.data
 			);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	},
 
@@ -453,9 +432,7 @@ export const actions = {
 				parsedReadBookId.data
 			);
 		} catch (error) {
-			return fail(400, {
-				fireBaseError: error instanceof Error ? error.message : 'Unknown error'
-			});
+			return fail(400, { fireBaseError: error instanceof Error ? error.message : 'Unknown error' });
 		}
 	}
 };
