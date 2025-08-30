@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Loader2 } from 'lucide-svelte';
+	import { Loader2 } from '@lucide/svelte';
 	import { Button } from './ui/button';
 	import * as Card from './ui/card';
 	import { Input } from './ui/input';
@@ -98,7 +98,7 @@
 				{/if}
 				Lagre
 			</Button>
-			<Button variant="destructive" on:click={() => dispatch('finishedEditing')}>Avbryt</Button>
+			<Button variant="destructive" onclick={() => dispatch('finishedEditing')}>Avbryt</Button>
 		</div>
 		<DeleteGoalButton goalId={goal.id} {deleteGoalForm} />
 	</Card.Footer>

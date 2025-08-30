@@ -80,7 +80,7 @@
 	{/key}
 {/if}
 
-<Button on:click={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
+<Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
 <AddBookModal addBookForm={data.addBookForm} bind:isOpen={showAddBookModal} />
 
 {#if Object.keys(data.readBooks).length > 0}
@@ -104,4 +104,4 @@
 	</MyBooksCard>
 {/if}
 
-<Button on:click={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>
+<Button onclick={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { books } from '$lib/stores/booksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
@@ -33,7 +33,7 @@
 
 			<Button type="submit" variant="outline">Flytt tilbake til aktive bøker</Button>
 
-			{#if $page.form?.reactivateBookError}
+			{#if page.form?.reactivateBookError}
 				<p>Noe gikk galt under re-aktiveringen</p>
 			{/if}
 		</form>

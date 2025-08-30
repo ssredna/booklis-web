@@ -8,7 +8,7 @@
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
 	import { Button } from './ui/button';
-	import { Loader2 } from 'lucide-svelte';
+	import { Loader2 } from '@lucide/svelte';
 
 	export let inputForm: SuperValidated<Infer<CreateGoalSchema>>;
 
@@ -67,7 +67,7 @@
 						bind:value={$deadlineProxy}
 						class="col-span-5"
 					/>
-					<Button on:click={setDeadlineToNextYear} class="col-span-3">I løpet av året</Button>
+					<Button onclick={setDeadlineToNextYear} class="col-span-3">I løpet av året</Button>
 				</div>
 				{#if $errors.deadline}
 					<small class="text-destructive">{$errors.deadline}</small>

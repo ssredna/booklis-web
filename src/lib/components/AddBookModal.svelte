@@ -7,8 +7,8 @@
 	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { AddBookSchema } from '$lib/schemas/addBookSchema';
 	import { superForm } from 'sveltekit-superforms';
-	import { Loader2 } from 'lucide-svelte';
-	import { page } from '$app/stores';
+	import { Loader2 } from '@lucide/svelte';
+	import { page } from '$app/state';
 	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
 
@@ -61,13 +61,13 @@
 				{/if}
 			</div>
 
-			{#if $page.form?.unauthorized}
+			{#if page.form?.unauthorized}
 				<p class="text-destructive">Du har ikke tilgang til å legge til en bok på dette målet.</p>
 			{/if}
 
-			{#if $page.form?.fireBaseError}
+			{#if page.form?.fireBaseError}
 				<p>Det oppsto en feil med databasen:</p>
-				<p>{$page.form?.fireBaseError}</p>
+				<p>{page.form?.fireBaseError}</p>
 			{/if}
 
 			<Button type="submit" disabled={$submitting}>

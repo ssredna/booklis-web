@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
-	import { Check, X } from 'lucide-svelte';
+	import { page } from '$app/state';
+	import { Check, X } from '@lucide/svelte';
 	import { Button } from './ui/button';
 	import { books } from '$lib/stores/booksStore';
 	import { Slider } from './ui/slider';
@@ -90,12 +90,13 @@
 			onValueChange={() => {
 				isDirty = true;
 			}}
-			class="mb-2 mt-4"
+			class="mt-4 mb-2"
+			type="multiple"
 		/>
 		<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
 		<input type="hidden" value={activeBookId} name="activeBookId" required />
 
-		{#if $page.form?.updatePagesReadError}
+		{#if page.form?.updatePagesReadError}
 			<p>Noe gikk galt i lagringen</p>
 		{/if}
 
@@ -117,7 +118,7 @@
 				Fullfør bok
 			</Button>
 
-			{#if $page.form?.finishBookError}
+			{#if page.form?.finishBookError}
 				<p>Noe gikk galt under flyttingen av boken til fullført</p>
 			{/if}
 		</form>

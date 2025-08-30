@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Loader2, Trash } from 'lucide-svelte';
+	import { Loader2, Trash } from '@lucide/svelte';
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
 	import type { SuperValidated, Infer } from 'sveltekit-superforms';
@@ -17,11 +17,13 @@
 </form>
 
 <AlertDialog.Root>
-	<AlertDialog.Trigger asChild let:builder>
-		<Button variant="destructive" builders={[builder]}>
-			<Trash class="mr-2 h-4 w-4" />
-			Slett mål
-		</Button>
+	<AlertDialog.Trigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="destructive">
+				<Trash class="mr-2 h-4 w-4" />
+				Slett mål
+			</Button>
+		{/snippet}
 	</AlertDialog.Trigger>
 	<AlertDialog.Content>
 		<AlertDialog.Header>
@@ -33,19 +35,21 @@
 		</AlertDialog.Header>
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Avbryt</AlertDialog.Cancel>
-			<AlertDialog.Action asChild let:builder>
-				<Button
-					{...builder}
-					type="submit"
-					form="deleteGoalForm"
-					variant="destructive"
-					disabled={$submitting}
-				>
-					{#if $delayed}
-						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-					{/if}
-					Slett mål
-				</Button>
+			<AlertDialog.Action>
+				{#snippet child({ props })}
+					<Button
+						{...props}
+						type="submit"
+						form="deleteGoalForm"
+						variant="destructive"
+						disabled={$submitting}
+					>
+						{#if $delayed}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{/if}
+						Slett mål
+					</Button>
+				{/snippet}
 			</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>

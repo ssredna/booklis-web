@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
 	import { goals } from '$lib/stores/goalsStore';
 	import type { SuperValidated, Infer } from 'sveltekit-superforms';
@@ -31,7 +31,7 @@
 		{#if readAnyPagesToday}
 			<form method="post" action="?/resetToday" use:enhance>
 				<Button variant="destructive" type="submit">Nullstill sider lest i dag</Button>
-				{#if $page.form?.resetTodayError}
+				{#if page.form?.resetTodayError}
 					<p>Noe gikk galt under nullstillingen</p>
 				{/if}
 			</form>

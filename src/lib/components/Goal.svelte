@@ -1,7 +1,7 @@
 <script lang="ts">
 	import * as Card from './ui/card';
 	import { Button } from './ui/button';
-	import { Edit } from 'lucide-svelte';
+	import { Edit } from '@lucide/svelte';
 	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import type { EditGoalSchema } from '$lib/schemas/editGoalSchema';
 	import { isOwner } from '$lib/stores/isOwnerStore';
@@ -69,7 +69,7 @@
 				{goal.numberOfBooks}
 				{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
 				{#if $isOwner}
-					<Button variant="link" on:click={() => (isEditing = true)} class="h-auto p-0">
+					<Button variant="link" onclick={() => (isEditing = true)} class="h-auto p-0">
 						<Edit class="mr-2 size-4" />
 						<span class="hidden lg:contents">Rediger mål</span>
 					</Button>

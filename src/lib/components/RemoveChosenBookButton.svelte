@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
-	import { X } from 'lucide-svelte';
+	import { X } from '@lucide/svelte';
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
 	import { enhance } from '$app/forms';
@@ -13,10 +13,12 @@
 </script>
 
 <AlertDialog.Root>
-	<AlertDialog.Trigger asChild let:builder>
-		<Button variant="destructive" size="icon" builders={[builder]}>
-			<X class="size-4" />
-		</Button>
+	<AlertDialog.Trigger>
+		{#snippet child({ props })}
+			<Button {...props} variant="destructive" size="icon">
+				<X class="size-4" />
+			</Button>
+		{/snippet}
 	</AlertDialog.Trigger>
 
 	<AlertDialog.Content>
@@ -41,8 +43,10 @@
 
 		<AlertDialog.Footer>
 			<AlertDialog.Cancel>Avbryt</AlertDialog.Cancel>
-			<AlertDialog.Action asChild let:builder>
-				<Button {...builder} type="submit" form="removeBookForm">Fjern bok fra valgte mål</Button>
+			<AlertDialog.Action>
+				{#snippet child({ props })}
+					<Button {...props} type="submit" form="removeBookForm">Fjern bok fra valgte mål</Button>
+				{/snippet}
 			</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>

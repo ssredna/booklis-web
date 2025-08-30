@@ -1,5 +1,5 @@
 <script>
-	import '../app.pcss';
+	import '../app.css';
 </script>
 
 <main class="flex min-h-screen flex-col items-center justify-center p-2 lg:p-4">
