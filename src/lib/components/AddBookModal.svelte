@@ -17,8 +17,7 @@
 	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {
 			if (form.valid) isOpen = false;
-		},
-		resetForm: true
+		}
 	});
 
 	export let isOpen: boolean;
