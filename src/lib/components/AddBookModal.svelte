@@ -28,7 +28,7 @@
 
 <Dialog.Root bind:open={isOpen}>
 	<Dialog.Trigger />
-	<Dialog.Content class="max-h-screen overflow-auto">
+	<Dialog.Content class="max-h-svh overflow-auto">
 		<Dialog.Header>Legg til bok</Dialog.Header>
 		<form method="post" action="?/addBook" use:enhance class="grid gap-6 py-4">
 			<div class="grid gap-2">
