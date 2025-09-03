@@ -12,20 +12,23 @@
 	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
 
-	export let addBookForm: SuperValidated<Infer<AddBookSchema>>;
+	interface Props {
+		addBookForm: SuperValidated<Infer<AddBookSchema>>;
+		isOpen: boolean;
+	}
+
+	let { addBookForm, isOpen = $bindable() }: Props = $props();
 
 	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {
 			if (form.valid) isOpen = false;
 		}
 	});
-
-	export let isOpen: boolean;
 </script>
 
 <Dialog.Root bind:open={isOpen}>
 	<Dialog.Trigger />
-	<Dialog.Content>
+	<Dialog.Content class="max-h-screen overflow-auto">
 		<Dialog.Header>Legg til bok</Dialog.Header>
 		<form method="post" action="?/addBook" use:enhance class="grid gap-6 py-4">
 			<div class="grid gap-2">
