@@ -9,6 +9,7 @@ export const { handle: authHandle } = SvelteKitAuth({
 			}
 		})
 	],
+	trustHost: true,
 	callbacks: {
 		jwt({ token, user }) {
 			if (user) token.id = user.sub;
