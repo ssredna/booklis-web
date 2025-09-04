@@ -22,7 +22,6 @@
 <Card.Root class="mb-6 w-full max-w-xl">
 	<Card.Header>
 		<Card.Title class="text-2xl font-bold">Lesemål</Card.Title>
-		<Card.Description>Oversikt over hvordan du ligger ann med lesemålene dine</Card.Description>
 	</Card.Header>
 
 	<Card.Content class="grid gap-6">
