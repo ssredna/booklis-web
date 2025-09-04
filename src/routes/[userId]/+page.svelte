@@ -19,6 +19,8 @@
 	import ActiveBook from '$lib/components/ActiveBook.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import GoalsCard from '$lib/components/GoalsCard.svelte';
+	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
+	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
 
 	export let data;
 
@@ -30,24 +32,31 @@
 	$: activeBooks.set(data.activeBooks);
 	$: readBooks.set(data.readBooks);
 	$: isOwner.set(data.isOwner);
+
+	$: activeGoals = Object.values(data.goals).filter(
+		(goal) => goal.readBooks.length < goal.numberOfBooks
+	);
+	$: finishedGoals = Object.values(data.goals).filter(
+		(goal) => goal.readBooks.length >= goal.numberOfBooks
+	);
 </script>
 
-{#if Object.keys(data.goals).length === 0 && data.isOwner}
+{#if activeGoals.length === 0 && data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Lag deg et lesemål
 	</h1>
 	<CreateGoalModal inputForm={data.createGoalForm}>
 		<Button size="lg" class="mb-4">Opprett mål</Button>
 	</CreateGoalModal>
-{:else if Object.keys(data.goals).length === 0 && !data.isOwner}
+{:else if activeGoals.length === 0 && !data.isOwner}
 	<h1 class="scroll-m-20 pb-4 text-4xl font-extrabold tracking-tight lg:text-5xl">
 		Her er det ingen lesemål
 	</h1>
 	<Button size="lg" href="/home">Gå hjem</Button>
 {:else}
-	{#key data.goals}
+	{#key activeGoals}
 		<GoalsCard createGoalForm={data.createGoalForm}>
-			{#each Object.values(data.goals) as goal}
+			{#each activeGoals as goal}
 				<Goal {goal} editGoalForm={data.editGoalForm} deleteGoalForm={data.deleteGoalForm} />
 			{/each}
 		</GoalsCard>
@@ -82,6 +91,20 @@
 
 <Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
 <AddBookModal addBookForm={data.addBookForm} bind:isOpen={showAddBookModal} />
+
+{#if finishedGoals.length > 0}
+	{#key finishedGoals}
+		<FinishedGoalsCard>
+			{#each finishedGoals as goal}
+				<FinishedGoal
+					{goal}
+					editGoalForm={data.editGoalForm}
+					deleteGoalForm={data.deleteGoalForm}
+				/>
+			{/each}
+		</FinishedGoalsCard>
+	{/key}
+{/if}
 
 {#if Object.keys(data.readBooks).length > 0}
 	{#key data.readBooks}
