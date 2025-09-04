@@ -7,10 +7,16 @@
 	import CreateGoalModal from './CreateGoalModal.svelte';
 	import { Button } from './ui/button';
 	import * as Card from './ui/card';
+	import type { Snippet } from 'svelte';
 
-	export let createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
+	interface Props {
+		createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
+		children?: Snippet;
+	}
 
-	$: readAnyPagesToday = Object.values($goals).some((goal) => goal.pagesReadToday > 0);
+	let { createGoalForm, children }: Props = $props();
+
+	let readAnyPagesToday = $derived(Object.values($goals).some((goal) => goal.pagesReadToday > 0));
 </script>
 
 <Card.Root class="mb-6 w-full max-w-xl">
@@ -20,7 +26,7 @@
 	</Card.Header>
 
 	<Card.Content class="grid gap-6">
-		<slot />
+		{@render children?.()}
 	</Card.Content>
 
 	<Card.Footer class="flex flex-col items-start gap-2 lg:flex-row lg:justify-between">
