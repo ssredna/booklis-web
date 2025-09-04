@@ -14,52 +14,65 @@
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 
-	export let goal: Goal;
-	export let editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
-	export let deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
+	interface Props {
+		goal: Goal;
+		editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
+		deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
+	}
 
-	$: pagesLeftInActiveBooks = goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
-		const activeBook = $activeBooks[activeBookId];
-		const book = $books[activeBook.bookId];
-		const pagesInBook = book?.pageCount ?? 0;
-		return pagesLeftTotal + (pagesInBook - activeBook.pagesRead);
-	}, 0);
+	let { goal, editGoalForm, deleteGoalForm }: Props = $props();
 
-	$: pagesLeftInChosenBooks = goal.chosenBooks.reduce((pagesLeftTotal, chosenBookId) => {
-		const chosenBook = $chosenBooks[chosenBookId];
-		const book = $books[chosenBook.bookId];
-		const pagesInBook = book?.pageCount ?? 0;
-		return pagesLeftTotal + pagesInBook;
-	}, 0);
+	let pagesLeftInActiveBooks = $derived(
+		goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
+			const activeBook = $activeBooks[activeBookId];
+			const book = $books[activeBook.bookId];
+			const pagesInBook = book?.pageCount ?? 0;
+			return pagesLeftTotal + (pagesInBook - activeBook.pagesRead);
+		}, 0)
+	);
 
-	$: pagesLeftInUnknownBooks =
+	let pagesLeftInChosenBooks = $derived(
+		goal.chosenBooks.reduce((pagesLeftTotal, chosenBookId) => {
+			const chosenBook = $chosenBooks[chosenBookId];
+			const book = $books[chosenBook.bookId];
+			const pagesInBook = book?.pageCount ?? 0;
+			return pagesLeftTotal + pagesInBook;
+		}, 0)
+	);
+
+	let pagesLeftInUnknownBooks = $derived(
 		(goal.numberOfBooks -
 			goal.chosenBooks.length -
 			goal.activeBooks.length -
 			goal.readBooks.length) *
-		goal.avgPageCount;
+			goal.avgPageCount
+	);
 
-	$: totalPagesLeftInBooks =
-		pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLeftInUnknownBooks;
+	let totalPagesLeftInBooks = $derived(
+		pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLeftInUnknownBooks
+	);
 
-	$: numberOfBooksLeft = goal.numberOfBooks - goal.readBooks.length;
+	let numberOfBooksLeft = $derived(goal.numberOfBooks - goal.readBooks.length);
 
-	$: pagesToRead =
+	let pagesToRead = $derived(
 		numberOfBooksLeft >= goal.activeBooks.length
 			? totalPagesLeftInBooks
-			: (totalPagesLeftInBooks / goal.activeBooks.length) * numberOfBooksLeft;
+			: (totalPagesLeftInBooks / goal.activeBooks.length) * numberOfBooksLeft
+	);
 
-	$: daysLeft = differenceInDays(goal.deadline, new Date());
+	let daysLeft = $derived(differenceInDays(goal.deadline, new Date()));
 
-	$: pagesPerDay = Math.ceil((pagesToRead + goal.pagesReadToday) / daysLeft);
+	let pagesPerDay = $derived(Math.ceil((pagesToRead + goal.pagesReadToday) / daysLeft));
 
-	$: pagesPerDayTomorrow = Math.ceil(pagesToRead / (daysLeft - 1));
+	let pagesPerDayTomorrow = $derived(Math.ceil(pagesToRead / (daysLeft - 1)));
 
-	$: pagesLeftToday = Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay);
+	let pagesLeftToday = $derived(
+		Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay)
+	);
 
-	$: dateString = dateFormatterShort.format(new Date(goal.deadline));
+	let dateString = $derived(dateFormatterShort.format(new Date(goal.deadline)));
 
-	let isEditing = false;
+	let isEditing = $state(false);
 </script>
 
 {#if !isEditing}
