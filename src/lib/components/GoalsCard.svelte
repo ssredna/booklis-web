@@ -8,6 +8,7 @@
 	import { Button } from './ui/button';
 	import * as Card from './ui/card';
 	import type { Snippet } from 'svelte';
+	import DarkModeToggle from './DarkModeToggle.svelte';
 
 	interface Props {
 		createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
@@ -21,7 +22,10 @@
 
 <Card.Root class="mb-6 w-full max-w-xl">
 	<Card.Header>
-		<Card.Title class="text-2xl font-bold">Lesemål</Card.Title>
+		<div class="flex items-center justify-between">
+			<Card.Title class="text-2xl font-bold">Lesemål</Card.Title>
+			<DarkModeToggle />
+		</div>
 	</Card.Header>
 
 	<Card.Content class="grid gap-6">
