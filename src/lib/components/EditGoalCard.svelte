@@ -64,19 +64,23 @@
 				{/if}
 			</div>
 
-			<div class="grid gap-2">
-				<Label for="avgPageCount" class={$createErrors.avgPageCount ? 'text-destructive' : ''}>
-					Gjennomsnittlig antall sider per bok
-				</Label>
-				<Input id="avgPageCount" name="avgPageCount" type="number" value={goal.avgPageCount} />
-				<small>
-					Brukes for å regne ut hvor mange sider du må lese, før du har lagt til alle de spesifikke
-					bøkene.
-				</small>
-				{#if $createErrors.avgPageCount}
-					<small class="text-destructive">{$createErrors.avgPageCount}</small>
-				{/if}
-			</div>
+			{#if goal.numberOfBooks > 1}
+				<div class="grid gap-2">
+					<Label for="avgPageCount" class={$createErrors.avgPageCount ? 'text-destructive' : ''}>
+						Gjennomsnittlig antall sider per bok
+					</Label>
+					<Input id="avgPageCount" name="avgPageCount" type="number" value={goal.avgPageCount} />
+					<small>
+						Brukes for å regne ut hvor mange sider du må lese, før du har lagt til alle de
+						spesifikke bøkene.
+					</small>
+					{#if $createErrors.avgPageCount}
+						<small class="text-destructive">{$createErrors.avgPageCount}</small>
+					{/if}
+				</div>
+			{:else}
+				<input type="hidden" name="avgPageCount" value={goal.avgPageCount} />
+			{/if}
 
 			{#if $page.form?.unauthorized}
 				<p class="text-destructive">Du har ikke tilgang til å gjøre endringer</p>
