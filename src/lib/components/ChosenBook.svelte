@@ -6,11 +6,16 @@
 	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
 	import { goals } from '$lib/stores/goalsStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 
-	export let chosenBookId: string;
+	interface Props {
+		chosenBookId: string;
+	}
 
-	$: chosenBook = $chosenBooks[chosenBookId];
-	$: book = $books[chosenBook.bookId];
+	let { chosenBookId }: Props = $props();
+
+	let chosenBook = $derived($chosenBooks[chosenBookId]);
+	let book = $derived($books[chosenBook.bookId]);
 </script>
 
 {#if book}
@@ -30,16 +35,18 @@
 				</small>
 			{/each}
 		</div>
-		<div class="flex flex-col items-end gap-2 pt-2 lg:flex-row lg:place-content-between">
-			<form action="?/startBook" method="post" use:enhance>
-				<input type="hidden" name="bookId" value={chosenBook.bookId} required />
-				<input type="hidden" name="goalIds" value={chosenBook.goals} required />
-				<input type="hidden" name="chosenBookId" value={chosenBookId} required />
-				<Button type="submit">Start bok</Button>
-			</form>
+		{#if $isOwner}
+			<div class="flex flex-col items-end gap-2 pt-2 lg:flex-row lg:place-content-between">
+				<form action="?/startBook" method="post" use:enhance>
+					<input type="hidden" name="bookId" value={chosenBook.bookId} required />
+					<input type="hidden" name="goalIds" value={chosenBook.goals} required />
+					<input type="hidden" name="chosenBookId" value={chosenBookId} required />
+					<Button type="submit">Start bok</Button>
+				</form>
 
-			<RemoveChosenBookButton {chosenBookId} />
-		</div>
+				<RemoveChosenBookButton {chosenBookId} />
+			</div>
+		{/if}
 	</div>
 {:else}
 	<small class="text-destructive">

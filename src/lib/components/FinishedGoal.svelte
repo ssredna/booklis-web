@@ -7,6 +7,7 @@
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { Button } from './ui/button';
 	import { Edit } from '@lucide/svelte';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 
 	interface Props {
 		goal: Goal;
@@ -28,9 +29,11 @@
 			{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
 		</h4>
 
-		<Button onclick={() => (isEditing = true)} variant="outline">
-			<Edit />
-		</Button>
+		{#if $isOwner}
+			<Button onclick={() => (isEditing = true)} variant="outline">
+				<Edit />
+			</Button>
+		{/if}
 	</div>
 {:else}
 	<EditGoalCard

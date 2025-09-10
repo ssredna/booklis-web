@@ -3,17 +3,22 @@
 	import { page } from '$app/state';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { books } from '$lib/stores/booksStore';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
 
-	export let readBookId: string;
+	interface Props {
+		readBookId: string;
+	}
 
-	$: readBook = $readBooks[readBookId];
+	let { readBookId }: Props = $props();
 
-	$: book = $books[readBook.bookId];
+	let readBook = $derived($readBooks[readBookId]);
 
-	$: formattedStartDate = dateFormatterShort.format(new Date(readBook.startDate));
-	$: formattedEndDate = dateFormatterShort.format(new Date(readBook.endDate));
+	let book = $derived($books[readBook.bookId]);
+
+	let formattedStartDate = $derived(dateFormatterShort.format(new Date(readBook.startDate)));
+	let formattedEndDate = $derived(dateFormatterShort.format(new Date(readBook.endDate)));
 </script>
 
 {#if book}
@@ -24,19 +29,22 @@
 				Lest fra {formattedStartDate} til {formattedEndDate}
 			</small>
 		</div>
-		<form method="post" action="?/reactivateBook" use:enhance>
-			<input type="hidden" name="goalIds" value={readBook.goals} required />
-			<input type="hidden" name="bookId" value={readBook.bookId} required />
-			<input type="hidden" name="readBookId" value={readBookId} required />
-			<input type="hidden" name="startDate" value={readBook.startDate} required />
-			<input type="hidden" name="pageCount" value={book.pageCount} required />
 
-			<Button type="submit" variant="outline">Flytt tilbake til aktive bøker</Button>
+		{#if $isOwner}
+			<form method="post" action="?/reactivateBook" use:enhance>
+				<input type="hidden" name="goalIds" value={readBook.goals} required />
+				<input type="hidden" name="bookId" value={readBook.bookId} required />
+				<input type="hidden" name="readBookId" value={readBookId} required />
+				<input type="hidden" name="startDate" value={readBook.startDate} required />
+				<input type="hidden" name="pageCount" value={book.pageCount} required />
 
-			{#if page.form?.reactivateBookError}
-				<p>Noe gikk galt under re-aktiveringen</p>
-			{/if}
-		</form>
+				<Button type="submit" variant="outline">Flytt tilbake til aktive bøker</Button>
+
+				{#if page.form?.reactivateBookError}
+					<p>Noe gikk galt under re-aktiveringen</p>
+				{/if}
+			</form>
+		{/if}
 	</div>
 {:else}
 	<small class="text-destructive">

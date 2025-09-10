@@ -7,6 +7,7 @@
 	import { Slider } from './ui/slider';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { goals } from '$lib/stores/goalsStore';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 
 	export let activeBookId: string;
 
@@ -50,61 +51,65 @@
 			</span>
 		</div>
 
-		<form
-			action="?/removeActiveBook"
-			method="post"
-			use:enhance
-			class="place-self-center justify-self-end"
-		>
-			<input type="hidden" name="bookId" value={activeBook.bookId} required />
-			<input type="hidden" name="goalIds" value={activeBook.goals} required />
-			<input type="hidden" name="activeBookId" value={activeBookId} required />
-			<Button type="submit" size="icon" variant="destructive">
-				<X class="size-4" />
-			</Button>
-		</form>
+		{#if $isOwner}
+			<form
+				action="?/removeActiveBook"
+				method="post"
+				use:enhance
+				class="place-self-center justify-self-end"
+			>
+				<input type="hidden" name="bookId" value={activeBook.bookId} required />
+				<input type="hidden" name="goalIds" value={activeBook.goals} required />
+				<input type="hidden" name="activeBookId" value={activeBookId} required />
+				<Button type="submit" size="icon" variant="destructive">
+					<X class="size-4" />
+				</Button>
+			</form>
+		{/if}
 	</div>
 
-	<form
-		bind:this={pagesReadForm}
-		action="?/updatePagesRead"
-		method="post"
-		use:enhance={({ formData }) => {
-			const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
-				return [goalId, String($goals[goalId].pagesReadToday)];
-			});
-			formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
-			isFormSubmitting = true;
+	{#if $isOwner}
+		<form
+			bind:this={pagesReadForm}
+			action="?/updatePagesRead"
+			method="post"
+			use:enhance={({ formData }) => {
+				const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
+					return [goalId, String($goals[goalId].pagesReadToday)];
+				});
+				formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
+				isFormSubmitting = true;
 
-			return async ({ update }) => {
-				await update();
-				isDirty = false;
-				isFormSubmitting = false;
-			};
-		}}
-	>
-		<Slider
-			bind:value={sliderValue}
-			min={0}
-			max={book.pageCount}
-			onValueChange={() => {
-				isDirty = true;
+				return async ({ update }) => {
+					await update();
+					isDirty = false;
+					isFormSubmitting = false;
+				};
 			}}
-			class="mt-4 mb-2"
-			type="multiple"
-		/>
-		<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
-		<input type="hidden" value={activeBookId} name="activeBookId" required />
+		>
+			<Slider
+				bind:value={sliderValue}
+				min={0}
+				max={book.pageCount}
+				onValueChange={() => {
+					isDirty = true;
+				}}
+				class="mt-4 mb-2"
+				type="multiple"
+			/>
+			<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
+			<input type="hidden" value={activeBookId} name="activeBookId" required />
 
-		{#if page.form?.updatePagesReadError}
-			<p>Noe gikk galt i lagringen</p>
-		{/if}
+			{#if page.form?.updatePagesReadError}
+				<p>Noe gikk galt i lagringen</p>
+			{/if}
 
-		<noscript>
-			<!-- If js is disabled there is no way to submit the form, so this is a backup -->
-			<input type="submit" value="Lagre" />
-		</noscript>
-	</form>
+			<noscript>
+				<!-- If js is disabled there is no way to submit the form, so this is a backup -->
+				<input type="submit" value="Lagre" />
+			</noscript>
+		</form>
+	{/if}
 
 	{#if activeBook.pagesRead === book.pageCount}
 		<form action="?/finishBook" method="post" use:enhance>

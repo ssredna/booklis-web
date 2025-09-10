@@ -89,7 +89,9 @@
 	{/key}
 {/if}
 
-<Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
+{#if $isOwner}
+	<Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
+{/if}
 <AddBookModal addBookForm={data.addBookForm} bind:isOpen={showAddBookModal} />
 
 {#if finishedGoals.length > 0}

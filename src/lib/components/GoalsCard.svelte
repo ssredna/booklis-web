@@ -9,6 +9,7 @@
 	import * as Card from './ui/card';
 	import type { Snippet } from 'svelte';
 	import DarkModeToggle from './DarkModeToggle.svelte';
+	import { isOwner } from '$lib/stores/isOwnerStore';
 
 	interface Props {
 		createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
@@ -32,18 +33,20 @@
 		{@render children?.()}
 	</Card.Content>
 
-	<Card.Footer class="flex flex-col items-start gap-2 lg:flex-row lg:justify-between">
-		<CreateGoalModal inputForm={createGoalForm}>
-			<Button>Legg til nytt mål</Button>
-		</CreateGoalModal>
+	{#if $isOwner}
+		<Card.Footer class="flex flex-col items-start gap-2 lg:flex-row lg:justify-between">
+			<CreateGoalModal inputForm={createGoalForm}>
+				<Button>Legg til nytt mål</Button>
+			</CreateGoalModal>
 
-		{#if readAnyPagesToday}
-			<form method="post" action="?/resetToday" use:enhance>
-				<Button variant="destructive" type="submit">Nullstill sider lest i dag</Button>
-				{#if page.form?.resetTodayError}
-					<p>Noe gikk galt under nullstillingen</p>
-				{/if}
-			</form>
-		{/if}
-	</Card.Footer>
+			{#if readAnyPagesToday}
+				<form method="post" action="?/resetToday" use:enhance>
+					<Button variant="destructive" type="submit">Nullstill sider lest i dag</Button>
+					{#if page.form?.resetTodayError}
+						<p>Noe gikk galt under nullstillingen</p>
+					{/if}
+				</form>
+			{/if}
+		</Card.Footer>
+	{/if}
 </Card.Root>
