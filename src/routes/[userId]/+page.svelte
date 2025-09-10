@@ -92,7 +92,7 @@
 	{/key}
 {/if}
 
-{#if $isOwner}
+{#if $isOwner && activeGoals.length > 0}
 	<Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
 {/if}
 <AddBookModal addBookForm={data.addBookForm} bind:isOpen={showAddBookModal} />
