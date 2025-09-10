@@ -118,7 +118,7 @@
 			<input type="hidden" name="bookId" value={activeBook.bookId} required />
 			<input type="hidden" name="startDate" value={activeBook.startDate} required />
 
-			<Button type="submit" class="float-end">
+			<Button type="submit" class="float-end" disabled={isFormSubmitting}>
 				<Check class="mr-2 size-4" />
 				Fullfør bok
 			</Button>
