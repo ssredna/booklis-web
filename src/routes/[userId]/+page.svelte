@@ -8,7 +8,7 @@
 	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
-	import { signOut } from '@auth/sveltekit/client';
+	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { goals } from '$lib/stores/goalsStore';
 	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
 	import ReadBook from '$lib/components/ReadBook.svelte';
@@ -21,6 +21,7 @@
 	import GoalsCard from '$lib/components/GoalsCard.svelte';
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
 	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
+	import { page } from '$app/state';
 
 	export let data;
 
@@ -32,6 +33,8 @@
 	$: activeBooks.set(data.activeBooks);
 	$: readBooks.set(data.readBooks);
 	$: isOwner.set(data.isOwner);
+
+	$: isLoggedIn = page.data.session?.user ? true : false;
 
 	$: activeGoals = Object.values(data.goals).filter(
 		(goal) => goal.readBooks.length < goal.numberOfBooks
@@ -129,4 +132,12 @@
 	</MyBooksCard>
 {/if}
 
-<Button onclick={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>
+{#if isLoggedIn && $isOwner}
+	<Button onclick={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>
+{:else if isLoggedIn && !$isOwner}
+	<Button size="lg" href="/home" class="my-4">Trykk her for å gå til lesemålet dit</Button>
+{:else}
+	<Button onclick={() => signIn('google', { callbackUrl: `/${page.params.userId}` })}>
+		Logg inn
+	</Button>
+{/if}
