@@ -6,8 +6,12 @@
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import { superForm } from 'sveltekit-superforms';
 
-	export let deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
-	export let goalId: string;
+	interface Props {
+		deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
+		goalId: string;
+	}
+
+	let { deleteGoalForm, goalId }: Props = $props();
 
 	const { delayed, submitting, enhance } = superForm(deleteGoalForm);
 </script>
@@ -20,8 +24,7 @@
 	<AlertDialog.Trigger>
 		{#snippet child({ props })}
 			<Button {...props} variant="destructive">
-				<Trash class="mr-2 h-4 w-4" />
-				Slett mål
+				<Trash class="h-4 w-4" />
 			</Button>
 		{/snippet}
 	</AlertDialog.Trigger>
