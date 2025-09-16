@@ -2,7 +2,7 @@
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import type { EditGoalSchema } from '$lib/schemas/editGoalSchema';
-	import type { Goal } from '$lib/types/goal';
+	import type { GoalType } from '$lib/types/goal';
 	import type { Infer, SuperValidated } from 'sveltekit-superforms';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { Button } from './ui/button';
@@ -10,7 +10,7 @@
 	import { isOwner } from '$lib/stores/isOwnerStore';
 
 	interface Props {
-		goal: Goal;
+		goal: GoalType;
 		editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
 		deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
 	}

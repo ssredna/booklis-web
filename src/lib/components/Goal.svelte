@@ -7,13 +7,13 @@
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import EditGoalCard from './EditGoalCard.svelte';
-	import { type Goal } from '$lib/types/goal';
+	import { type GoalType } from '$lib/types/goal';
 	import { differenceInDays } from 'date-fns';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
-		goal: Goal;
+		goal: GoalType;
 		editGoalForm: SuperValidated<Infer<EditGoalSchema>>;
 		deleteGoalForm: SuperValidated<Infer<DeleteGoalSchema>>;
 	}

@@ -20,7 +20,7 @@ import type { ReadBook } from '$lib/types/readBook';
 import type { BookType } from '$lib/types/book';
 import dateFormat from 'dateformat';
 import type { ChosenBookType } from '$lib/types/chosenBook';
-import type { Goal } from '$lib/types/goal';
+import type { GoalType } from '$lib/types/goal';
 
 enum Path {
 	ACTIVE_BOOKS = 'activeBooks',
@@ -105,7 +105,7 @@ export async function getGoals(userId: string) {
 		];
 	});
 
-	return Object.fromEntries(goals) as Record<string, Goal>;
+	return Object.fromEntries(goals) as Record<string, GoalType>;
 }
 
 export async function deleteGoal(userId: string, goalId: string) {
