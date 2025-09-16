@@ -1,4 +1,4 @@
 import { writable } from 'svelte/store';
-import type { Book } from '../types/book';
+import type { BookType } from '../types/book';
 
-export const books = writable<Record<string, Book>>({});
+export const books = writable<Record<string, BookType>>({});

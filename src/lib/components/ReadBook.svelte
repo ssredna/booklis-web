@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import { dateFormatterShort } from '$lib/dateFormatters';
-	import { books } from '$lib/stores/booksStore';
+	import { getLibrary } from '$lib/state/Library.svelte';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
@@ -13,9 +13,11 @@
 
 	let { readBookId }: Props = $props();
 
+	const library = getLibrary();
+
 	let readBook = $derived($readBooks[readBookId]);
 
-	let book = $derived($books[readBook.bookId]);
+	let book = $derived(library.books[readBook.bookId]);
 
 	let formattedStartDate = $derived(dateFormatterShort.format(new Date(readBook.startDate)));
 	let formattedEndDate = $derived(dateFormatterShort.format(new Date(readBook.endDate)));

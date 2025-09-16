@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { books } from '$lib/stores/booksStore';
 	import * as Dialog from './ui/dialog';
 	import { Label } from './ui/label';
 	import { Input } from './ui/input';
@@ -11,6 +10,7 @@
 	import { page } from '$app/state';
 	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
 		addBookForm: SuperValidated<Infer<AddBookSchema>>;
@@ -18,6 +18,8 @@
 	}
 
 	let { addBookForm, isOpen = $bindable() }: Props = $props();
+
+	const library = getLibrary();
 
 	const { form, errors, delayed, submitting, enhance } = superForm(addBookForm, {
 		onUpdated: ({ form }) => {
@@ -80,10 +82,10 @@
 				Legg til bok
 			</Button>
 
-			{#if Object.keys($books).length > 0}
+			{#if Object.keys(library.books).length > 0}
 				<h3>Vil du legge til en bok du allerede har?</h3>
 				<div class="flex flex-wrap gap-2">
-					{#each Object.entries($books) as [bookId, book]}
+					{#each Object.entries(library.books) as [bookId, book]}
 						<Button
 							type="submit"
 							formaction="?/addExistingBook"

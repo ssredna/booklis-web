@@ -17,7 +17,7 @@ import { db } from './firebase';
 import { isSameDay } from 'date-fns';
 import type { ActiveBook } from '$lib/types/activeBook';
 import type { ReadBook } from '$lib/types/readBook';
-import type { Book } from '$lib/types/book';
+import type { BookType } from '$lib/types/book';
 import dateFormat from 'dateformat';
 import type { ChosenBook } from '$lib/types/chosenBook';
 import type { Goal } from '$lib/types/goal';
@@ -200,7 +200,7 @@ export async function addExistingBookToGoals(userId: string, goalIds: string[], 
 
 export async function getBooks(userId: string) {
 	const querySnapshot = await getDoc(doc(db, Path.BOOKS, userId));
-	const books = querySnapshot.data() as Record<string, Book>;
+	const books = querySnapshot.data() as Record<string, BookType>;
 
 	return books ?? {};
 }

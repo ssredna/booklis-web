@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Button } from './ui/button';
-	import { books } from '$lib/stores/booksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
 	import { goals } from '$lib/stores/goalsStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { isOwner } from '$lib/stores/isOwnerStore';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
 		chosenBookId: string;
@@ -14,8 +14,10 @@
 
 	let { chosenBookId }: Props = $props();
 
+	const library = getLibrary();
+
 	let chosenBook = $derived($chosenBooks[chosenBookId]);
-	let book = $derived($books[chosenBook.bookId]);
+	let book = $derived(library.books[chosenBook.bookId]);
 </script>
 
 {#if book}

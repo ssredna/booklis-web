@@ -22,10 +22,15 @@
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
 	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
 	import { page } from '$app/state';
+	import { getLibrary, setLibrary } from '$lib/state/Library.svelte.js';
 
 	export let data;
 
 	let showAddBookModal = false;
+
+	setLibrary(data);
+
+	const library = getLibrary();
 
 	$: books.set(data.books);
 	$: goals.set(data.goals);
@@ -124,9 +129,9 @@
 	{/key}
 {/if}
 
-{#if Object.keys(data.books).length > 0}
+{#if Object.keys(library.books).length > 0}
 	<MyBooksCard>
-		{#each Object.values(data.books) as book}
+		{#each Object.values(library.books) as book}
 			<p>{book.title}</p>
 		{/each}
 	</MyBooksCard>
