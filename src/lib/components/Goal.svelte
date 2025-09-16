@@ -9,7 +9,6 @@
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type Goal } from '$lib/types/goal';
 	import { differenceInDays } from 'date-fns';
-	import { activeBooks } from '$lib/stores/activeBooksStore';
 	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { getLibrary } from '$lib/state/Library.svelte';
@@ -23,15 +22,6 @@
 	let { goal, editGoalForm, deleteGoalForm }: Props = $props();
 
 	const library = getLibrary();
-
-	let pagesLeftInActiveBooks = $derived(
-		goal.activeBooks.reduce((pagesLeftTotal, activeBookId) => {
-			const activeBook = $activeBooks[activeBookId];
-			const book = library.books[activeBook.bookId];
-			const pagesInBook = book?.pageCount ?? 0;
-			return pagesLeftTotal + (pagesInBook - activeBook.pagesRead);
-		}, 0)
-	);
 
 	let pagesLeftInChosenBooks = $derived(
 		goal.chosenBooks.reduce((pagesLeftTotal, chosenBookId) => {
@@ -51,7 +41,7 @@
 	);
 
 	let totalPagesLeftInBooks = $derived(
-		pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLeftInUnknownBooks
+		library.pagesLeftInActiveBooks + pagesLeftInChosenBooks + pagesLeftInUnknownBooks
 	);
 
 	let numberOfBooksLeft = $derived(goal.numberOfBooks - goal.readBooks.length);
