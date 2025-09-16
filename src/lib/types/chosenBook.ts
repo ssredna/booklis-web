@@ -1,4 +1,4 @@
-export type ChosenBook = {
+export type ChosenBookType = {
 	bookId: string;
 	goals: string[];
 };

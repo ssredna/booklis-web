@@ -19,7 +19,7 @@ import type { ActiveBookType } from '$lib/types/activeBook';
 import type { ReadBook } from '$lib/types/readBook';
 import type { BookType } from '$lib/types/book';
 import dateFormat from 'dateformat';
-import type { ChosenBook } from '$lib/types/chosenBook';
+import type { ChosenBookType } from '$lib/types/chosenBook';
 import type { Goal } from '$lib/types/goal';
 
 enum Path {
@@ -208,7 +208,7 @@ export async function getBooks(userId: string) {
 export async function removeChosenBook(userId: string, goalIds: string[], chosenBookId: string) {
 	await runTransaction(db, async (transaction) => {
 		const chosenBookSnap = await transaction.get(doc(db, Path.CHOSEN_BOOKS, userId));
-		const chosenBook = chosenBookSnap.data() as Record<string, ChosenBook>;
+		const chosenBook = chosenBookSnap.data() as Record<string, ChosenBookType>;
 		const partOfOtherGoals = chosenBook[chosenBookId].goals.length > goalIds.length;
 
 		for (const goalId of goalIds) {
@@ -430,7 +430,7 @@ export async function getReadBooks(userId: string) {
 
 export async function getChosenBooks(userId: string) {
 	const querySnapshot = await getDoc(doc(db, Path.CHOSEN_BOOKS, userId));
-	const chosenBooks = querySnapshot.data() as Record<string, ChosenBook>;
+	const chosenBooks = querySnapshot.data() as Record<string, ChosenBookType>;
 
 	return chosenBooks ?? {};
 }
