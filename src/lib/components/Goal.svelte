@@ -22,16 +22,10 @@
 
 	const library = getLibrary();
 
-	let pagesLeftInUnknownBooks = $derived(
-		(goal.numberOfBooks -
-			goal.chosenBooks.length -
-			goal.activeBooks.length -
-			goal.readBooks.length) *
-			goal.avgPageCount
-	);
-
 	let totalPagesLeftInBooks = $derived(
-		library.pagesLeftInActiveBooks + library.pagesLeftInChosenBooks + pagesLeftInUnknownBooks
+		library.goals[goal.id].pagesLeftInActiveBooks +
+			library.goals[goal.id].pagesLeftInChosenBooks +
+			library.goals[goal.id].pagesLeftInUnknownBooks
 	);
 
 	let numberOfBooksLeft = $derived(goal.numberOfBooks - goal.readBooks.length);

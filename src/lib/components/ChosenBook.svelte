@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { Button } from './ui/button';
 	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
-	import { goals } from '$lib/stores/goalsStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { isOwner } from '$lib/stores/isOwnerStore';
 	import { getLibrary } from '$lib/state/Library.svelte';
@@ -29,9 +28,9 @@
 			{#each chosenBook.goals as goalId}
 				<br />
 				<small>
-					&ensp; - {$goals[goalId].numberOfBooks}
-					{$goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormatterShort.format(
-						new Date($goals[goalId].deadline)
+					&ensp; - {library.goals[goalId].numberOfBooks}
+					{library.goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormatterShort.format(
+						new Date(library.goals[goalId].deadline)
 					)}
 				</small>
 			{/each}

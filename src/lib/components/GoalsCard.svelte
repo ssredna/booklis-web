@@ -2,7 +2,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
 	import type { CreateGoalSchema } from '$lib/schemas/createGoalSchema';
-	import { goals } from '$lib/stores/goalsStore';
 	import type { SuperValidated, Infer } from 'sveltekit-superforms';
 	import CreateGoalModal from './CreateGoalModal.svelte';
 	import { Button } from './ui/button';
@@ -10,6 +9,7 @@
 	import type { Snippet } from 'svelte';
 	import DarkModeToggle from './DarkModeToggle.svelte';
 	import { isOwner } from '$lib/stores/isOwnerStore';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
 		createGoalForm: SuperValidated<Infer<CreateGoalSchema>>;
@@ -18,7 +18,11 @@
 
 	let { createGoalForm, children }: Props = $props();
 
-	let readAnyPagesToday = $derived(Object.values($goals).some((goal) => goal.pagesReadToday > 0));
+	const library = getLibrary();
+
+	let readAnyPagesToday = $derived(
+		Object.values(library.goals).some((goal) => goal.pagesReadToday > 0)
+	);
 </script>
 
 <Card.Root class="mb-6 w-full max-w-xl">

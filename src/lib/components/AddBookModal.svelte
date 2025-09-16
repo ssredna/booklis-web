@@ -8,7 +8,6 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { Loader2 } from '@lucide/svelte';
 	import { page } from '$app/state';
-	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
@@ -51,7 +50,7 @@
 
 			<div class="grid gap-4">
 				<Label>Hvilke mål vil du legge boken til i?</Label>
-				{#each Object.values($goals) as goal}
+				{#each Object.values(library.goals) as goal}
 					<Label>
 						<input type="checkbox" name="goalIds" value={goal.id} class="mr-2" />
 						{goal.numberOfBooks}

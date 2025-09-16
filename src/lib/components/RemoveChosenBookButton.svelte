@@ -3,7 +3,6 @@
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
 	import { enhance } from '$app/forms';
-	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
@@ -38,9 +37,9 @@
 			{#each chosenBook.goals as goalId}
 				<label>
 					<input type="checkbox" name="goalIds" value={goalId} />
-					{$goals[goalId].numberOfBooks}
-					{$goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
-						$goals[goalId].deadline,
+					{library.goals[goalId].numberOfBooks}
+					{library.goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
+						library.goals[goalId].deadline,
 						'yyyy-mm-dd'
 					)}
 				</label>
