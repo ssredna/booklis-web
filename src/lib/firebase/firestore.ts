@@ -15,7 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { isSameDay } from 'date-fns';
-import type { ActiveBook } from '$lib/types/activeBook';
+import type { ActiveBookType } from '$lib/types/activeBook';
 import type { ReadBook } from '$lib/types/readBook';
 import type { BookType } from '$lib/types/book';
 import dateFormat from 'dateformat';
@@ -281,7 +281,7 @@ export async function moveBookFromActiveToChosen(
 async function removeActiveBook(userId: string, goalIds: string[], activeBookId: string) {
 	await runTransaction(db, async (transaction) => {
 		const activeBookSnap = await transaction.get(doc(db, Path.ACTIVE_BOOKS, userId));
-		const activeBook = activeBookSnap.data() as Record<string, ActiveBook>;
+		const activeBook = activeBookSnap.data() as Record<string, ActiveBookType>;
 		const partOfOtherGoals = activeBook[activeBookId].goals.length > goalIds.length;
 
 		for (const goalId of goalIds) {
@@ -416,7 +416,7 @@ async function removeReadBook(userId: string, goalIds: string[], readBookId: str
 
 export async function getActiveBooks(userId: string) {
 	const querySnapshot = await getDoc(doc(db, Path.ACTIVE_BOOKS, userId));
-	const activeBooks = querySnapshot.data() as Record<string, ActiveBook>;
+	const activeBooks = querySnapshot.data() as Record<string, ActiveBookType>;
 
 	return activeBooks ?? {};
 }

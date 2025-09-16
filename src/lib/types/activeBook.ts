@@ -1,4 +1,4 @@
-export type ActiveBook = {
+export type ActiveBookType = {
 	bookId: string;
 	pagesRead: number;
 	startDate: string;
