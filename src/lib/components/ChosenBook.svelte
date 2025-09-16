@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { Button } from './ui/button';
-	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import RemoveChosenBookButton from './RemoveChosenBookButton.svelte';
 	import { goals } from '$lib/stores/goalsStore';
 	import { dateFormatterShort } from '$lib/dateFormatters';
@@ -16,7 +15,7 @@
 
 	const library = getLibrary();
 
-	let chosenBook = $derived($chosenBooks[chosenBookId]);
+	let chosenBook = $derived(library.chosenBooks[chosenBookId]);
 	let book = $derived(library.books[chosenBook.bookId]);
 </script>
 

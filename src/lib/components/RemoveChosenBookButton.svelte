@@ -1,15 +1,21 @@
 <script lang="ts">
-	import { chosenBooks } from '$lib/stores/chosenBooksStore';
 	import { X } from '@lucide/svelte';
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
 	import { enhance } from '$app/forms';
 	import { goals } from '$lib/stores/goalsStore';
 	import dateFormat from 'dateformat';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
-	export let chosenBookId: string;
+	interface Props {
+		chosenBookId: string;
+	}
 
-	$: chosenBook = $chosenBooks[chosenBookId];
+	let { chosenBookId }: Props = $props();
+
+	const library = getLibrary();
+
+	let chosenBook = $derived(library.chosenBooks[chosenBookId]);
 </script>
 
 <AlertDialog.Root>
