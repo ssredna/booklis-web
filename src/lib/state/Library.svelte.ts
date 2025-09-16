@@ -1,5 +1,5 @@
 import { getContext, setContext } from 'svelte';
-import type { Book } from './Book.svelte';
+import { Book } from './Book.svelte';
 import type { BookType } from '$lib/types/book';
 
 type LibraryData = {
@@ -10,7 +10,9 @@ class Library {
 	books: Record<string, Book>;
 
 	constructor(data: LibraryData) {
-		this.books = data.books;
+		this.books = Object.fromEntries(
+			Object.entries(data.books).map(([id, book]) => [id, new Book(book.title, book.pageCount)])
+		);
 	}
 }
 
