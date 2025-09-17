@@ -22,18 +22,11 @@
 
 	const library = getLibrary();
 
-	let totalPagesLeftInBooks = $derived(
-		library.goals[goal.id].pagesLeftInActiveBooks +
-			library.goals[goal.id].pagesLeftInChosenBooks +
-			library.goals[goal.id].pagesLeftInUnknownBooks
-	);
-
-	let numberOfBooksLeft = $derived(goal.numberOfBooks - goal.readBooks.length);
-
 	let pagesToRead = $derived(
-		numberOfBooksLeft >= goal.activeBooks.length
-			? totalPagesLeftInBooks
-			: (totalPagesLeftInBooks / goal.activeBooks.length) * numberOfBooksLeft
+		library.goals[goal.id].booksLeft >= goal.activeBooks.length
+			? library.goals[goal.id].totalPagesLeft
+			: (library.goals[goal.id].totalPagesLeft / goal.activeBooks.length) *
+					library.goals[goal.id].booksLeft
 	);
 
 	let daysLeft = $derived(differenceInDays(goal.deadline, new Date()));

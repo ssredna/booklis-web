@@ -54,4 +54,10 @@ export class Goal {
 			this.readBooks.length;
 		return pagesLeft > 0 ? pagesLeft * this.avgPageCount : 0;
 	});
+
+	totalPagesLeft = $derived(
+		this.pagesLeftInActiveBooks + this.pagesLeftInChosenBooks + this.pagesLeftInUnknownBooks
+	);
+
+	booksLeft = $derived(this.numberOfBooks - this.readBooks.length);
 }
