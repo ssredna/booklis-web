@@ -21,7 +21,7 @@ class Library {
 	chosenBooks = $state<Record<string, ChosenBook>>({});
 	goals = $state<Record<string, Goal>>({});
 
-	constructor(data: LibraryData) {
+	setLibrary(data: LibraryData) {
 		this.goals = Object.fromEntries(
 			Object.entries(data.goals).map(([id, goal]) => [
 				id,
@@ -69,10 +69,12 @@ class Library {
 	);
 }
 
-export function setLibrary(libraryData: LibraryData) {
-	setContext('library', new Library(libraryData));
+const LIBRARY_KEY = Symbol('library');
+
+export function createLibrary() {
+	return setContext(LIBRARY_KEY, new Library());
 }
 
 export function getLibrary() {
-	return getContext('library') as Library;
+	return getContext<ReturnType<typeof createLibrary>>(LIBRARY_KEY);
 }

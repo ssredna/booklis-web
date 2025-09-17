@@ -22,15 +22,16 @@
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
 	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
 	import { page } from '$app/state';
-	import { getLibrary, setLibrary } from '$lib/state/Library.svelte.js';
+	import { getLibrary, createLibrary } from '$lib/state/Library.svelte.js';
 
 	export let data;
 
 	let showAddBookModal = false;
 
-	setLibrary(data);
+	createLibrary();
 
 	const library = getLibrary();
+	$: library.setLibrary(data);
 
 	$: books.set(data.books);
 	$: goals.set(data.goals);
