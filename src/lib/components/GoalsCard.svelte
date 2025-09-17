@@ -19,10 +19,6 @@
 	let { createGoalForm, children }: Props = $props();
 
 	const library = getLibrary();
-
-	let readAnyPagesToday = $derived(
-		Object.values(library.goals).some((goal) => goal.pagesReadToday > 0)
-	);
 </script>
 
 <Card.Root class="mb-6 w-full max-w-xl">
@@ -43,7 +39,7 @@
 				<Button>Legg til nytt mål</Button>
 			</CreateGoalModal>
 
-			{#if readAnyPagesToday}
+			{#if library.pagesReadToday > 0}
 				<form method="post" action="?/resetToday" use:enhance>
 					<Button variant="destructive" type="submit">Nullstill sider lest i dag</Button>
 					{#if page.form?.resetTodayError}

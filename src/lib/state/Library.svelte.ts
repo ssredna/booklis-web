@@ -61,6 +61,12 @@ class Library {
 			])
 		);
 	}
+
+	pagesReadToday = $derived(
+		Object.values(this.goals).reduce((total, goal) => {
+			return total + goal.pagesReadToday;
+		}, 0)
+	);
 }
 
 export function setLibrary(libraryData: LibraryData) {
