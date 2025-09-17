@@ -3,12 +3,12 @@ import { getLibrary } from './Library.svelte';
 export class Goal {
 	id: string;
 	deadline: string;
-	numberOfBooks: number = 0;
-	avgPageCount: number = 0;
-	chosenBooks: string[] = [];
-	activeBooks: string[] = [];
-	readBooks: string[] = [];
-	pagesReadToday: number = 0;
+	numberOfBooks = $state(0);
+	avgPageCount = $state(0);
+	chosenBooks = $state<string[]>([]);
+	activeBooks = $state<string[]>([]);
+	readBooks = $state<string[]>([]);
+	pagesReadToday = $state(0);
 
 	constructor(
 		id: string,
@@ -20,14 +20,14 @@ export class Goal {
 		readBooks: string[],
 		pagesReadToday: number
 	) {
-		this.id = $state(id);
-		this.deadline = $state(deadlines);
-		this.numberOfBooks = $state(numberOfBooks);
-		this.avgPageCount = $state(avgPageCount);
-		this.chosenBooks = $state(chosenBooks);
-		this.activeBooks = $state(activeBooks);
-		this.readBooks = $state(readBooks);
-		this.pagesReadToday = $state(pagesReadToday);
+		this.id = id;
+		this.deadline = deadlines;
+		this.numberOfBooks = numberOfBooks;
+		this.avgPageCount = avgPageCount;
+		this.chosenBooks = chosenBooks;
+		this.activeBooks = activeBooks;
+		this.readBooks = readBooks;
+		this.pagesReadToday = pagesReadToday;
 	}
 
 	pagesLeftInActiveBooks = $derived(
@@ -39,7 +39,7 @@ export class Goal {
 	);
 
 	pagesLeftInChosenBooks = $derived(
-		Object.values(this.chosenBooks).reduce((total, chosenBookId) => {
+		this.chosenBooks.reduce((total, chosenBookId) => {
 			const book = getLibrary().books[chosenBookId];
 			if (!book) return total;
 			return total + book.pageCount;

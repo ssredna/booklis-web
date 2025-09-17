@@ -16,10 +16,10 @@ type LibraryData = {
 };
 
 class Library {
-	books: Record<string, Book> = {};
-	activeBooks: Record<string, ActiveBook> = {};
-	chosenBooks: Record<string, ChosenBook> = {};
-	goals: Record<string, Goal> = {};
+	books = $state<Record<string, Book>>({});
+	activeBooks = $state<Record<string, ActiveBook>>({});
+	chosenBooks = $state<Record<string, ChosenBook>>({});
+	goals = $state<Record<string, Goal>>({});
 
 	constructor(data: LibraryData) {
 		this.goals = Object.fromEntries(
