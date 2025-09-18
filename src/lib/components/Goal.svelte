@@ -8,7 +8,6 @@
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type GoalType } from '$lib/types/goal';
-	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
@@ -23,13 +22,10 @@
 
 	const pagesPerDay = $derived(library.goals[goal.id].pagesPerDay);
 	const pagesPerDayTomorrow = $derived(library.goals[goal.id].pagesPerDayTomorrow);
-	const pagesLeftToday = $derived(library.goals[goal.id].pagesLeftToday);
 
 	const displayedPagesLeftToday = $derived(
 		goal.pagesReadToday <= pagesPerDay ? pagesPerDay : pagesPerDayTomorrow
 	);
-
-	const dateString = $derived(dateFormatterShort.format(new Date(goal.deadline)));
 
 	let isEditing = $state(false);
 </script>
@@ -38,8 +34,7 @@
 	<Card.Root class="w-full max-w-xl">
 		<Card.Header>
 			<Card.Title class="flex place-content-between">
-				{goal.numberOfBooks}
-				{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
+				{library.goals[goal.id].goalTitle}
 				{#if $isOwner}
 					<Button variant="link" onclick={() => (isEditing = true)} class="h-auto p-0">
 						<Edit class="mr-2 size-4" />
@@ -53,7 +48,7 @@
 		</Card.Header>
 		<Card.Content>
 			<p class="text-xl">
-				<span class="text-3xl">{pagesLeftToday}</span>
+				<span class="text-3xl">{library.goals[goal.id].pagesLeftToday}</span>
 				sider igjen i dag
 			</p>
 		</Card.Content>

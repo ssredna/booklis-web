@@ -1,5 +1,6 @@
 import { differenceInDays } from 'date-fns';
 import { getLibrary } from './Library.svelte';
+import { dateFormatterShort } from '$lib/dateFormatters';
 
 export class Goal {
 	id: string;
@@ -88,4 +89,36 @@ export class Goal {
 	pagesLeftToday = $derived(
 		Math.min(Math.max(this.pagesPerDay - this.pagesReadToday, 0), this.pagesPerDay)
 	);
+
+	books = $derived.by(() => {
+		const library = getLibrary();
+
+		const chosenBooksBookIds = this.chosenBooks.map(
+			(bookId) => library.chosenBooks[bookId]?.bookId
+		);
+		const activeBooksBookIds = this.activeBooks.map(
+			(bookId) => library.activeBooks[bookId]?.bookId
+		);
+		const readBooksBookIds = this.readBooks.map((bookId) => library.readBooks[bookId]?.bookId);
+
+		const allBookIds = [...chosenBooksBookIds, ...activeBooksBookIds, ...readBooksBookIds];
+
+		const allBooks = allBookIds
+			.map((bookId) => library.books[bookId])
+			.filter((book) => book !== undefined);
+
+		return allBooks;
+	});
+
+	deadlineString = $derived(dateFormatterShort.format(new Date(this.deadline)));
+
+	goalTitle = $derived.by(() => {
+		const library = getLibrary();
+
+		if (this.numberOfBooks === 1 && this.books.length === 1) {
+			return `${this.books[0].title} til ${this.deadlineString}`;
+		}
+
+		return `${this.numberOfBooks} ${this.numberOfBooks == 1 ? 'bok' : 'bøker'} til ${this.deadlineString}`;
+	});
 }

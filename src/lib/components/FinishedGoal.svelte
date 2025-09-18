@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { dateFormatterShort } from '$lib/dateFormatters';
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import type { EditGoalSchema } from '$lib/schemas/editGoalSchema';
 	import type { GoalType } from '$lib/types/goal';
@@ -8,6 +7,7 @@
 	import { Button } from './ui/button';
 	import { Edit } from '@lucide/svelte';
 	import { isOwner } from '$lib/stores/isOwnerStore';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
 		goal: GoalType;
@@ -17,7 +17,7 @@
 
 	let { goal, editGoalForm, deleteGoalForm }: Props = $props();
 
-	let dateString = $derived(dateFormatterShort.format(new Date(goal.deadline)));
+	const library = getLibrary();
 
 	let isEditing = $state(false);
 </script>
@@ -25,8 +25,7 @@
 {#if !isEditing}
 	<div class="flex place-content-between items-center">
 		<h4 class="text-lg/none font-bold tracking-tight">
-			{goal.numberOfBooks}
-			{goal.numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateString}
+			{library.goals[goal.id].goalTitle}
 		</h4>
 
 		{#if $isOwner}
