@@ -4,7 +4,6 @@
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { getLibrary } from '$lib/state/Library.svelte';
 	import { isOwner } from '$lib/stores/isOwnerStore';
-	import { readBooks } from '$lib/stores/readBooksStore';
 	import { Button } from './ui/button';
 
 	interface Props {
@@ -15,7 +14,7 @@
 
 	const library = getLibrary();
 
-	let readBook = $derived($readBooks[readBookId]);
+	let readBook = $derived(library.readBooks[readBookId]);
 
 	let book = $derived(library.books[readBook.bookId]);
 
