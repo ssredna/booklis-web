@@ -50,6 +50,12 @@
 			<p class="text-xl">
 				<span class="text-3xl">{library.goals[goal.id].pagesLeftToday}</span>
 				sider igjen i dag
+				{#if library.goals[goal.id].activeBooks.length === 1}
+					i
+					<span class="italic">
+						{library.books[library.activeBooks[library.goals[goal.id].activeBooks[0]].bookId].title}
+					</span>
+				{/if}
 			</p>
 		</Card.Content>
 	</Card.Root>
