@@ -32,15 +32,21 @@ export class Goal {
 
 	pagesLeftInActiveBooks = $derived(
 		this.activeBooks.reduce((total, activeBookId) => {
-			const book = getLibrary().books[activeBookId];
+			const library = getLibrary();
+			const activeBook = library.activeBooks[activeBookId];
+			if (!activeBook) return total;
+			const book = library.books[activeBook.bookId];
 			if (!book) return total;
-			return total + (book.pageCount - getLibrary().activeBooks[activeBookId].pagesRead);
+			return total + (book.pageCount - activeBook.pagesRead);
 		}, 0)
 	);
 
 	pagesLeftInChosenBooks = $derived(
 		this.chosenBooks.reduce((total, chosenBookId) => {
-			const book = getLibrary().books[chosenBookId];
+			const library = getLibrary();
+			const chosenBook = library.chosenBooks[chosenBookId];
+			if (!chosenBook) return total;
+			const book = library.books[chosenBook.bookId];
 			if (!book) return total;
 			return total + book.pageCount;
 		}, 0)
