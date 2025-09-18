@@ -1,8 +1,9 @@
+import { differenceInDays } from 'date-fns';
 import { getLibrary } from './Library.svelte';
 
 export class Goal {
 	id: string;
-	deadline: string;
+	deadline = $state(new Date().toISOString().split('T')[0]);
 	numberOfBooks = $state(0);
 	avgPageCount = $state(0);
 	chosenBooks = $state<string[]>([]);
@@ -12,7 +13,7 @@ export class Goal {
 
 	constructor(
 		id: string,
-		deadlines: string,
+		deadline: string,
 		numberOfBooks: number,
 		avgPageCount: number,
 		chosenBooks: string[],
@@ -21,7 +22,7 @@ export class Goal {
 		pagesReadToday: number
 	) {
 		this.id = id;
-		this.deadline = deadlines;
+		this.deadline = deadline;
 		this.numberOfBooks = numberOfBooks;
 		this.avgPageCount = avgPageCount;
 		this.chosenBooks = chosenBooks;
@@ -66,4 +67,25 @@ export class Goal {
 	);
 
 	booksLeft = $derived(this.numberOfBooks - this.readBooks.length);
+
+	pagesToRead = $derived.by(() => {
+		if (this.booksLeft >= this.activeBooks.length) {
+			// If there are more books left than active books, read all the pages left.
+			return this.totalPagesLeft;
+		} else {
+			// If there are more active books than books left, spread the pages left
+			// evenly across the books left.
+			return (this.totalPagesLeft / this.activeBooks.length) * this.booksLeft;
+		}
+	});
+
+	daysLeft = $derived(differenceInDays(this.deadline, new Date()));
+
+	pagesPerDay = $derived(Math.ceil((this.pagesToRead + this.pagesReadToday) / this.daysLeft));
+
+	pagesPerDayTomorrow = $derived(Math.ceil(this.pagesToRead / (this.daysLeft - 1)));
+
+	pagesLeftToday = $derived(
+		Math.min(Math.max(this.pagesPerDay - this.pagesReadToday, 0), this.pagesPerDay)
+	);
 }

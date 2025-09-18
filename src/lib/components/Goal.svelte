@@ -8,7 +8,6 @@
 	import type { DeleteGoalSchema } from '$lib/schemas/deleteGoalSchema';
 	import EditGoalCard from './EditGoalCard.svelte';
 	import { type GoalType } from '$lib/types/goal';
-	import { differenceInDays } from 'date-fns';
 	import { dateFormatterShort } from '$lib/dateFormatters';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
@@ -22,24 +21,15 @@
 
 	const library = getLibrary();
 
-	let pagesToRead = $derived(
-		library.goals[goal.id].booksLeft >= goal.activeBooks.length
-			? library.goals[goal.id].totalPagesLeft
-			: (library.goals[goal.id].totalPagesLeft / goal.activeBooks.length) *
-					library.goals[goal.id].booksLeft
+	const pagesPerDay = $derived(library.goals[goal.id].pagesPerDay);
+	const pagesPerDayTomorrow = $derived(library.goals[goal.id].pagesPerDayTomorrow);
+	const pagesLeftToday = $derived(library.goals[goal.id].pagesLeftToday);
+
+	const displayedPagesLeftToday = $derived(
+		goal.pagesReadToday <= pagesPerDay ? pagesPerDay : pagesPerDayTomorrow
 	);
 
-	let daysLeft = $derived(differenceInDays(goal.deadline, new Date()));
-
-	let pagesPerDay = $derived(Math.ceil((pagesToRead + goal.pagesReadToday) / daysLeft));
-
-	let pagesPerDayTomorrow = $derived(Math.ceil(pagesToRead / (daysLeft - 1)));
-
-	let pagesLeftToday = $derived(
-		Math.min(Math.max(pagesPerDay - goal.pagesReadToday, 0), pagesPerDay)
-	);
-
-	let dateString = $derived(dateFormatterShort.format(new Date(goal.deadline)));
+	const dateString = $derived(dateFormatterShort.format(new Date(goal.deadline)));
 
 	let isEditing = $state(false);
 </script>
@@ -58,8 +48,7 @@
 				{/if}
 			</Card.Title>
 			<Card.Description>
-				{goal.pagesReadToday <= pagesPerDay ? pagesPerDay : pagesPerDayTomorrow} sider om dagen for å
-				nå målet
+				{displayedPagesLeftToday} sider om dagen for å nå målet
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
