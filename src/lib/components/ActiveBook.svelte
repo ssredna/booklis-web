@@ -3,24 +3,28 @@
 	import { page } from '$app/state';
 	import { Check, X } from '@lucide/svelte';
 	import { Button } from './ui/button';
-	import { books } from '$lib/stores/booksStore';
 	import { Slider } from './ui/slider';
-	import { activeBooks } from '$lib/stores/activeBooksStore';
-	import { goals } from '$lib/stores/goalsStore';
 	import { isOwner } from '$lib/stores/isOwnerStore';
+	import { getLibrary } from '$lib/state/Library.svelte';
 
-	export let activeBookId: string;
+	interface Props {
+		activeBookId: string;
+	}
 
-	$: activeBook = $activeBooks[activeBookId];
-	$: book = $books[activeBook.bookId];
+	let { activeBookId }: Props = $props();
 
-	let pagesReadForm: HTMLFormElement;
-	let isFormSubmitting = false;
+	const library = getLibrary();
 
-	let oldPagesRead = $activeBooks[activeBookId].pagesRead;
-	$: increase = activeBook.pagesRead - oldPagesRead;
+	let activeBook = $derived(library.activeBooks[activeBookId]);
+	let book = $derived(library.books[activeBook.bookId]);
 
-	let isDirty = false;
+	let pagesReadForm = $state<HTMLFormElement>();
+	let isFormSubmitting = $state(false);
+
+	let oldPagesRead = $state(library.activeBooks[activeBookId].pagesRead);
+	let increase = $derived(activeBook.pagesRead - oldPagesRead);
+
+	let isDirty = $state(false);
 </script>
 
 {#if book}
@@ -59,7 +63,7 @@
 			method="post"
 			use:enhance={({ formData }) => {
 				const goalIdsAndPagesReadToday = activeBook.goals.map((goalId) => {
-					return [goalId, String($goals[goalId].pagesReadToday)];
+					return [goalId, String(library.goals[goalId].pagesReadToday)];
 				});
 				formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
 
@@ -80,12 +84,15 @@
 				}}
 				onValueCommit={() => {
 					activeBook.goals.forEach((goalId) => {
-						$goals[goalId].pagesReadToday = Math.max($goals[goalId].pagesReadToday + increase, 0);
+						library.goals[goalId].pagesReadToday = Math.max(
+							library.goals[goalId].pagesReadToday + increase,
+							0
+						);
 					});
 					oldPagesRead = activeBook.pagesRead;
 
 					isFormSubmitting = true;
-					pagesReadForm.requestSubmit();
+					pagesReadForm?.requestSubmit();
 				}}
 				class="mt-4 mb-2"
 			/>
