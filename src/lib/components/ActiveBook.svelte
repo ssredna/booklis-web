@@ -14,9 +14,6 @@
 	$: activeBook = $activeBooks[activeBookId];
 	$: book = $books[activeBook.bookId];
 
-	let sliderValue = [$activeBooks[activeBookId].pagesRead];
-	$: activeBook.pagesRead = sliderValue[0];
-
 	let pagesReadForm: HTMLFormElement;
 	let isFormSubmitting = false;
 
@@ -25,19 +22,6 @@
 
 	let isDirty = false;
 </script>
-
-<svelte:window
-	on:click={() => {
-		// Couldn't find a way to register clicks on the slider, so this is a workaround
-		if (isDirty) {
-			activeBook.goals.forEach((goalId) => {
-				$goals[goalId].pagesReadToday = Math.max($goals[goalId].pagesReadToday + increase, 0);
-			});
-			oldPagesRead = activeBook.pagesRead;
-			pagesReadForm.requestSubmit();
-		}
-	}}
-/>
 
 {#if book}
 	<div class="grid grid-cols-4">
@@ -78,24 +62,32 @@
 					return [goalId, String($goals[goalId].pagesReadToday)];
 				});
 				formData.append('pagesReadToday', goalIdsAndPagesReadToday.join(';'));
-				isFormSubmitting = true;
 
 				return async ({ update }) => {
 					await update();
-					isDirty = false;
 					isFormSubmitting = false;
+					isDirty = false;
 				};
 			}}
 		>
 			<Slider
-				bind:value={sliderValue}
+				bind:value={activeBook.pagesRead}
+				type="single"
 				min={0}
 				max={book.pageCount}
 				onValueChange={() => {
 					isDirty = true;
 				}}
+				onValueCommit={() => {
+					activeBook.goals.forEach((goalId) => {
+						$goals[goalId].pagesReadToday = Math.max($goals[goalId].pagesReadToday + increase, 0);
+					});
+					oldPagesRead = activeBook.pagesRead;
+
+					isFormSubmitting = true;
+					pagesReadForm.requestSubmit();
+				}}
 				class="mt-4 mb-2"
-				type="multiple"
 			/>
 			<input type="hidden" value={activeBook.pagesRead} name="pagesRead" required />
 			<input type="hidden" value={activeBookId} name="activeBookId" required />
@@ -111,7 +103,7 @@
 		</form>
 	{/if}
 
-	{#if activeBook.pagesRead === book.pageCount}
+	{#if activeBook.pagesRead === book.pageCount && !isDirty}
 		<form action="?/finishBook" method="post" use:enhance>
 			<input type="hidden" name="goalIds" value={activeBook.goals} required />
 			<input type="hidden" name="activeBookId" value={activeBookId} required />
