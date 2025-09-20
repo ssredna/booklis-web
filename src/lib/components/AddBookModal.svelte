@@ -8,8 +8,8 @@
 	import { superForm } from 'sveltekit-superforms';
 	import { Loader2 } from '@lucide/svelte';
 	import { page } from '$app/state';
-	import dateFormat from 'dateformat';
 	import { getLibrary } from '$lib/state/Library.svelte';
+	import * as Accordion from '$lib/components/ui/accordion/index.js';
 
 	interface Props {
 		addBookForm: SuperValidated<Infer<AddBookSchema>>;
@@ -78,21 +78,27 @@
 			</Button>
 
 			{#if Object.keys(library.books).length > 0}
-				<h3>Vil du legge til en bok du allerede har?</h3>
-				<div class="flex flex-wrap gap-2">
-					{#each Object.entries(library.books) as [bookId, book]}
-						<Button
-							type="submit"
-							formaction="?/addExistingBook"
-							name="bookId"
-							value={bookId}
-							variant="outline"
-							disabled={$submitting}
-						>
-							{book.title}
-						</Button>
-					{/each}
-				</div>
+				<Accordion.Root type="single">
+					<Accordion.Item>
+						<Accordion.Trigger>Vil du legge til en bok du allerede har?</Accordion.Trigger>
+						<Accordion.Content>
+							<div class="flex flex-wrap gap-2">
+								{#each Object.entries(library.books) as [bookId, book]}
+									<Button
+										type="submit"
+										formaction="?/addExistingBook"
+										name="bookId"
+										value={bookId}
+										variant="outline"
+										disabled={$submitting}
+									>
+										{book.title}
+									</Button>
+								{/each}
+							</div>
+						</Accordion.Content>
+					</Accordion.Item>
+				</Accordion.Root>
 
 				{#if $errors.bookId}
 					<small class="text-destructive">{$errors.bookId}</small>
