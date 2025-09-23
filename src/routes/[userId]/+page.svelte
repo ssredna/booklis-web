@@ -15,14 +15,13 @@
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
 	import ChosenBooksCard from '$lib/components/ChosenBooksCard.svelte';
 	import ChosenBook from '$lib/components/ChosenBook.svelte';
-	import ActiveBooksCard from '$lib/components/ActiveBooksCard.svelte';
-	import ActiveBook from '$lib/components/ActiveBook.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import GoalsCard from '$lib/components/GoalsCard.svelte';
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
 	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
 	import { page } from '$app/state';
 	import { getLibrary, createLibrary } from '$lib/state/Library.svelte.js';
+	import ActiveBooks from '$lib/components/ActiveBooks.svelte';
 
 	export let data;
 
@@ -72,18 +71,7 @@
 	{/key}
 {/if}
 
-{#if library.activeBookIds.length > 0}
-	{#key data.activeBooks}
-		<ActiveBooksCard>
-			{#each library.activeBookIds as activeBookId, i (activeBookId)}
-				<ActiveBook {activeBookId} />
-				{#if i < library.activeBookIds.length - 1}
-					<Separator />
-				{/if}
-			{/each}
-		</ActiveBooksCard>
-	{/key}
-{/if}
+<ActiveBooks />
 
 {#if Object.keys(data.chosenBooks).length > 0}
 	{#key data.chosenBooks}
