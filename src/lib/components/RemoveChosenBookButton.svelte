@@ -3,7 +3,6 @@
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Button } from './ui/button';
 	import { enhance } from '$app/forms';
-	import dateFormat from 'dateformat';
 	import { getLibrary } from '$lib/state/Library.svelte';
 
 	interface Props {
@@ -37,11 +36,7 @@
 			{#each chosenBook.goals as goalId}
 				<label>
 					<input type="checkbox" name="goalIds" value={goalId} />
-					{library.goals[goalId].numberOfBooks}
-					{library.goals[goalId].numberOfBooks == 1 ? 'bok' : 'bøker'} til {dateFormat(
-						library.goals[goalId].deadline,
-						'yyyy-mm-dd'
-					)}
+					{library.goals[goalId].goalTitle}
 				</label>
 			{/each}
 		</form>
