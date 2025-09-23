@@ -72,12 +72,12 @@
 	{/key}
 {/if}
 
-{#if Object.keys(data.activeBooks).length > 0}
+{#if library.activeBookIds.length > 0}
 	{#key data.activeBooks}
 		<ActiveBooksCard>
-			{#each Object.keys(data.activeBooks) as activeBookId, i (activeBookId)}
+			{#each library.activeBookIds as activeBookId, i (activeBookId)}
 				<ActiveBook {activeBookId} />
-				{#if i < Object.keys(data.activeBooks).length - 1}
+				{#if i < library.activeBookIds.length - 1}
 					<Separator />
 				{/if}
 			{/each}

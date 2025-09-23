@@ -78,6 +78,21 @@ class Library {
 			return total + goal.pagesReadToday;
 		}, 0)
 	);
+
+	activeBookIds = $derived(
+		Object.entries(this.activeBooks)
+			.sort(([, a], [, b]) => {
+				// Sort by start date, then by book title
+				const dateComparison = a.startDate.localeCompare(b.startDate);
+				if (dateComparison !== 0) return dateComparison;
+
+				const bookA = this.books[a.bookId];
+				const bookB = this.books[b.bookId];
+				if (!bookA || !bookB) return 0;
+				return bookA.title.localeCompare(bookB.title);
+			})
+			.map(([id]) => id)
+	);
 }
 
 const LIBRARY_KEY = Symbol('library');
