@@ -7,6 +7,7 @@
 		<Card.Title class="text-2xl font-bold">Aktive bøker</Card.Title>
 		<Card.Description>De bøkene du leser for tiden</Card.Description>
 	</Card.Header>
+
 	<Card.Content class="grid gap-6">
 		<slot />
 	</Card.Content>

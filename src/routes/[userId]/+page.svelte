@@ -13,8 +13,7 @@
 	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
 	import ReadBook from '$lib/components/ReadBook.svelte';
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
-	import ChosenBooksCard from '$lib/components/ChosenBooksCard.svelte';
-	import ChosenBook from '$lib/components/ChosenBook.svelte';
+	import ChosenBooks from '$lib/components/ChosenBooks.svelte';
 	import { Separator } from '$lib/components/ui/separator';
 	import GoalsCard from '$lib/components/GoalsCard.svelte';
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
@@ -73,18 +72,7 @@
 
 <ActiveBooks />
 
-{#if Object.keys(data.chosenBooks).length > 0}
-	{#key data.chosenBooks}
-		<ChosenBooksCard>
-			{#each Object.keys(data.chosenBooks) as chosenBookId, i}
-				<ChosenBook {chosenBookId} />
-				{#if i < Object.keys(data.chosenBooks).length - 1}
-					<Separator />
-				{/if}
-			{/each}
-		</ChosenBooksCard>
-	{/key}
-{/if}
+<ChosenBooks />
 
 {#if $isOwner && activeGoals.length > 0}
 	<Button onclick={() => (showAddBookModal = true)} class="mb-6">Legg til bok</Button>
