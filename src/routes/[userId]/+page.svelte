@@ -2,7 +2,7 @@
 	import { books } from '$lib/stores/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
-	import MyBooksCard from '$lib/components/MyBooksCard.svelte';
+	import MyBooks from '$lib/components/MyBooks.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { isOwner } from '$lib/stores/isOwnerStore.js';
 	import { activeBooks } from '$lib/stores/activeBooksStore';
@@ -93,13 +93,7 @@
 
 <ReadBooks />
 
-{#if Object.keys(library.books).length > 0}
-	<MyBooksCard>
-		{#each Object.values(library.books) as book}
-			<p>{book.title}</p>
-		{/each}
-	</MyBooksCard>
-{/if}
+<MyBooks />
 
 {#if isLoggedIn && $isOwner}
 	<Button onclick={() => signOut({ callbackUrl: '/' })}>Logg ut</Button>
