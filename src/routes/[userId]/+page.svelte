@@ -10,11 +10,9 @@
 	import { readBooks } from '$lib/stores/readBooksStore';
 	import { signIn, signOut } from '@auth/sveltekit/client';
 	import { goals } from '$lib/stores/goalsStore';
-	import ReadBooksCard from '$lib/components/ReadBooksCard.svelte';
-	import ReadBook from '$lib/components/ReadBook.svelte';
+	import ReadBooks from '$lib/components/ReadBooks.svelte';
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
 	import ChosenBooks from '$lib/components/ChosenBooks.svelte';
-	import { Separator } from '$lib/components/ui/separator';
 	import GoalsCard from '$lib/components/GoalsCard.svelte';
 	import FinishedGoalsCard from '$lib/components/FinishedGoalsCard.svelte';
 	import FinishedGoal from '$lib/components/FinishedGoal.svelte';
@@ -93,18 +91,7 @@
 	{/key}
 {/if}
 
-{#if Object.keys(data.readBooks).length > 0}
-	{#key data.readBooks}
-		<ReadBooksCard>
-			{#each Object.keys(data.readBooks) as readBookId, i}
-				<ReadBook {readBookId} />
-				{#if i < Object.keys(data.readBooks).length - 1}
-					<Separator />
-				{/if}
-			{/each}
-		</ReadBooksCard>
-	{/key}
-{/if}
+<ReadBooks />
 
 {#if Object.keys(library.books).length > 0}
 	<MyBooksCard>
