@@ -13,7 +13,7 @@
 		</Card.Header>
 
 		<Card.Content class="grid grid-cols-2 gap-4">
-			{#each Object.values(library.books) as book}
+			{#each Object.values(library.books).sort((a, b) => a.title.localeCompare(b.title)) as book}
 				<p>{book.title}</p>
 			{/each}
 		</Card.Content>
