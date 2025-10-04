@@ -82,9 +82,9 @@ export class Goal {
 
 	daysLeft = $derived(differenceInDays(this.deadline, new Date()));
 
-	pagesPerDay = $derived(Math.ceil((this.pagesToRead + this.pagesReadToday) / this.daysLeft));
+	pagesPerDay = $derived((this.pagesToRead + this.pagesReadToday) / this.daysLeft);
 
-	pagesPerDayTomorrow = $derived(Math.ceil(this.pagesToRead / (this.daysLeft - 1)));
+	pagesPerDayTomorrow = $derived(this.pagesToRead / (this.daysLeft - 1));
 
 	pagesLeftToday = $derived(
 		Math.min(Math.max(this.pagesPerDay - this.pagesReadToday, 0), this.pagesPerDay)
