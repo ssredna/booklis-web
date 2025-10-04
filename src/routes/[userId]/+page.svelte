@@ -1,15 +1,10 @@
 <script lang="ts">
-	import { books } from '$lib/stores/booksStore.js';
 	import CreateGoalModal from '$lib/components/CreateGoalModal.svelte';
 	import Goal from '$lib/components/Goal.svelte';
 	import MyBooks from '$lib/components/MyBooks.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { isOwner } from '$lib/stores/isOwnerStore.js';
-	import { activeBooks } from '$lib/stores/activeBooksStore';
-	import { chosenBooks } from '$lib/stores/chosenBooksStore';
-	import { readBooks } from '$lib/stores/readBooksStore';
 	import { signIn, signOut } from '@auth/sveltekit/client';
-	import { goals } from '$lib/stores/goalsStore';
 	import ReadBooks from '$lib/components/ReadBooks.svelte';
 	import AddBookModal from '$lib/components/AddBookModal.svelte';
 	import ChosenBooks from '$lib/components/ChosenBooks.svelte';
@@ -29,11 +24,6 @@
 	const library = getLibrary();
 	$: library.setLibrary(data);
 
-	$: books.set(data.books);
-	$: goals.set(data.goals);
-	$: chosenBooks.set(data.chosenBooks);
-	$: activeBooks.set(data.activeBooks);
-	$: readBooks.set(data.readBooks);
 	$: isOwner.set(data.isOwner);
 
 	$: isLoggedIn = page.data.session?.user ? true : false;
