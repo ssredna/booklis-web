@@ -50,7 +50,7 @@
 
 			<div class="grid gap-4">
 				<Label>Hvilke mål vil du legge boken til i?</Label>
-				{#each Object.values(library.goals) as goal}
+				{#each Object.values(library.activeGoals) as goal}
 					<Label>
 						<input type="checkbox" name="goalIds" value={goal.id} class="mr-2" />
 						{library.goals[goal.id].goalTitle}

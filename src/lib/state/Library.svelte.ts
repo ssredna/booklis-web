@@ -93,6 +93,10 @@ class Library {
 			})
 			.map(([id]) => id)
 	);
+
+	activeGoals = $derived(
+		Object.values(this.goals).filter((goal) => goal.readBooks.length < goal.numberOfBooks)
+	);
 }
 
 const LIBRARY_KEY = Symbol('library');
