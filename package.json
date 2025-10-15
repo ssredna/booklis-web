@@ -51,7 +51,7 @@
 		"dateformat": "^5.0.3",
 		"firebase": "^12.3.0",
 		"formsnap": "^2.0.1",
-		"sveltekit-superforms": "^2.27.2",
+		"sveltekit-superforms": "^2.27.4",
 		"tailwindcss-animate": "^1.0.7",
 		"zod": "^3.25.76"
 	}
